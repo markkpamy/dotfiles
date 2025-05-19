@@ -1,0 +1,18 @@
+# .gitleaksignore
+# This file contains patterns of secrets that should be ignored by gitleaks
+# Use this file to suppress false positives or known safe values
+
+# Example entries:
+# 4fb0f85fa2e2c961a6e8e2b6e7b2d4c3e5f6a7b8  # Allow specific hash
+# some-file.txt:generic-api-key:42             # Allow line 42 in some-file.txt
+# *.md:generic-password                        # Allow generic-password rule in all markdown files
+
+# Common false positives:
+# - Example API keys in documentation
+# - Test values and placeholders
+# - Non-sensitive configuration values
+
+# Format: [file-pattern]:[rule-id]:[line-number]
+# Or just: [hash-of-secret]
+
+# Add specific ignores below:

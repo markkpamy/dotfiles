@@ -1,0 +1,95 @@
+# Pre-commit configuration
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: destroyed-symlinks
+      - id: fix-byte-order-marker
+      #- id: mixed-line-ending
+      - id: check-executables-have-shebangs
+  #      - id: check-shebang-scripts-are-executable
+
+  # Gitleaks for secret detection
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.26.0
+    hooks:
+      - id: gitleaks
+
+  # GitGuardian Secret Scan
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.39.0
+    hooks:
+      - id: ggshield
+        language_version: python3
+        stages: [pre-commit]
+
+  # YAML formatting and linting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types: [yaml]
+
+  # Shell script linting
+  #  - repo: https://github.com/koalaman/shellcheck-precommit
+  #    rev: v0.10.0
+  #    hooks:
+  #      - id: shellcheck
+  #        args: ["--severity=warning"]
+
+  # PowerShell script analysis (Windows)
+  #  - repo: local
+  #    hooks:
+  #      - id: powershell-analysis
+  #        name: PowerShell Script Analysis
+  #        entry: pwsh
+  #        args: ["-Command", "Invoke-ScriptAnalyzer", "-Path"]
+  #        language: system
+  #        files: \.ps1$
+  #        stages: [commit]
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.45.0
+    hooks:
+      - id: markdownlint-fix
+        args: ["--disable", "MD013", "MD033"]
+
+  # Git commit message linting
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.7.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+# Configuration for specific hooks
+default_language_version:
+  python: python3
+
+# Exclude certain files/directories
+exclude: |
+  (?x)^(
+    .*\.min\.js|
+    .*\.min\.css|
+    \.git/.*|
+    node_modules/.*|
+    vendor/.*|
+    .*/migrations/.*|
+    .*/__pycache__/.*
+  )$

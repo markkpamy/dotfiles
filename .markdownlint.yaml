@@ -1,0 +1,26 @@
+# Markdownlint configuration
+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Disable specific rules
+MD013: false # Line length - often too restrictive for documentation
+MD033: false # Inline HTML - useful for GitHub-flavored markdown
+MD041: false # First line in file should be a top level header
+
+# Configure specific rules
+MD003:
+  style: "atx" # Use # style headers
+
+MD007:
+  indent: 2 # Unordered list indentation
+
+MD025:
+  front_matter_title: "" # Allow multiple H1 if front matter exists
+
+MD029:
+  style: "ordered" # Use 1. 2. 3. for ordered lists
+
+# Files to ignore
+ignore:
+  - "node_modules/"
+  - ".git/"
+  - "*.min.*"

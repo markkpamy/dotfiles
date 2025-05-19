@@ -1,0 +1,20 @@
+pkgs:
+  ubuntu:
+    repositories:
+      - 'ppa:neovim-ppa/stable'
+
+    pkgs:
+      # CLI tools
+      - '7zip' # yazi requirements
+      - 'fd-find' # yazi requirements
+      - 'ffmpeg' # yazi requirements
+      - 'imagemagick' # yazi requirements
+      - 'poppler-utils' # yazi requirements
+      - 'docker-ce'
+      - 'docker-ce-cli'
+      - 'containerd.io'
+      - 'docker-buildx-plugin'
+      - 'docker-compose-plugin'
+    #      - 'elinks'
+    oneScriptInstall:
+      #- 'https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh'

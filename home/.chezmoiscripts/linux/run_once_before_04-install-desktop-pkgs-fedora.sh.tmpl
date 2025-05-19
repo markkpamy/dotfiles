@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# Install desktop packages for Fedora/RHEL-based systems
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+{{ if and (eq .chezmoi.os "linux") (or (eq .chezmoi.osRelease.id "fedora") (eq .chezmoi.osRelease.id "rhel") (eq .chezmoi.osRelease.id "centos") (eq .chezmoi.osRelease.id "rocky") (eq .chezmoi.osRelease.id "alma")) .isDesktop -}}
+# Only execute on Fedora/RHEL-based desktop systems
+
+set -eufo pipefail
+
+print_header "Fedora Desktop Package Installation" "Installing desktop packages for Fedora/RHEL-based systems" "$ICON_PACKAGE"
+
+# Add RPM Fusion repositories for Fedora if not already enabled
+if [ "{{ .chezmoi.osRelease.id }}" = "fedora" ]; then
+    print_section "Repository Configuration" "$ICON_CONFIG"
+
+    if ! dnf repolist | grep -q "rpmfusion-free"; then
+        print_action "Adding" "RPM Fusion Free repository" "$ICON_CONFIG"
+        sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+    fi
+
+    if ! dnf repolist | grep -q "rpmfusion-nonfree"; then
+        print_action "Adding" "RPM Fusion NonFree repository" "$ICON_CONFIG"
+        sudo dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    fi
+
+    print_success "Repositories configured successfully"
+fi
+
+print_section "Common Desktop Packages" "$ICON_PACKAGE"
+print_action "Installing" "common desktop packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.common -}}
+  {{ . }} \
+  {{ end -}}
+
+# Install desktop environment specific packages
+{{ if eq .desktopEnv "gnome" -}}
+print_section "GNOME Packages" "$ICON_CONFIG"
+print_action "Installing" "GNOME-specific packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.gnome -}}
+  {{ . }} \
+  {{ end -}}
+{{ else if eq .desktopEnv "kde" -}}
+print_section "KDE Packages" "$ICON_CONFIG"
+print_action "Installing" "KDE-specific packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.kde -}}
+  {{ . }} \
+  {{ end -}}
+{{ else if eq .desktopEnv "xfce" -}}
+print_section "Xfce Packages" "$ICON_CONFIG"
+print_action "Installing" "Xfce-specific packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.xfce -}}
+  {{ . }} \
+  {{ end -}}
+{{ else if eq .desktopEnv "cinnamon" -}}
+print_section "Cinnamon Packages" "$ICON_CONFIG"
+print_action "Installing" "Cinnamon-specific packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.cinnamon -}}
+  {{ . }} \
+  {{ end -}}
+{{ else if eq .desktopEnv "mate" -}}
+print_section "MATE Packages" "$ICON_CONFIG"
+print_action "Installing" "MATE-specific packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.mate -}}
+  {{ . }} \
+  {{ end -}}
+{{ else if eq .desktopEnv "i3" -}}
+print_section "i3 Packages" "$ICON_CONFIG"
+print_action "Installing" "i3-specific packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.i3 -}}
+  {{ . }} \
+  {{ end -}}
+{{ else if eq .desktopEnv "sway" -}}
+print_section "Sway Packages" "$ICON_CONFIG"
+print_action "Installing" "Sway-specific packages" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.sway -}}
+  {{ . }} \
+  {{ end -}}
+{{ end -}}
+
+print_section "Desktop Themes" "$ICON_CONFIG"
+print_action "Installing" "desktop themes" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.themes -}}
+  {{ . }} \
+  {{ end -}}
+
+print_section "Additional Fonts" "$ICON_FONT"
+print_action "Installing" "additional fonts" "$ICON_FONT"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.fonts -}}
+  {{ . }} \
+  {{ end -}}
+
+print_section "Desktop Utilities" "$ICON_CONFIG"
+print_action "Installing" "desktop utilities" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.utilities -}}
+  {{ . }} \
+  {{ end -}}
+
+print_section "Multimedia Applications" "$ICON_PACKAGE"
+print_action "Installing" "multimedia applications" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.multimedia -}}
+  {{ . }} \
+  {{ end -}}
+
+print_section "Development Tools" "$ICON_PACKAGE"
+print_action "Installing" "development tools" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.development -}}
+  {{ . }} \
+  {{ end -}}
+
+print_section "Productivity Applications" "$ICON_PACKAGE"
+print_action "Installing" "productivity applications" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.productivity -}}
+  {{ . }} \
+  {{ end -}}
+
+print_section "Communication Applications" "$ICON_PACKAGE"
+print_action "Installing" "communication applications" "$ICON_INSTALL"
+sudo dnf install -y \
+  {{ range .pkgs.linuxDesktop.communication -}}
+  {{ . }} \
+  {{ end -}}
+
+print_success "Desktop packages installation completed for Fedora/RHEL!"
+print_footer "Fedora Desktop Package Installation" "completed"
+
+{{ else }}
+print_header "Fedora Desktop Package Installation" "Skipping - not a Fedora/RHEL-based desktop system" "$ICON_PACKAGE"
+print_warning "This script is designed for Fedora/RHEL-based desktop systems only"
+print_footer "Fedora Desktop Package Installation" "skipped"
+{{ end -}}

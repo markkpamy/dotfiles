@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "Shell Change" "Setting Fish as default shell" "$ICON_CONFIG"
+
+if [[ "$SHELL" =~ .*fish$ ]]; then
+  print_success "Fish shell is already set as default"
+  print_footer "Shell Change" "completed"
+  exit 0
+fi
+
+print_section "Shell Configuration" "$ICON_CONFIG"
+
+print_action "Changing" "default shell to Fish" "$ICON_CONFIG"
+chsh -s "$(which fish)"
+
+print_success "Default shell changed to Fish!"
+print_info "Please log out and log back in to use the new shell"
+
+print_footer "Shell Change" "completed"

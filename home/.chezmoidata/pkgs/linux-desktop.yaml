@@ -1,0 +1,149 @@
+# Linux Desktop Packages Configuration
+# This file defines desktop-specific packages for different Linux distributions and environments
+
+pkgs:
+  linuxDesktop:
+    common: # Packages installed on all desktop systems
+      - firefox
+      - vlc
+      - libreoffice
+      - neofetch
+      - flameshot # Screenshot tool
+      - tabby-terminal
+
+    gnome: # GNOME-specific packages
+    #      - gnome-tweaks
+    #      - gnome-shell-extensions
+    #      - dconf-editor
+    #      - gnome-themes-extra
+
+    kde: # KDE-specific packages
+    #      - plasma-discover
+    #      - kde-spectacle
+    #      - kdeconnect
+    #      - kvantum-theme-materia
+
+    xfce: # XFCE-specific packages
+    #      - xfce4-whiskermenu-plugin
+    #      - xfce4-goodies
+    #      - xfce4-pulseaudio-plugin
+
+    cinnamon: # Cinnamon-specific packages
+    #      - cinnamon-control-center
+    #      - nemo-fileroller
+    #      - mint-themes
+
+    mate: # MATE-specific packages
+    #      - mate-tweak
+    #      - mate-menu
+    #      - mate-themes
+
+    i3: # i3 window manager packages
+    #      - i3status
+    #      - i3blocks
+    #      - polybar
+    #      - rofi
+
+    sway: # Sway window manager packages
+    #      - swaylock
+    #      - waybar
+    #      - wofi
+
+    themes: # Theme and appearance packages
+    #      - papirus-icon-theme
+    #      - arc-theme
+    #      - materia-gtk-theme
+    #      - breeze-cursor-theme
+    #      - fonts-font-awesome
+
+    fonts: # Font packages
+    #      - fonts-firacode
+    #      - fonts-jetbrains-mono
+    #      - fonts-noto
+    #      - fonts-roboto
+    #      - fonts-hack-ttf
+    #      - fonts-liberation
+
+    utilities: # Desktop utility packages
+    #      - gparted             # Partition editor
+    #      - timeshift           # System backup
+    #      - baobab              # Disk usage analyzer
+    #      - gnome-disk-utility  # Disk management
+    #      - catfish             # File search
+    #      - syncthing           # File synchronization
+    #      - xclip               # X11 clipboard tool
+    #      - wl-clipboard        # Wayland clipboard tool
+    #      - rsync               # File synchronization
+    #      - unrar               # RAR archive support
+    #      - unzip               # ZIP archive support
+    #      - p7zip-full          # 7zip archive support
+
+    multimedia: # Multimedia applications
+    #      - gimp                # Image editor
+    #      - inkscape            # Vector graphics editor
+    #      - audacity            # Audio editor
+    #      - obs-studio          # Screen recording/streaming
+    #      - mpv                 # Video player
+    #      - ffmpeg              # Media converter
+
+    development: # Development tools
+    #      - meld                # Diff tool
+    #      - dbeaver-ce          # Database tool
+    #      - gitg                # Git GUI
+    #      - vscode              # Code editor
+    #      - sublime-text        # Text editor
+
+    productivity: # Productivity applications
+    #      - zotero              # Research assistant
+    #      - calibre             # E-book manager
+    #      - pdfarranger         # PDF editor
+    #      - zathura             # PDF viewer
+    #      - xournalpp           # PDF annotation
+
+    communication: # Communication apps
+    #      - telegram-desktop
+    #      - discord
+    #      - signal-desktop
+    #      - slack-desktop
+
+    flatpak: # Applications to install via Flatpak
+      common:
+        #        - com.spotify.Client
+        #        - com.slack.Slack
+        #        - org.kde.krita
+        #        - com.discordapp.Discord
+        - org.localsend.localsend_app
+        - md.obsidian.Obsidian
+        - com.quexten.Goldwarden
+        - com.bitwarden.desktop
+        - org.remmina.Remmina
+        - net.devolutions.RDM
+        - org.libreoffice.LibreOffice
+        - com.discordapp.Discord
+        - io.github.zefr0x.hashes
+        - dev.skynomads.Seabird
+
+      debian: # Debian/Ubuntu-specific Flatpaks
+      #        - org.gimp.GIMP
+      #        - com.visualstudio.code
+      #        - com.jetbrains.IntelliJ-IDEA-Community
+
+      arch: # Arch-specific Flatpaks
+    #        - com.visualstudio.code
+    #        - com.obsproject.Studio
+    #        - org.blender.Blender
+
+    snap: # Applications to install via Snap
+      common:
+        - raindrop
+        - postman
+        - insomnia
+      #        - bitwarden
+      #        - postman
+      #        - spotify
+
+      ubuntu: # Ubuntu-specific snaps
+        - 'code --classic'
+        - 'intellij-idea-ultimate --classic'
+        - 'powershell --classic'
+#        - intellij-idea-community

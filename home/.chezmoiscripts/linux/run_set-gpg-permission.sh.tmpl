@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "GPG Permissions Setup" "Setting correct permissions for GPG directory" "$ICON_CONFIG"
+
+print_section "Permission Configuration" "$ICON_CONFIG"
+
+print_action "Setting" "GPG directory ownership" "$ICON_CONFIG"
+chown -R "$(whoami)" ~/.gnupg/
+
+print_action "Setting" "directory permissions (700)" "$ICON_CONFIG"
+find ~/.gnupg -type d -exec chmod 700 {} \;
+
+print_action "Setting" "file permissions (600)" "$ICON_CONFIG"
+find ~/.gnupg -type f -exec chmod 600 {} \;
+
+print_success "GPG permissions configured successfully!"
+print_footer "GPG Permissions Setup" "completed"

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "Custom Package Installation" "Installing additional tools and utilities" "$ICON_INSTALL"
+
+# Set total steps for progress tracking
+set_total_steps 3
+
+#################################################################################
+# Step 1: CLI SNAP TOOLS
+#################################################################################
+
+print_step 1 "Snap Tools Installation"
+
+snap_packages=("fast" "speedtest")
+
+for i in "${!snap_packages[@]}"; do
+    pkg="${snap_packages[$i]}"
+    print_progress $((i+1)) ${#snap_packages[@]} "Installing: $pkg"
+    sudo snap install "$pkg"
+done
+
+#################################################################################
+# Step 2: INSTALL FROM SOURCES
+#################################################################################
+
+print_step 2 "Source Installations"
+
+print_action "Installing" "krew plugin: rook-ceph" "$ICON_INSTALL"
+kubectl krew install rook-ceph
+
+#################################################################################
+# Step 3: Final cleanup
+#################################################################################
+
+print_step 3 "Installation Complete"
+print_success "All custom packages installed successfully!"
+
+print_footer "Custom Package Installation" "completed"

@@ -1,0 +1,142 @@
+# vim:ft=gitignore.chezmoitmpl
+
+##########################################
+# Platform-specific scripts and binaries
+
+{{- if ne .chezmoi.os "linux" }}
+    .chezmoiscripts/linux/**
+{{- end }}
+
+{{- if ne .osId "windows" }}
+    .chezmoiscripts/windows/**
+    .local/bin/*.bat
+    .local/bin/*.reg
+    .local/bin/*.ps1
+{{- end }}
+
+{{- if ne .osId "darwin" }}
+    .chezmoiscripts/darwin/**
+{{- end }}
+
+{{- if eq .osId "windows" }}
+    .chezmoiscripts/unix/**
+    .local/bin/*.sh
+{{- end }}
+
+
+
+##########################################
+# Windows-specific exclusions
+
+{{- if eq .osId "windows" }}
+    .config/Code/
+    .config/bat/
+    .config/crontab/**
+    .config/fd/
+    .config/gdu/
+    .config/kanata/
+    .config/kitty/**
+    .config/lazygit/
+    .config/rclone/**
+    .config/vlc/
+
+    .font/
+    .npm-global/
+
+    .tmux.conf
+    .zprofile
+    .zshenv
+    .zshrc
+    .zshenv_private
+    .zsh_history
+
+    # Optional: Exclude Kubernetes config on Windows
+    # .kube/config
+{{- else }}
+
+    ##########################################
+    # Non-Windows (likely Linux/macOS) exclusions
+
+    .config/autohotkey/**
+    .config/komorebi/
+    .config/microsoft-office/
+    .config/scoop/**
+    .config/whkdrc/
+    .config/windows-tasks-scheduler/
+    .config/xinmeng/
+    .config/yasb/
+    AppData/**
+    Documents/**
+
+    .vsvimrc
+    .wslconfig
+{{- end }}
+
+##########################################
+# Non-Linux-specific configs
+
+{{- if ne .chezmoi.os "linux" }}
+    .gtkrc-2.0.mine
+    .config/.ktrashrc
+    .config/.trashrc
+    .config/brave-flags.conf
+    .config/chrome-flags.conf
+    .config/chromium-flags.conf
+    .config/code-flags.conf
+    .config/dolphinrc
+    .config/electron-flags.conf
+    .config/kdeglobals
+    .config/libinput-gestures.conf
+    .config/mimeapps.list
+    .config/spotify-flags.conf
+
+    .config/fcitx5/**
+    .config/gammastep/
+    .config/hypr/**
+    .config/sddm/
+    .config/systemd/**
+    .config/tlp/
+{{- end }}
+
+##########################################
+# Desktop environment-specific exclusions
+
+{{- if not .isDesktop }}
+    # Ignore desktop configuration files on non-desktop systems
+    .config/mimeapps.list
+    .local/share/applications/
+{{- end }}
+
+{{- if .isDesktop }}
+    # Ignore desktop environment-specific files that don't match current DE
+    {{- if ne .desktopEnv "gnome" }}
+    .config/gnome-*
+    .config/dconf/
+    {{- end }}
+
+    {{- if ne .desktopEnv "kde" }}
+    .config/kde*
+    .config/plasma*
+    .config/KDE/
+    {{- end }}
+
+    {{- if ne .desktopEnv "xfce" }}
+    .config/xfce4/
+    {{- end }}
+
+    {{- if ne .desktopEnv "cinnamon" }}
+    .config/cinnamon/
+    {{- end }}
+
+    {{- if ne .desktopEnv "mate" }}
+    .config/mate/
+    {{- end }}
+
+    {{- if ne .desktopEnv "i3" }}
+    .config/i3/
+    {{- end }}
+
+    {{- if ne .desktopEnv "sway" }}
+    .config/sway/
+    {{- end }}
+{{- end }}

@@ -1,0 +1,223 @@
+{{/* Default static values */}}
+{{- writeToStdout "==== SETTING CHEZMOI CONFIG ====\n" -}}
+{{ $gpgId := "80F43975A84EAC1F" }}
+{{/*TODO*/}}
+{{ $agePubKey := "age14xt22jc4d8p4t5sc7k0fnsy7fuxcgy464rrgkfzt2z2mmmzy835qpkckhd" }}
+{{ $sshId := "" }}
+{{ if stat (joinPath .chezmoi.homeDir ".ssh/id_ed25519.pub") }}
+  {{ $sshId = include (joinPath .chezmoi.homeDir ".ssh/id_ed25519.pub") | trim }}
+{{ end }}
+{{ $themes := list
+     "dark"
+     "light"
+}}
+
+{{/* Default dynamic values */}}
+
+{{ $shell := "bash" }}
+{{ $terminalFontSize := 13 }}
+{{ $terminalBlur := "1" }}
+{{ $theme := "dark" }}
+{{ $installScoopPackages := false }}
+{{ $installChocoPackages := false }}
+{{ $installPythonPackages := true }}
+{{ $isDesktop := false }}
+{{ $desktopEnv := "none" }}
+
+{{/* Access token handling */}}
+{{ $accessToken := env "BWS_ACCESS_TOKEN" }}
+{{ if not $accessToken }}
+  {{ $accessToken = promptString "Bitwarden access token not found in environment. Please enter it" }}
+{{ end }}
+
+{{/* Pre auto */}}
+
+{{ $osId := .chezmoi.os }}
+{{ if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) }}
+  {{ $osId = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id }}
+{{ end }}
+
+{{ if eq $osId "windows" }}
+  {{ $shell = "pwsh" }}
+  {{/* Prompt for Scoop package installation if running interactively */}}
+  {{ $installScoopPackages = promptBool "Install Scoop packages? This may take some time" $installScoopPackages }}
+  {{/* Prompt for Choco package installation if running interactively */}}
+  {{ $installChocoPackages = promptBool "Install Choco packages? This may take some time" $installChocoPackages }}
+  {{/* Prompt for Python package installation if running interactively */}}
+  {{ $installPythonPackages = promptBool "Install Python packages (pip and pipx)? This may take some time" $installPythonPackages }}
+{{ else if eq .chezmoi.os "linux" }}
+  {{/* Try to detect current shell on Linux */}}
+  {{ $envShell := env "SHELL" }}
+  {{ if $envShell }}
+    {{ $detectedShell := output "basename" $envShell | trim }}
+    {{ if eq $detectedShell "fish" }}
+      {{ $shell = "fish" }}
+      {{- writeToStdout "Detected shell is fish\n" -}}
+    {{ else if eq $detectedShell "zsh" }}
+      {{ $shell = "zsh" }}
+      {{- writeToStdout "Detected shell is zsh\n" -}}
+    {{ else if eq $detectedShell "bash" }}
+      {{ $shell = "bash" }}
+      {{- writeToStdout "Detected shell is bash\n" -}}
+    {{ end }}
+  {{ else }}
+    {{ $shell = promptString "Which shell do you use? (bash/zsh/fish)" "bash" }}
+  {{ end }}
+  {{/* Prompt for Python package installation if running interactively */}}
+  {{ $installPythonPackages = promptBool "Install Python packages (pip and pipx)? This may take some time" $installPythonPackages }}
+  {{/* Check XDG_CURRENT_DESKTOP (primary method) */}}
+  {{ $xdgCurrentDesktop := env "XDG_CURRENT_DESKTOP" }}
+  {{ if $xdgCurrentDesktop }}
+    {{ $isDesktop = true }}
+    {{ $parts := splitList ":" (lower $xdgCurrentDesktop) }}
+    {{ $currentDesktop := $xdgCurrentDesktop | lower }}
+    {{ if gt (len $parts) 1 }}
+      {{ $currentDesktop = index $parts 1 }}
+    {{ else }}
+      {{ $currentDesktop = lower $xdgCurrentDesktop }}
+    {{ end }}
+    {{ if eq $currentDesktop "gnome" }}
+      {{ $desktopEnv = "gnome" }}
+    {{ else if eq $currentDesktop "kde" }}
+      {{ $desktopEnv = "kde" }}
+    {{ else if eq $currentDesktop "xfce" }}
+      {{ $desktopEnv = "xfce" }}
+    {{ else if eq $currentDesktop "cinnamon" }}
+      {{ $desktopEnv = "cinnamon" }}
+    {{ else if eq $currentDesktop "mate" }}
+      {{ $desktopEnv = "mate" }}
+    {{ else if eq $currentDesktop "lxde" }}
+      {{ $desktopEnv = "lxde" }}
+    {{ else if eq $currentDesktop "lxqt" }}
+      {{ $desktopEnv = "lxqt" }}
+    {{ else if eq $currentDesktop "budgie" }}
+      {{ $desktopEnv = "budgie" }}
+    {{ else if eq $currentDesktop "deepin" }}
+      {{ $desktopEnv = "deepin" }}
+    {{ else if contains $currentDesktop "gnome" }}
+      {{ $desktopEnv = "gnome" }}
+    {{ else if contains $currentDesktop "unity" }}
+      {{ $desktopEnv = "unity" }}
+    {{ else if contains $currentDesktop "i3" }}
+      {{ $desktopEnv = "i3" }}
+    {{ else if contains $currentDesktop "sway" }}
+      {{ $desktopEnv = "sway" }}
+    {{ else }}
+      {{ $desktopEnv = $currentDesktop }}
+    {{ end }}
+
+    {{ writeToStdout (printf "Detected desktop environment from XDG_CURRENT_DESKTOP: %s\n" $desktopEnv) }}
+  {{ else }}
+    {{/* Check DESKTOP_SESSION (secondary method) */}}
+    {{ $desktopSession := env "DESKTOP_SESSION" }}
+    {{ if $desktopSession }}
+      {{ $isDesktop = true }}
+      {{ $session := $desktopSession | lower }}
+
+      {{ if or (eq $session "gnome") (contains $session "gnome") (contains $session "ubuntu") }}
+        {{ $desktopEnv = "gnome" }}
+      {{ else if or (eq $session "kde") (contains $session "kde") (contains $session "plasma") }}
+        {{ $desktopEnv = "kde" }}
+      {{ else if or (eq $session "xfce") (contains $session "xfce") }}
+        {{ $desktopEnv = "xfce" }}
+      {{ else if or (eq $session "cinnamon") (contains $session "cinnamon") }}
+        {{ $desktopEnv = "cinnamon" }}
+      {{ else if or (eq $session "mate") (contains $session "mate") }}
+        {{ $desktopEnv = "mate" }}
+      {{ else if or (eq $session "lxde") (contains $session "lxde") }}
+        {{ $desktopEnv = "lxde" }}
+      {{ else if or (eq $session "lxqt") (contains $session "lxqt") }}
+        {{ $desktopEnv = "lxqt" }}
+      {{ else if contains $session "budgie" }}
+        {{ $desktopEnv = "budgie" }}
+      {{ else if contains $session "deepin" }}
+        {{ $desktopEnv = "deepin" }}
+      {{ else if contains $session "i3" }}
+        {{ $desktopEnv = "i3" }}
+      {{ else if contains $session "sway" }}
+        {{ $desktopEnv = "sway" }}
+      {{ else }}
+        {{ $desktopEnv = $session }}
+      {{ end }}
+
+      {{ writeToStdout (printf "Detected desktop environment from DESKTOP_SESSION: %s\n" $desktopEnv) }}
+    {{ else }}
+      {{ if eq .chezmoi.os "linux" }}
+        {{ if (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
+          {{ writeToStdout "Running on WSL (Windows Subsystem for Linux), assuming not a desktop environment\n" }}
+        {{ else }}
+          {{ $hasDisplayEnv := env "DISPLAY" }}
+          {{ $hasWaylandEnv := env "WAYLAND_DISPLAY" }}
+          {{ if or $hasDisplayEnv $hasWaylandEnv }}
+            {{ $isDesktop = true }}
+            {{ $desktopEnv = "unknown" }}
+            {{ writeToStdout "Display server detected but couldn't determine desktop environment\n" }}
+          {{ else }}
+            {{ writeToStdout "No display server detected, assuming not a desktop environment\n" }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+encryption = "age" # or gpg
+mode = "file" # file, symlink
+progress = true
+
+[data]
+terminalFontSize = {{ $terminalFontSize }}
+terminalBlur = {{ $terminalBlur }}
+gpgId = {{ $gpgId | quote }}
+sshId = {{ $sshId | quote }}
+osId = {{ $osId | quote }}
+name = "Mark Kpamy"
+email = "markkpamy@gmail.com"
+shell = {{ $shell | quote }}
+installScoopPackages = {{ $installScoopPackages }}
+installChocoPackages = {{ $installChocoPackages }}
+installPythonPackages = {{ $installPythonPackages }}
+accessToken = {{ $accessToken | quote }}
+isDesktop = {{ $isDesktop }}
+desktopEnv = {{ $desktopEnv | quote }}
+
+# Kubernetes configuration
+kubectx = "default"
+kubeClusterName = "talos"
+kubeServer = "https://192.168.1.12:6443"
+kubeNamespace = "default"
+kubeUserName = "admin@talos"
+# These values will be retrieved from individual Bitwarden secure notes:
+# - k8s-talos-certificate-authority-data
+# - k8s-talos-client-certificate-data
+# - k8s-talos-client-key-data
+
+
+[age]
+identity = "~/.age-key.txt"
+recipient = {{ $agePubKey | quote }}
+
+[gpg]
+recipient = {{ $gpgId | quote }}
+args = ["--quiet"]
+
+[git]
+autoAdd = true # Add changes to the source state after any change
+autoCommit = false
+autoPush = false
+
+[completion]
+custom = true
+
+[edit]
+command = "nvim"
+
+[diff]
+command = "delta"
+pager = "delta"
+args = ["--paging=never"]
+
+[merge]
+command = "nvim"
+args = ["-d", "{{ "{{" }} .Destination {{ "}}" }}", "{{ "{{" }} .Source {{ "}}" }}", "{{ "{{" }} .Target {{ "}}" }}"]
+{{- writeToStdout "==== END CHEZMOI CONFIG ====\n" -}}

@@ -1,0 +1,205 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+# Script to install Bitwarden Secrets Manager CLI
+# This script detects the OS and architecture and installs the appropriate version
+
+set -e
+
+print_header "Bitwarden Secrets Manager CLI Installation" "Installing BWS CLI for secrets management" "$ICON_CONFIG"
+
+#LATEST_VERSION=$(curl -s https://api.github.com/repos/bitwarden/sdk/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | cut -c 2-)
+LATEST_VERSION="1.0.0"
+INSTALL_DIR="$HOME/.local/bin"
+TEMP_DIR=$(mktemp -d)
+LOG_FILE="/tmp/bws-install.log"
+
+# Function to log messages
+log() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Clean up on exit
+cleanup() {
+  print_action "Cleaning up" "temporary files" "$ICON_CONFIG"
+  rm -rf "$TEMP_DIR"
+}
+trap cleanup EXIT
+
+print_section "Environment Check" "$ICON_CHECK"
+
+# Detect OS and architecture
+detect_os_arch() {
+  OS=""
+  ARCH=""
+
+  # Detect OS
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    OS="linux"
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    OS="macos"
+  else
+    print_error "Unsupported operating system: $OSTYPE"
+    exit 1
+  fi
+
+  # Detect architecture
+  local machine=$(uname -m)
+  if [[ "$machine" == "x86_64" ]]; then
+    ARCH="x86_64"
+  elif [[ "$machine" == "arm64" || "$machine" == "aarch64" ]]; then
+    ARCH="aarch64"
+  else
+    print_error "Unsupported architecture: $machine"
+    exit 1
+  fi
+
+  print_success "Detected OS: $OS, Architecture: $ARCH"
+}
+
+# Install Bitwarden Secrets Manager CLI
+install_bws() {
+  local version="$LATEST_VERSION"
+  local download_url=""
+  local filename=""
+
+  if [[ "$OS" == "linux" ]]; then
+    filename="bws-$ARCH-unknown-$OS-gnu-${version}.zip"
+    download_url="https://github.com/bitwarden/sdk/releases/download/bws-v${version}/$filename"
+  elif [[ "$OS" == "macos" ]]; then
+    echo ""
+#    filename="bws-$OS-$ARCH.zip"
+#    download_url="https://github.com/bitwarden/sdk/releases/download/bws-v${version}/$filename"
+  fi
+
+  print_section "Download and Installation" "$ICON_DOWNLOAD"
+  print_action "Downloading" "Bitwarden Secrets Manager CLI v${version}" "$ICON_DOWNLOAD"
+  log "Download URL: $download_url"
+
+  # Check if curl or wget is available
+  if command_exists curl; then
+    curl -L "$download_url" -o "$TEMP_DIR/$filename"
+  elif command_exists wget; then
+    wget -q "$download_url" -O "$TEMP_DIR/$filename"
+  else
+    print_error "Neither curl nor wget is installed. Please install one of them and try again."
+    exit 1
+  fi
+
+  print_action "Extracting" "package" "$ICON_INSTALL"
+  # Check if unzip is available
+  if ! command_exists unzip; then
+    print_error "unzip is not installed. Please install unzip and try again."
+    exit 1
+  fi
+
+  unzip -q "$TEMP_DIR/$filename" -d "$TEMP_DIR"
+
+  # Ensure the installation directory exists and we have permission to write to it
+  if [[ ! -d "$INSTALL_DIR" ]]; then
+    if [[ "$EUID" -eq 0 ]]; then
+      mkdir -p "$INSTALL_DIR"
+    else
+      print_error "Installation directory $INSTALL_DIR does not exist and you don't have permission to create it."
+      print_info "Please run this script with sudo or create the directory manually."
+      exit 1
+    fi
+  fi
+
+  # Check if we have permission to write to the installation directory
+  if [[ ! -w "$INSTALL_DIR" ]]; then
+    print_error "You don't have permission to write to $INSTALL_DIR"
+    print_info "Please run this script with sudo."
+    exit 1
+  fi
+
+  print_action "Installing" "BWS CLI to $INSTALL_DIR" "$ICON_INSTALL"
+  cp "$TEMP_DIR/bws" "$INSTALL_DIR/"
+  chmod +x "$INSTALL_DIR/bws"
+
+  # Verify installation
+  if command_exists bws; then
+    print_success "Bitwarden Secrets Manager CLI has been successfully installed!"
+    print_info "Version: $(bws --version)"
+  else
+    print_error "Installation failed. Please check your PATH and try again."
+    exit 1
+  fi
+}
+
+# Check for required tools
+check_requirements() {
+  local missing_tools=()
+
+  if ! command_exists curl && ! command_exists wget; then
+    missing_tools+=("curl or wget")
+  fi
+
+  if ! command_exists unzip; then
+    missing_tools+=("unzip")
+  fi
+
+  if [[ ${#missing_tools[@]} -gt 0 ]]; then
+    print_error "Required tools are missing: ${missing_tools[*]}"
+    print_info "Please install them and try again."
+    exit 1
+  fi
+
+  print_success "All required tools are available"
+}
+
+# Create config file
+create_config_file() {
+  print_section "Configuration" "$ICON_CONFIG"
+  print_action "Creating" "BWS configuration file" "$ICON_CONFIG"
+
+  # Determine config directory
+  local config_dir=""
+  if [[ "$OS" == "linux" ]]; then
+    config_dir="$HOME/.config/bws"
+  elif [[ "$OS" == "macos" ]]; then
+    echo ""
+#    config_dir="$HOME/Library/Application Support/Bitwarden Secrets Manager"
+  fi
+
+  # Create config directory if it doesn't exist
+  if [[ ! -d "$config_dir" ]]; then
+    mkdir -p "$config_dir"
+  fi
+
+  local config_file="$config_dir/config"
+
+  # Write config file
+  cat > "$config_file" << EOF
+[profiles.default]
+server_api = "https://api.bitwarden.eu"
+server_identity = "https://identity.bitwarden.eu"
+EOF
+
+  print_success "Configuration file created at: $config_file"
+  print_info "Configuration set to use Bitwarden EU servers"
+}
+
+# Main function
+main() {
+  check_requirements
+  detect_os_arch
+  install_bws
+  create_config_file
+
+  print_success "BWS CLI installation completed successfully!"
+  print_info "You can now use the 'bws' command"
+  print_info "For more information, visit: https://bitwarden.com/help/secrets-manager-cli/"
+}
+
+# Run the main function
+main
+
+print_footer "Bitwarden Secrets Manager CLI Installation" "completed"

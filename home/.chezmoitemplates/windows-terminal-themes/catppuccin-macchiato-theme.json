@@ -1,0 +1,15 @@
+{
+  "name": "Catppuccin Macchiato",
+  "tab": {
+    "background": "#24273AFF",
+    "showCloseButton": "always",
+    "unfocusedBackground": null
+  },
+  "tabRow": {
+    "background": "#1E2030FF",
+    "unfocusedBackground": "#181926FF"
+  },
+  "window": {
+    "applicationTheme": "dark"
+  }
+}

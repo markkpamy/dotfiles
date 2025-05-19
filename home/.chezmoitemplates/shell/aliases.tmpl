@@ -1,0 +1,143 @@
+# Common aliases for both Bash and Fish
+{{ if eq .chezmoi.os "linux" -}}
+# Linux-specific aliases
+alias ls="eza"
+{{ end -}}
+
+# General aliases
+alias cr='clear'
+alias du="dust"
+alias df="duf"
+alias lzg='lazygit'
+alias lzd='lazydocker'
+alias z='zoxide'
+alias cat='bat'
+alias bc='bc -l'
+alias h='history | nl'
+
+# Docker compose aliases
+# Start the docker-compose stack in the current directory
+alias dcu="docker compose up -d"
+
+# Start the docker-compose stack in the current directory and rebuild the images
+alias dcub="docker-compose up -d --build"
+
+# Stop, delete (down) or restart the docker-compose stack in the current directory
+alias dcs="docker compose stop"
+alias dcd="docker compose down"
+alias dcr="docker compose restart"
+
+# Show the logs for the docker-compose stack in the current directory
+alias dcl="docker compose logs"
+
+# Quickly run the docker exec command
+alias dex="docker exec -it"
+
+# 'docker ps' displays the currently running containers
+alias dps="docker ps"
+
+# Stop all running containers
+alias dsa="docker ps -q | xargs -r docker stop"
+
+# Remove stopped containers, unused images, unused networks, etc.
+alias dsp="docker system prune"
+
+# FluxCD shortcuts
+alias fxs='flux get sources all -A'
+# Get all sources across namespaces
+alias fxk='flux get kustomizations -A'
+# Get all kustomizations across namespaces
+alias fxh='flux get helmreleases -A'
+# Get all helm releases across namespaces
+alias fxr='flux reconcile'
+# Shortcut for reconcile command
+alias fxrk='flux reconcile kustomization'
+# Reconcile kustomization
+alias fxrh='flux reconcile helmrelease'
+# Reconcile helmrelease
+alias fxrs='flux reconcile source'
+# Reconcile source
+alias fxl='flux logs'
+# View flux logs
+alias fxe='flux events -A'
+# Show all flux events
+alias fxsusp='flux suspend'
+# Suspend flux resource
+alias fxres='flux resume'
+# Resume flux resource
+
+# More advanced aliases
+alias fxrhf='flux reconcile helmrelease -n flux-system'
+# Reconcile helmrelease in flux-system namespace
+alias fxrkf='flux reconcile kustomization -n flux-system'
+# Reconcile kustomization in flux-system namespace
+alias fxhr='flux get helmreleases --status-selector ready=false -A'
+# Get non-ready helm releases
+alias fxkr='flux get kustomizations --status-selector ready=false -A'
+# Get non-ready kustomizations
+alias fxpend='flux get all -A | grep -i progressing'
+# Show all progressing resources
+alias fxfail='flux get all -A | grep -i failed'
+# Show all failed resources
+
+# Resource troubleshooting
+alias fxtree='flux tree kustomization'
+# Show kustomization tree
+alias fxgtk='flux get kustomization'
+# Get kustomization details
+alias fxgth='flux get helmrelease'
+# Get helmrelease details
+
+# Kubernetes aliases
+alias k='kubectl'
+alias ka='kubectl apply -f'
+alias kf='kubectl create -f'
+alias ke='kubectl explain'
+alias kg='kubectl get'
+alias kd='kubectl describe'
+alias kk='kubectl krew'
+alias kgaa='kubectl get all -A'
+
+# Namespaces
+alias kgns='kubectl get namespaces'
+
+# Pod
+alias kdp='kubectl describe pod'
+alias kgp='kubectl get pods'
+alias kgpa='kubectl get pod --all-namespaces'
+
+# Service
+alias kds='kubectl describe svc'
+alias kgs='kubectl get svc'
+alias kgsa='kubectl get svc --all-namespaces'
+
+# Deployments
+alias kdsd='kubectl describe deploy'
+alias kgd='kubectl get deploy'
+alias kgda='kubectl get deploy --all-namespaces'
+
+# Nodes
+alias kgn='kubectl get nodes'
+
+{{ if eq .chezmoi.os "linux" -}}
+    # Ceph (Linux only)
+    alias ceph="kubectl rook-ceph ceph"
+{{ end -}}
+
+# System commands
+{{ if eq .chezmoi.os "linux" -}}
+# Linux system commands
+alias reboot='sudo /sbin/reboot'
+alias poweroff='sudo /sbin/poweroff'
+alias halt='sudo /sbin/halt'
+alias shutdown='sudo /sbin/shutdown'
+
+# System info aliases
+alias meminfo='free -m -l -t'
+alias psmem='ps auxf | sort -nr -k 4'
+alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+alias pscpu='ps auxf | sort -nr -k 3'
+alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
+alias cpuinfo='lscpu'
+alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
+{{ end -}}

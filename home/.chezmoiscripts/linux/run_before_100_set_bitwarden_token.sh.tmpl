@@ -1,0 +1,48 @@
+#!/usr/bin/env {{ if eq .shell "fish" }}fish{{ else }}bash{{ end }}
+
+{{- if eq .shell "fish" }}
+# Import formatting library would need to be ported to fish, skip for now
+echo "🔐 Bitwarden Token Setup (Fish)"
+echo "Setting up Bitwarden access token..."
+
+# Make the fish script executable
+chmod +x "$HOME/.local/share/chezmoi/home/utils-linux/set_bitwarden_token.fish"
+
+# Source the fish script
+source "$HOME/.local/share/chezmoi/home/utils-linux/set_bitwarden_token.fish"
+
+# Verify that BWS_ACCESS_TOKEN is set after running the script
+if not set -q BWS_ACCESS_TOKEN; or test -z "$BWS_ACCESS_TOKEN"
+    echo "⚠️  WARNING: BWS_ACCESS_TOKEN is still not set after running the setup script."
+    echo "ℹ️  Some functionality may not work correctly."
+else
+    echo "✅ BWS_ACCESS_TOKEN has been successfully set."
+end
+
+echo "🏁 Bitwarden token setup completed!"
+{{- else }}
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "Bitwarden Token Setup" "Setting up Bitwarden access token" "$ICON_CONFIG"
+
+print_section "Token Configuration" "$ICON_CONFIG"
+
+print_action "Making" "Bitwarden token script executable" "$ICON_CONFIG"
+# Make the bash script executable
+chmod +x "$HOME/.local/share/chezmoi/home/utils-linux/set_bitwarden_token.sh"
+
+print_action "Running" "Bitwarden token setup script" "$ICON_CONFIG"
+# Source the bash script
+source "$HOME/.local/share/chezmoi/home/utils-linux/set_bitwarden_token.sh"
+
+# Verify that BWS_ACCESS_TOKEN is set after running the script
+if [ -z "$BWS_ACCESS_TOKEN" ]; then
+    print_warning "BWS_ACCESS_TOKEN is still not set after running the setup script."
+    print_info "Some functionality may not work correctly."
+else
+    print_success "BWS_ACCESS_TOKEN has been successfully set."
+fi
+
+print_footer "Bitwarden Token Setup" "completed"
+{{- end }}

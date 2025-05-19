@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+{{- if and .pkgs.python.linux.pip .installPythonPackages }}
+
+print_header "Python Pip Package Installation" "Installing Python packages via pip" "$ICON_PYTHON"
+
+# Set total steps for progress tracking
+set_total_steps 4
+
+# Step 1: Environment Check
+print_step 1 "Environment Check"
+
+# Check if Python is installed
+if ! command -v python3 &> /dev/null; then
+    print_error "Python3 is not installed. Please install Python first."
+    print_footer "Python Pip Package Installation" "failed"
+    exit 1
+fi
+
+# Check if pip is installed
+if ! command -v pip3 &> /dev/null; then
+    print_error "pip3 is not installed. Please install python3-pip first."
+    print_footer "Python Pip Package Installation" "failed"
+    exit 1
+fi
+
+print_success "Python3 and pip3 are available"
+
+# Step 2: Pip Upgrade
+print_step 2 "Pip Upgrade"
+print_action "Upgrading" "pip to latest version" "$ICON_UPDATE"
+python3 -m pip install --upgrade pip
+
+# Step 3: Package Installation
+print_step 3 "Package Installation"
+
+packages=({{ range $pkg := .pkgs.python.linux.pip }}"{{ $pkg }}"{{ end }})
+
+print_info "Installing ${#packages[@]} packages via pip..."
+
+# Install each package with progress tracking
+for i in "${!packages[@]}"; do
+    pkg="${packages[$i]}"
+    print_progress $((i+1)) ${#packages[@]} "Installing: $pkg"
+    python3 -m pip install --user "$pkg"
+    if [ $? -ne 0 ]; then
+        print_warning "Failed to install $pkg"
+    else
+        print_success "Successfully installed $pkg"
+    fi
+done
+
+# Step 4: PATH Configuration
+print_step 4 "PATH Configuration"
+# Ensure pip user bin directory is in PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    print_action "Adding" "~/.local/bin to PATH for current session" "$ICON_CONFIG"
+    export PATH="$HOME/.local/bin:$PATH"
+    print_success "PATH updated for current session"
+else
+    print_info "~/.local/bin is already in PATH"
+fi
+
+print_success "Pip packages installation completed!"
+print_footer "Python Pip Package Installation" "completed"
+
+{{- else }}
+print_header "Python Pip Package Installation" "Skipping pip package installation" "$ICON_PYTHON"
+print_warning "Pip packages installation is disabled or no packages configured"
+print_footer "Python Pip Package Installation" "skipped"
+{{- end }}

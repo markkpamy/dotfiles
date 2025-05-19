@@ -1,0 +1,13 @@
+# Fish shell configuration
+# Environment setup
+{{ includeTemplate "shell/environment.tmpl" . }}
+{{ includeTemplate "shell/environment-fish.tmpl" . }}
+
+# Common aliases
+{{ includeTemplate "shell/aliases.tmpl" . }}
+
+# Functions
+{{ includeTemplate "shell/functions-fish.tmpl" . }}
+
+# Initialize tools and prompt
+{{ includeTemplate "shell/init-fish.tmpl" . }}

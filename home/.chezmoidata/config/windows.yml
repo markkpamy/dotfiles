@@ -1,0 +1,25 @@
+config:
+  windows:
+    envs:
+      path:
+        - '%USERPROFILE%\scoop\apps\git\current\usr\bin'
+        - '%USERPROFILE%\.local\bin'
+      others:
+        YAZI_CONFIG_HOME: '%USERPROFILE%\.config\yazi'
+        YAZI_FILE_ONE: '%USERPROFILE%\scoop\apps\git\current\usr\bin\file.exe'
+        KOMOREBI_CONFIG_HOME: '%USERPROFILE%\.config\komorebi'
+        CARGO_HOME: '%USERPROFILE%\packages\cargo'
+        #npm_config_cache: '%USERPROFILE%\cache\npm'
+        PIP_CACHE_DIR: '%USERPROFILE%\cache\pip'
+        VCPKG_BINARY_CACHE: '%USERPROFILE%\packages\vcpkg'
+    features:
+      enable:
+        # - 'Microsoft-Hyper-V-All'
+        # - 'HypervisorPlatform'
+        # - 'NetFx4Extended-ASPNET45'
+        #- 'VirtualMachinePlatform'
+        #- 'Microsoft-Windows-Subsystem-Linux'
+        #- 'NetFx3'
+        #- 'NetFx4-AdvSrvs'
+      disable:
+        - 'MicrosoftWindowsPowerShellV2'

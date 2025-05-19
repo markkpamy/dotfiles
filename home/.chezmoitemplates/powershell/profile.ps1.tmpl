@@ -1,0 +1,576 @@
+# PowerShell Profile
+# {{ if eq .osId "windows" }}
+# Windows PowerShell / PowerShell Core Profile
+# {{ else }}
+# Linux PowerShell Core Profile
+# {{ end }}
+
+# MODULES
+# Import modules if they exist
+$modules = @(
+    "Terminal-Icons",
+    "Catppuccin",
+    "DockerCompletion",
+    "CompletionPredictor",
+    "posh-git",
+    "PsReadLine",
+    "PSFzf"
+)
+
+# Set a flavor for easy access
+
+foreach ($module in $modules) {
+    if (Get-Module -ListAvailable -Name $module) {
+        Import-Module $module
+    }
+}
+
+$Flavor = $Catppuccin['Mocha']
+
+# PSStyle Catppuccin
+# Ref: https://github.com/catppuccin/powershell#profile-usage
+$PSStyle.Formatting.Debug = $Flavor.Sky.Foreground()
+$PSStyle.Formatting.Error = $Flavor.Red.Foreground()
+$PSStyle.Formatting.ErrorAccent = $Flavor.Blue.Foreground()
+$PSStyle.Formatting.FormatAccent = $Flavor.Teal.Foreground()
+$PSStyle.Formatting.TableHeader = $Flavor.Rosewater.Foreground()
+$PSStyle.Formatting.Verbose = $Flavor.Yellow.Foreground()
+$PSStyle.Formatting.Warning = $Flavor.Peach.Foreground()
+
+
+##########################################
+# PSReadLine Configuration
+##########################################
+
+# Catppuccin Mocha PSReadLine
+$Colors = @{
+# Largely based on the Code Editor style guide
+# Emphasis, ListPrediction and ListPredictionSelected are inspired by the Catppuccin fzf theme
+
+# Powershell colours
+    ContinuationPrompt     = $Flavor.Teal.Foreground()
+    Emphasis               = $Flavor.Red.Foreground()
+    Selection              = $Flavor.Surface0.Background()
+
+    # PSReadLine prediction colours
+    InlinePrediction       = $Flavor.Overlay0.Foreground()
+    ListPrediction         = $Flavor.Mauve.Foreground()
+    ListPredictionSelected = $Flavor.Surface0.Background()
+
+    # Syntax highlighting
+    Command                = $Flavor.Blue.Foreground()
+    Comment                = $Flavor.Overlay0.Foreground()
+    Default                = $Flavor.Text.Foreground()
+    Error                  = $Flavor.Red.Foreground()
+    Keyword                = $Flavor.Mauve.Foreground()
+    Member                 = $Flavor.Rosewater.Foreground()
+    Number                 = $Flavor.Peach.Foreground()
+    Operator               = $Flavor.Sky.Foreground()
+    Parameter              = $Flavor.Pink.Foreground()
+    String                 = $Flavor.Green.Foreground()
+    Type                   = $Flavor.Yellow.Foreground()
+    Variable               = $Flavor.Lavender.Foreground()
+}
+
+# Set the colours
+Set-PSReadLineOption -Colors $Colors
+
+if (Get-Module -ListAvailable -Name PSReadLine) {
+    # Enable predictive IntelliSense
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+    Set-PSReadLineOption -PredictionViewStyle ListView
+
+    # Enable syntax highlighting
+    Set-PSReadLineOption -Colors $Colors
+
+    # History settings
+    Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+    Set-PSReadLineOption -MaximumHistoryCount 2000
+
+    # Key handlers for better history navigation
+    Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
+    Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+    # Ctrl+Space to accept suggestion
+    Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function AcceptSuggestion
+
+    Set-PSReadLineKeyHandler -Chord Ctrl+F1 -Function ShowCommandHelp
+
+
+    # Tab to complete from history
+{{/*    Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete*/}}
+}
+
+##########################################
+# PSFzf Configuration
+##########################################
+
+if (Get-Module -ListAvailable -Name PSFzf) {
+
+    # Set default options for fzf
+{{/*    $env:FZF_DEFAULT_OPTS = '--height=40% --layout=reverse --border --inline-info --preview-window=:hidden'*/}}
+    $env:FZF_DEFAULT_OPTS = @"
+--height=40% --layout=reverse --border --inline-info --preview-window=:hidden
+--color=bg+:$($Flavor.Surface0),bg:$($Flavor.Base),spinner:$($Flavor.Rosewater)
+--color=hl:$($Flavor.Red),fg:$($Flavor.Text),header:$($Flavor.Red)
+--color=info:$($Flavor.Mauve),pointer:$($Flavor.Rosewater),marker:$($Flavor.Rosewater)
+--color=fg+:$($Flavor.Text),prompt:$($Flavor.Mauve),hl+:$($Flavor.Red)
+--color=border:$($Flavor.Surface2)
+"@
+    $env:FZF_DEFAULT_COMMAND = 'fd --type file --follow --hidden --exclude .git'
+    $env:FZF_CTRL_T_COMMAND = 'fd --type f --hidden --follow --exclude .git'
+
+
+    # Enable PSFzf key bindings
+    Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
+
+    Set-PsFzfOption -TabExpansion
+
+    # Set Tab key for directory search
+    Set-PSReadLineKeyHandler -Key Tab -ScriptBlock { Invoke-FzfTabCompletion }
+
+    # Override default z command with PSFzf version (zoxide integration)
+    if (Get-Command "zoxide" -ErrorAction SilentlyContinue) {
+        Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
+
+        # Use PSFzf for directory search with zoxide
+        function cdf {
+            $result = z -l | fzf | ForEach-Object { $_.Split("\s+")[1] }
+            if ($result) {
+                cd $result
+            }
+        }
+    }
+
+    # Git integration
+    if (Get-Command "git" -ErrorAction SilentlyContinue) {
+        # Fuzzy find and checkout git branches
+        function fbr {
+            $branches = git branch --all | ForEach-Object { $_.Trim() }
+            $branch = $branches | fzf --height 40% --reverse
+            if ($branch) {
+                git checkout $(echo $branch | ForEach-Object { $_.Replace("remotes/origin/", "").Trim() })
+            }
+        }
+
+        # Fuzzy find git commits
+        function fco {
+            git log --pretty=oneline --abbrev-commit | fzf --height 40% --reverse | ForEach-Object { $_.Split(" ")[0] } | ForEach-Object { git checkout $_ }
+        }
+    }
+}
+
+# Load WakaTime if available
+$wakatimePath = "$env:USERPROFILE\.config\wakatime\posh-wakatime\posh-wakatime.psm1"
+if (Test-Path $wakatimePath) {
+    Import-Module $wakatimePath
+}
+
+##########################################
+# Git aliases for PowerShell
+# These functions mirror the Git aliases you have in your bash/fish configs
+
+function Get-GitStatus { git status $args }
+function Get-GitBranch { git branch $args }
+function Get-GitCommit { git commit $args }
+function Get-GitPush { git push $args }
+function Get-GitPull { git pull $args }
+function Get-GitFetch { git fetch $args }
+function Get-GitLog { git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative $args }
+function Get-GitCheckout { git checkout $args }
+
+# Set aliases
+Set-Alias -Name gst -Value Get-GitStatus
+Set-Alias -Name gbr -Value Get-GitBranch
+Set-Alias -Name gco -Value Get-GitCommit
+Set-Alias -Name gpsh -Value Get-GitPush
+Set-Alias -Name gpl -Value Get-GitPull
+Set-Alias -Name gf -Value Get-GitFetch
+Set-Alias -Name gtg -Value Get-GitLog
+Set-Alias -Name gch -Value Get-GitCheckout
+
+# Kubernetes aliases (similar to your bash/fish setup)
+function Get-KubeCtl { kubectl $args }
+function Get-KubeCtlApply { kubectl apply -f $args }
+function Get-KubeCtlCreate { kubectl create -f $args }
+function Get-KubeCtlExplain { kubectl explain $args }
+function Get-KubeCtlGet { kubectl get $args }
+function Get-KubeCtlDescribe { kubectl describe $args }
+function Get-KubeCtlGetNamespaces { kubectl get namespaces $args }
+function Get-KubeCtlGetPods { kubectl get pods $args }
+function Get-KubeCtlGetPodAll { kubectl get pod --all-namespaces $args }
+function Get-KubeCtlGetSvc { kubectl get svc $args }
+function Get-KubeCtlGetSvcAll { kubectl get svc --all-namespaces $args }
+function Get-KubeCtlGetDeployments { kubectl get deploy $args }
+function Get-KubeCtlGetDeployAll { kubectl get deploy --all-namespaces $args }
+function Get-KubeCtlGetNodes { kubectl get nodes $args }
+
+# Set Kubernetes aliases
+Set-Alias -Name k -Value Get-KubeCtl
+Set-Alias -Name ka -Value Get-KubeCtlApply
+Set-Alias -Name kf -Value Get-KubeCtlCreate
+Set-Alias -Name ke -Value Get-KubeCtlExplain
+Set-Alias -Name kg -Value Get-KubeCtlGet
+Set-Alias -Name kd -Value Get-KubeCtlDescribe
+Set-Alias -Name kgns -Value Get-KubeCtlGetNamespaces
+Set-Alias -Name kgp -Value Get-KubeCtlGetPods
+Set-Alias -Name kgpa -Value Get-KubeCtlGetPodAll
+Set-Alias -Name kgs -Value Get-KubeCtlGetSvc
+Set-Alias -Name kgsa -Value Get-KubeCtlGetSvcAll
+Set-Alias -Name kgd -Value Get-KubeCtlGetDeployments
+Set-Alias -Name kgda -Value Get-KubeCtlGetDeployAll
+Set-Alias -Name kgn -Value Get-KubeCtlGetNodes
+
+# Flux CD aliases (similar to your bash/fish setup)
+function Get-FluxSources { flux get sources all -A $args }
+function Get-FluxKustomizations { flux get kustomizations -A $args }
+function Get-FluxHelmReleases { flux get helmreleases -A $args }
+function Get-FluxReconcile { flux reconcile $args }
+function Get-FluxReconcileKustomization { flux reconcile kustomization $args }
+function Get-FluxReconcileHelmRelease { flux reconcile helmrelease $args }
+function Get-FluxReconcileSource { flux reconcile source $args }
+function Get-FluxLogs { flux logs $args }
+function Get-FluxEvents { flux events -A $args }
+function Get-FluxSuspend { flux suspend $args }
+function Get-FluxResume { flux resume $args }
+
+# Set Flux aliases
+Set-Alias -Name fxs -Value Get-FluxSources
+Set-Alias -Name fxk -Value Get-FluxKustomizations
+Set-Alias -Name fxh -Value Get-FluxHelmReleases
+Set-Alias -Name fxr -Value Get-FluxReconcile
+Set-Alias -Name fxrk -Value Get-FluxReconcileKustomization
+Set-Alias -Name fxrh -Value Get-FluxReconcileHelmRelease
+Set-Alias -Name fxrs -Value Get-FluxReconcileSource
+Set-Alias -Name fxl -Value Get-FluxLogs
+Set-Alias -Name fxe -Value Get-FluxEvents
+Set-Alias -Name fxsusp -Value Get-FluxSuspend
+Set-Alias -Name fxres -Value Get-FluxResume
+
+# Docker aliases (similar to your bash/fish setup)
+function Invoke-DockerComposeUp { docker compose up -d $args }
+function Invoke-DockerComposeUpBuild { docker-compose up -d --build $args }
+function Invoke-DockerComposeStop { docker compose stop $args }
+function Invoke-DockerComposeDown { docker compose down $args }
+function Invoke-DockerComposeRestart { docker compose restart $args }
+function Invoke-DockerComposeLogs { docker compose logs $args }
+function Invoke-DockerExec {
+  param([Parameter(Mandatory=$true)][string]$Container, [string]$Command = "bash")
+  docker exec -it $Container $Command
+}
+function Get-DockerPs { docker ps $args }
+function Stop-AllDockers { docker ps -q | ForEach-Object { docker stop $_ } }
+function Invoke-DockerSystemPrune { docker system prune $args }
+
+# Set Docker aliases
+Set-Alias -Name dcu -Value Invoke-DockerComposeUp
+Set-Alias -Name dcub -Value Invoke-DockerComposeUpBuild
+Set-Alias -Name dcs -Value Invoke-DockerComposeStop
+Set-Alias -Name dcd -Value Invoke-DockerComposeDown
+Set-Alias -Name dcr -Value Invoke-DockerComposeRestart
+Set-Alias -Name dcl -Value Invoke-DockerComposeLogs
+Set-Alias -Name dex -Value Invoke-DockerExec
+Set-Alias -Name dps -Value Get-DockerPs
+Set-Alias -Name dsa -Value Stop-AllDockers
+Set-Alias -Name dsp -Value Invoke-DockerSystemPrune
+
+# Other tools aliases
+Set-Alias -Name lzg -Value lazygit
+Set-Alias -Name lzd -Value lazydocker
+Set-Alias -Name yz -Value yazi
+
+##########################################
+# Built-in PowerShell Aliases
+##########################################
+# Cheat sheet from The Primeagen
+# https://github.com/ThePrimeagen/.dotfiles/blob/master/bin/.local/scripts/tmux-cht.sh
+function chtsh {
+  param($query)
+  $languages = @(
+    "python",
+    "cpp",
+    "js",
+    "ts",
+    "bash",
+    "powershell",
+    "nodejs",
+    "lua",
+    "css",
+    "html"
+  )
+
+  if (-not $query) {
+    $selected = $languages | fzf --prompt "cht.sh  "  --height=~80% --layout=reverse --border --exit-0 --cycle --margin="2,3" --padding=1
+    if (-not $selected) {
+      return
+    }
+
+    $query = Read-Host "Enter Query"
+    $query = $query -replace ' ', '+'
+    curl "cht.sh/$selected/$query"
+  } else {
+    curl "cht.sh/$query"
+  }
+}
+
+# EZA setup if installed
+if (Get-Command -Name "eza" -ErrorAction SilentlyContinue) {
+  $DEFAULT_EZA_ARGS = @(
+    "--colour=always",
+    "--git",
+    "--group-directories-first",
+    "--icons=always",
+    "--ignore-glob=.DS_Store",
+    "--no-quotes",
+    "--sort=type"
+  )
+
+  function _ls {
+    eza -1 @DEFAULT_EZA_ARGS @args
+  }
+
+  function l {
+    eza -l @DEFAULT_EZA_ARGS @args
+  }
+
+  function ll {
+    eza -lag @DEFAULT_EZA_ARGS @args
+  }
+
+  function ld {
+    eza -lD @DEFAULT_EZA_ARGS @args
+  }
+
+  function lt {
+    eza --tree @DEFAULT_EZA_ARGS @args
+  }
+
+  function llt {
+    eza --tree -lag @DEFAULT_EZA_ARGS @args
+  }
+
+
+}
+
+##########################################
+# Utility Functions
+##########################################
+
+# Check if a command exists
+Function Test-CommandExists {
+  Param ($command)
+  $oldPreference = $ErrorActionPreference
+  $ErrorActionPreference = 'SilentlyContinue'
+
+  try {
+    if (Get-Command $command) {
+      RETURN $true
+    }
+  } Catch {
+    Write-Host "$command does not exist"; RETURN $false
+  } Finally {
+    $ErrorActionPreference = $oldPreference
+  }
+}
+
+# Set up editor preference
+if (Test-CommandExists nvim) {
+  if (Test-Path "$env:LOCALAPPDATA/$env:DEFAULT_NVIM_CONFIG" -PathType Container) {
+    $env:NVIM_APPNAME = $env:DEFAULT_NVIM_CONFIG
+  }
+  $EDITOR = 'nvim'
+} elseif (Test-CommandExists code) {
+  $EDITOR = 'code'
+} elseif (Test-CommandExists notepad) {
+  $EDITOR = 'notepad'
+} elseif (Test-CommandExists pvim) {
+  $EDITOR = 'pvim'
+} elseif (Test-CommandExists vim) {
+  $EDITOR = 'vim'
+} elseif (Test-CommandExists vi) {
+  $EDITOR = 'vi'
+} elseif (Test-CommandExists notepad++) {
+  $EDITOR = 'notepad++'
+} elseif (Test-CommandExists sublime_text) {
+  $EDITOR = 'sublime_text'
+}
+
+Set-Alias -Name v -Value $EDITOR
+$env:EDITOR = $EDITOR
+
+############################################
+# Unix-like command aliases for PowerShell
+############################################
+
+function unzip ($file) {
+  Write-Output("Extracting", $file, "to", $pwd)
+  $fullFile = Get-ChildItem -Path $pwd -Filter $file | ForEach-Object { $_.FullName }
+  Expand-Archive -Path $fullFile -DestinationPath $pwd
+}
+
+function grep($regex, $dir) {
+  if ($dir) {
+    Get-ChildItem $dir | select-string $regex
+    return
+  }
+  $input | select-string $regex
+}
+
+function df {
+  get-volume
+}
+
+function sed($file, $find, $replace) {
+  (Get-Content $file).replace("$find", $replace) | Set-Content $file
+}
+
+function which($name) {
+  Get-Command $name | Select-Object -ExpandProperty Definition
+}
+
+function export($name, $value) {
+  set-item -force -path "env:$name" -value $value;
+}
+
+function pkill($name) {
+  Get-Process $name -ErrorAction SilentlyContinue | Stop-Process
+}
+
+function pgrep($name) {
+  Get-Process $name
+}
+
+function head {
+  param($Path, $n = 10)
+  Get-Content $Path -Head $n
+}
+
+function tail {
+  param($Path, $n = 10, [switch]$f = $false)
+  Get-Content $Path -Tail $n -Wait:$f
+}
+
+# Quick File Creation
+function nf { param($name) New-Item -ItemType "file" -Path . -Name $name }
+
+# Directory Management
+function mkcd { param($dir) mkdir $dir -Force; Set-Location $dir }
+
+function trash($path) {
+  $fullPath = (Resolve-Path -Path $path).Path
+
+  if (Test-Path $fullPath) {
+    $item = Get-Item $fullPath
+
+    # Determine parent path
+    if ($item.PSIsContainer) {
+      $parentPath = $item.Parent.FullName
+    } else {
+      $parentPath = $item.DirectoryName
+    }
+
+    $shell = New-Object -ComObject 'Shell.Application'
+    $shellItem = $shell.NameSpace($parentPath).ParseName($item.Name)
+
+    if ($shellItem) {
+      $shellItem.InvokeVerb('delete')
+      Write-Host "Item '$fullPath' has been moved to the Recycle Bin."
+    } else {
+      Write-Host "Error: Could not find the item '$fullPath' to trash."
+    }
+  } else {
+    Write-Host "Error: Item '$fullPath' does not exist."
+  }
+}
+
+### Quality of Life Aliases
+
+# Navigation Shortcuts
+function docs {
+  $docs = if(([Environment]::GetFolderPath("MyDocuments"))) {
+    ([Environment]::GetFolderPath("MyDocuments"))
+  } else {
+    $HOME + "\Documents"
+  }
+  Set-Location -Path $docs
+}
+
+function dtop {
+  $dtop = if ([Environment]::GetFolderPath("Desktop")) {
+    [Environment]::GetFolderPath("Desktop")
+  } else {
+    $HOME + "\Desktop"
+  }
+  Set-Location -Path $dtop
+}
+
+# Simplified Process Management
+function k9 { Stop-Process -Name $args[0] }
+
+# Enhanced Listing (if eza isn't available)
+if (-not (Get-Command -Name "eza" -ErrorAction SilentlyContinue)) {
+  function la { Get-ChildItem | Format-Table -AutoSize }
+  function ll { Get-ChildItem -Force | Format-Table -AutoSize }
+}
+
+# Git Shortcuts
+function gs { git status }
+function ga { git add . }
+function gc { param($m) git commit -m "$m" }
+function gp { git push }
+function g { if (Get-Command __zoxide_z -ErrorAction SilentlyContinue) { __zoxide_z github } }
+function gcl { git clone "$args" }
+function gcom {
+  git add .
+  git commit -m "$args"
+}
+
+# Quick Access to System Information
+function sysinfo { Get-ComputerInfo }
+
+# Networking Utilities
+function flushdns {
+  Clear-DnsClientCache
+  Write-Host "DNS has been flushed"
+}
+
+# Clipboard Utilities
+function cpy { Set-Clipboard $args[0] }
+function pst { Get-Clipboard }
+
+##########################################
+# Initialize Tools
+##########################################
+
+# Initialize Zoxide if installed
+if (Get-Command zoxide -ErrorAction SilentlyContinue) {
+  Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
+}
+
+# Run Fastfetch if installed
+if (Get-Command fastfetch -ErrorAction SilentlyContinue) {
+{{ if eq .chezmoi.os "windows" }}
+  fastfetch
+{{ else }}
+  # Fastfetch might be too verbose in Linux terminal sessions
+  # Only run in interactive mode
+  if ($Host.UI.RawUI.WindowTitle -ne "") {
+    fastfetch
+  }
+{{ end }}
+}
+
+# Initialize Oh-My-Posh if installed
+if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
+  $poshConfigPath = "$Env:USERPROFILE\.oh-my-posh.json"
+  if (Test-Path $poshConfigPath) {
+    oh-my-posh init pwsh --config $poshConfigPath | Invoke-Expression
+  } else {
+    oh-my-posh init pwsh | Invoke-Expression
+  }
+}
+
+# Initialize Thefuck if installed
+if (Get-Command thefuck -ErrorAction SilentlyContinue) {
+  Invoke-Expression "$(thefuck --alias)"
+}

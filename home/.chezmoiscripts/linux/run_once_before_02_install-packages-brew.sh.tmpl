@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+set -eufo pipefail
+
+print_header "Homebrew Package Installation" "Installing packages via Homebrew" "$ICON_BREW"
+
+# Set total steps for progress tracking
+set_total_steps 3
+
+# Step 1: Check availability
+print_step 1 "Homebrew Availability Check"
+if ! command -v brew &>/dev/null; then
+  print_error "Homebrew is not installed. Please install it first."
+  print_footer "Homebrew Package Installation" "failed"
+  exit 1
+fi
+
+print_success "Homebrew is available"
+
+# Step 2: Update Homebrew
+print_step 2 "Homebrew Update"
+print_action "Updating" "Homebrew" "$ICON_UPDATE"
+brew update
+
+# Step 3: Package Installation
+print_step 3 "Package Installation"
+
+{{ if .pkgs.homebrew }}
+print_action "Installing" "Homebrew packages" "$ICON_INSTALL"
+
+# Make a temporary Brewfile
+BREWFILE=$(mktemp)
+
+cat > "$BREWFILE" << 'EOF'
+{{ range $category, $packages := .pkgs.homebrew }}
+# {{ $category }}
+{{ range $package := $packages }}
+brew "{{ $package }}"
+{{ end }}
+
+{{ end }}
+EOF
+
+# Count total packages for progress tracking
+total_packages=$(grep -c '^brew' "$BREWFILE" || echo "0")
+print_info "Installing $total_packages packages via Homebrew..."
+
+# Install with progress tracking
+current=0
+while IFS= read -r line; do
+    if [[ "$line" =~ ^brew ]]; then
+        current=$((current + 1))
+        pkg_name=$(echo "$line" | sed 's/brew "//' | sed 's/"//')
+        print_progress $current $total_packages "Installing: $pkg_name"
+    fi
+done < "$BREWFILE"
+
+# Install from the temporary Brewfile
+brew bundle --file="$BREWFILE"
+
+# Clean up
+rm "$BREWFILE"
+
+print_success "All Homebrew packages installed successfully"
+{{ else }}
+print_warning "No Homebrew packages configured for installation"
+{{ end }}
+
+print_success "Homebrew setup completed successfully!"
+print_footer "Homebrew Package Installation" "completed"

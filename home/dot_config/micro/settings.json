@@ -1,0 +1,13 @@
+{
+    "colorscheme": "catppuccin-mocha",
+    "mkparents": true,
+    "rmtrailingws": true,
+    "savecursor": true,
+    "savehistory": true,
+    "saveundo": true,
+    "scrollbar": true,
+    "scrollmargin": 3,
+    "softwrap": true,
+    "tabsize": 4,
+    "tabstospaces": true
+}

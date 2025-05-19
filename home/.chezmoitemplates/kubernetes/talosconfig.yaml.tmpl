@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Config
+current-context: {{ .kubectx | default "default" }}
+preferences: {}
+clusters:
+- cluster:
+    certificate-authority-data: {{ (bitwardenSecrets "a5fd117d-c05f-4ad0-b280-b2cf010e6add" .accessToken).value }}
+    server: {{ .kubeServer | default "https://kubernetes.default.svc" }}
+  name: {{ .kubeClusterName | default "default-cluster" }}
+contexts:
+- context:
+    cluster: {{ .kubeClusterName | default "default-cluster" }}
+    namespace: {{ .kubeNamespace | default "default" }}
+    user: {{ .kubeUserName | default "default-user" }}
+  name: {{ .kubectx | default "default" }}
+users:
+- name: {{ .kubeUserName | default "default-user" }}
+  user:
+    client-certificate-data: {{ (bitwardenSecrets "2d291d64-0a87-47c4-a9cf-b2cf010e81d9" .accessToken).value }}
+    client-key-data: {{ (bitwardenSecrets "a9fa7384-3598-4837-bffb-b2cf010e9bed" .accessToken).value }}
+{{/*    # Uncomment and add token if using token auth instead of cert-based*/}}
+{{/*    # token: {{ if (bitwarden "item" "k8s-talos-token").notes }}{{ (bitwarden "item" "k8s-talos-token").notes }}{{ else }}{{ .kubeToken | default "YOUR_TOKEN" }}{{ end }}*/}}

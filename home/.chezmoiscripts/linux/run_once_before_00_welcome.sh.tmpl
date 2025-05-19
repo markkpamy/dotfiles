@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+# Display welcome ASCII art and system information
+print_welcome
+
+# Small delay to let user read the welcome message
+sleep 2
+
+# Ensure script exits with success code
+ensure_success_exit

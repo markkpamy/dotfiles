@@ -1,0 +1,107 @@
+# k9s main configuration file
+# This uses the Catppuccin theme
+k9s:
+  # General K9s settings
+  refreshRate: 2
+  maxConnRetry: 5
+  enableMouse: true
+  headless: false
+  logoless: false
+  crumbsless: false
+  readOnly: false
+  noExitOnCtrlC: false
+  noIcons: false
+
+  # Skin configuration
+  ui:
+    skin: catppuccin-mocha  # Use the specified skin from Catppuccin collection
+    enableMouse: true
+    mouseEvents:
+      enabled: true
+      wrap: false
+
+  # Default namespaces to use when starting K9s
+  cluster:
+    namespace:
+      #active: default  # Default namespace when K9s starts
+      favorites:
+        - default
+        - kube-system
+
+    view:
+      active: pods  # Default resource view when K9s starts
+
+  # Set up key bindings
+  hotKey:
+    # Assign specific resources to shortcut keys
+    shift-0:
+      shortCut: Shift-0
+      description: View pods
+      command: pods
+    shift-1:
+      shortCut: Shift-1
+      description: View deployments
+      command: deployments
+    shift-2:
+      shortCut: Shift-2
+      description: View services
+      command: services
+    shift-3:
+      shortCut: Shift-3
+      description: View statefulsets
+      command: statefulsets
+    shift-4:
+      shortCut: Shift-4
+      description: View ingresses
+      command: ingress
+    shift-5:
+      shortCut: Shift-5
+      description: View configmaps
+      command: configmaps
+    shift-6:
+      shortCut: Shift-6
+      description: View secrets
+      command: secrets
+    shift-7:
+      shortCut: Shift-7
+      description: View nodes
+      command: nodes
+    shift-8:
+      shortCut: Shift-8
+      description: View namespaces
+      command: namespaces
+
+  # Command aliases
+  aliases:
+    np:
+      shortCut: np
+      description: View namespaces
+      command: namespaces
+    dp:
+      shortCut: dp
+      description: View deployments
+      command: deployments
+    po:
+      shortCut: po
+      description: View pods
+      command: pods
+    svc:
+      shortCut: svc
+      description: View services
+      command: services
+    ing:
+      shortCut: ing
+      description: View ingresses
+      command: ingress
+    cm:
+      shortCut: cm
+      description: View configmaps
+      command: configmaps
+    sec:
+      shortCut: sec
+      description: View secrets
+      command: secrets
+    no:
+      shortCut: no
+      description: View nodes
+      command: nodes

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+set -eufo pipefail
+
+print_header "Docker Setup" "Configuring Docker for current user" "$ICON_DOCKER"
+
+if ! command -v docker &>/dev/null; then
+  print_warning "Docker is not installed, skipping setup..."
+  print_footer "Docker Setup" "skipped"
+  exit 0
+fi
+
+print_section "Docker Configuration" "$ICON_CONFIG"
+
+print_action "Creating" "docker group" "$ICON_CONFIG"
+sudo groupadd -f docker
+
+print_action "Adding user" "$USER to docker group" "$ICON_CONFIG"
+sudo usermod -aG docker $USER
+
+print_success "Docker setup completed successfully!"
+print_info "Please log out and log back in for group changes to take effect"
+print_info "Then you can run docker commands without sudo"
+
+print_footer "Docker Setup" "completed"

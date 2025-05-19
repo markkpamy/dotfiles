@@ -1,0 +1,137 @@
+{
+  "$help": "https://aka.ms/terminal-documentation",
+  "$schema": "https://aka.ms/terminal-profiles-schema",
+  "actions": [
+    {
+      "command": {
+        "action": "copy",
+        "singleLine": false
+      },
+      "id": "User.copy.644BA8F2"
+    },
+    {
+      "command": "paste",
+      "id": "User.paste"
+    },
+    {
+      "command": "find",
+      "id": "User.find"
+    },
+    {
+      "command": {
+        "action": "splitPane",
+        "split": "auto",
+        "splitMode": "duplicate"
+      },
+      "id": "User.splitPane.A6751878"
+    }
+  ],
+  "copyFormatting": "none",
+  "copyOnSelect": false,
+  "multiLinePasteWarning": false,
+  "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+  "keybindings": [
+    {
+      "id": "User.copy.644BA8F2",
+      "keys": "ctrl+c"
+    },
+    {
+      "id": "User.find",
+      "keys": "ctrl+shift+f"
+    },
+    {
+      "id": "User.paste",
+      "keys": "ctrl+v"
+    },
+    {
+      "id": "User.splitPane.A6751878",
+      "keys": "alt+shift+d"
+    }
+  ],
+  "newTabMenu": [
+    {
+      "type": "remainingProfiles"
+    }
+  ],
+  "profiles": {
+    "defaults": {
+      "font": {
+        "face": "JetBrainsMono Nerd Font"
+      },
+      "cursorShape": "bar",
+      "fontSize": 12,
+      "opacity": 66,
+      "useAcrylic": true,
+      "colorScheme": "Catppuccin Mocha"
+    },
+    "list": [
+      {
+        "commandline": "%SystemRoot%\\System32\\cmd.exe",
+        "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+        "hidden": false,
+        "name": "Invite de commandes"
+      },
+      {
+        "guid": "{17bf3de4-5353-5709-bcf9-835bd952a95e}",
+        "hidden": true,
+        "name": "Ubuntu-22.04",
+        "source": "Windows.Terminal.Wsl"
+      },
+      {
+        "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+        "hidden": false,
+        "name": "Azure Cloud Shell",
+        "source": "Windows.Terminal.Azure"
+      },
+      {
+        "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+        "hidden": false,
+        "name": "PowerShell",
+        "source": "Windows.Terminal.PowershellCore"
+      },
+      {
+        "guid": "{2b372ca1-1152-448f-8e5e-cd7650fddaa0}",
+        "hidden": false,
+        "name": "Nushell",
+        "commandline": "nu.exe",
+        "startingDirectory": "%USERPROFILE%",
+        "icon": "%USERPROFILE%\\AppData\\Local\\Programs\\nu\\nushell.ico"
+      },
+      {
+        "guid": "{58ad8b0c-3ef8-5f4d-bc6f-13e4c00f2530}",
+        "hidden": false,
+        "name": "Debian",
+        "source": "Windows.Terminal.Wsl"
+      },
+      {
+        "guid": "{8ab8e6f6-35c6-5b46-8419-3e1568105476}",
+        "hidden": false,
+        "name": "podman-machine-default",
+        "source": "Windows.Terminal.Wsl"
+      },
+      {
+        "guid": "{4ff56d04-d9cf-57ea-bae2-ad396374e7e3}",
+        "hidden": false,
+        "name": "Ubuntu 22.04.5 LTS",
+        "source": "CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc"
+      },
+      {
+        "commandline": "ssh -A unknown224@192.168.1.16",
+        "guid": "{19672a6e-dc9b-5dc3-b914-2adeb049c3dc}",
+        "name": "SSH PROD-US"
+      }
+    ]
+  },
+  "schemes": [
+    {{ includeTemplate "windows-terminal-themes/catppuccin-mocha.json" . }},
+    {{ includeTemplate "windows-terminal-themes/catppuccin-macchiato.json" . }},
+    {{ includeTemplate "windows-terminal-themes/catppuccin-latte.json" . }},
+    {{ includeTemplate "windows-terminal-themes/catppuccin-frappe.json" . }}
+  ],
+  "themes": [
+    {{ includeTemplate "windows-terminal-themes/catppuccin-frappe-theme.json" . }},
+    {{ includeTemplate "windows-terminal-themes/catppuccin-latte-theme.json" . }},
+    {{ includeTemplate "windows-terminal-themes/catppuccin-macchiato-theme.json" . }},
+    {{ includeTemplate "windows-terminal-themes/catppuccin-mocha-theme.json" . }}
+  ]
+}

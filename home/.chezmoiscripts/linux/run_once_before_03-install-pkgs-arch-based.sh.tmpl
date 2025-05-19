@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+set -eufo pipefail
+
+DISTRO=$(lsb_release -i | awk '{print $NF}')
+
+print_header "Arch-based Package Installation" "Installing packages via pacman/yay" "$ICON_PACKAGE"
+
+case "$DISTRO" in
+"Arch")
+    print_success "Detected Arch Linux distribution"
+    ;;
+*)
+    print_warning "Not an Arch-based system (detected: $DISTRO), skipping..."
+    print_footer "Arch-based Package Installation" "skipped"
+    exit 0
+    ;;
+esac
+
+# Set total steps for progress tracking
+set_total_steps 4
+
+# Step 1: System Update
+print_step 1 "System Update"
+print_action "Updating" "package sources" "$ICON_UPDATE"
+sudo pacman -Sy
+
+# Step 2: AUR Helper Setup
+print_step 2 "AUR Helper Setup"
+if ! command -v yay &>/dev/null; then
+    print_action "Installing" "yay AUR helper" "$ICON_INSTALL"
+    sudo pacman -S --needed git base-devel --noconfirm
+    git clone https://aur.archlinux.org/yay-bin.git
+    cd yay-bin
+    makepkg -si
+    cd ..
+    print_success "yay installed successfully"
+else
+    print_success "yay is already installed"
+fi
+
+# Step 3: Package Installation
+print_step 3 "Package Installation"
+
+{{ $pkgs := .pkgs.archBased.universal }}
+
+{{ if $pkgs }}
+packages=({{ $pkgs | quoteList | join " " }})
+
+print_info "Installing ${#packages[@]} packages..."
+
+for i in "${!packages[@]}"; do
+    pkg="${packages[$i]}"
+    print_progress $((i+1)) ${#packages[@]} "Installing: $pkg"
+    yay -S "$pkg" --needed --noconfirm || print_warning "Failed to install $pkg"
+done
+
+print_success "Packages installed successfully"
+{{ else }}
+print_warning "No packages configured for installation"
+{{ end }}
+
+# Step 4: Service Configuration
+print_step 4 "Service Configuration"
+print_action "Setting up" "services" "$ICON_CONFIG"
+systemctl list-unit-files "cronie.service" &>/dev/null && sudo systemctl enable --now cronie.service
+
+print_success "Arch-based package installation completed!"
+print_footer "Arch-based Package Installation" "completed"

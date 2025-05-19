@@ -1,0 +1,33 @@
+{{- if and .pkgs.python.windows.pip .installPythonPackages }}
+
+# Refresh environment variables to ensure Python is in PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Check if Python is installed
+if (-not (Get-Command "python" -ErrorAction SilentlyContinue)) {
+    Write-Error "Python is not installed or not in PATH. Please install Python first."
+    exit 1
+}
+
+Write-Host "INSTALLING PIP PACKAGES (Windows)..." -ForegroundColor Green
+
+# Upgrade pip first
+Write-Host "Upgrading pip..." -ForegroundColor Yellow
+python -m pip install --upgrade pip
+
+# Install each package
+{{ range $pkg := .pkgs.python.windows.pip }}
+Write-Host "Installing {{ $pkg }}..." -ForegroundColor Cyan
+python -m pip install {{ $pkg }}
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Failed to install {{ $pkg }}"
+} else {
+    Write-Host "Successfully installed {{ $pkg }}" -ForegroundColor Green
+}
+{{ end }}
+
+Write-Host "PIP PACKAGES INSTALLATION COMPLETED" -ForegroundColor Green
+
+{{- else }}
+Write-Host "SKIPPING PIP PACKAGES INSTALLATION" -ForegroundColor Yellow
+{{- end }}

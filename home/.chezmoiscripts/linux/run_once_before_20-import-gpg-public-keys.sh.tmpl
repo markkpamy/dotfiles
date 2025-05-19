@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "GPG Public Keys Import" "Importing GPG public keys" "$ICON_CONFIG"
+
+if ! command -v gpg &>/dev/null; then
+  print_warning "GPG is not installed, skipping key import..."
+  print_footer "GPG Public Keys Import" "skipped"
+  exit 0
+fi
+
+print_section "Key Import" "$ICON_DOWNLOAD"
+
+print_action "Importing" "GitHub web-flow GPG key" "$ICON_DOWNLOAD"
+curl 'https://github.com/web-flow.gpg' | gpg --import
+
+print_success "GPG public keys imported successfully!"
+print_footer "GPG Public Keys Import" "completed"

@@ -1,0 +1,18 @@
+pkgs:
+  python:
+    windows:
+      pip:
+        # Package management and environments
+        - 'pipx'
+      pipx:
+        # CLI applications (isolated)
+        - 'pre-commit'
+        - 'commitizen'
+        - 'poetry'
+        - 'elia-chat'
+        - 'ggshield' #GitGuardian CLI
+    linux:
+      pip:
+        # Package management and environments
+      pipx:
+        # CLI applications (isolated)

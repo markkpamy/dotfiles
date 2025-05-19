@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "Post-Installation Setup" "Configuring Fish shell and updating fisher" "$ICON_CONFIG"
+
+# Path to the Fish shell configuration file
+fish_config=~/.config/fish/config.fish
+
+print_section "Fish Shell Configuration" "$ICON_CONFIG"
+
+print_action "Adding" "Fish shell to /etc/shells" "$ICON_CONFIG"
+echo /home/linuxbrew/.linuxbrew/bin/fish | sudo tee -a /etc/shells
+# chsh -s /home/linuxbrew/.linuxbrew/bin/fish
+
+# Check if the Fish shell configuration file exists
+if [ -f ~/.config/fish/config.fish ]; then
+  print_action "Sourcing" "Fish shell configuration" "$ICON_CONFIG"
+  fish -c 'source ~/.config/fish/config.fish'
+  print_success "Fish configuration sourced successfully"
+else
+  print_warning "Fish shell configuration file not found: $fish_config"
+fi
+
+print_section "Fisher Update" "$ICON_UPDATE"
+print_action "Updating" "Fisher packages" "$ICON_UPDATE"
+fish -c 'fisher update'
+
+print_success "Post-installation setup completed!"
+print_footer "Post-Installation Setup" "completed"

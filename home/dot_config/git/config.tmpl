@@ -1,0 +1,107 @@
+[user]
+    email = {{ .email }}
+    name = Mark Kpamy
+    signingkey = "{{ .sshId }}"
+
+[github]
+  user = markkpamy
+
+[init]
+  defaultBranch = main
+
+[commit]
+  gpgsign = true
+
+[core]
+    longpaths = true
+    autocrlf = input
+    editor = nvim
+    eol = lf
+    pager = delta
+    excludesFile = ~/.config/git/ignore
+
+[remote]
+  pushDefault = origin
+
+# Common aliases
+[alias]
+    st = status
+    co = checkout
+    ci = commit
+    br = branch
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    unstage = reset HEAD --
+
+[help]
+  autoCorrect = prompt
+
+[gpg]
+  format = ssh
+
+[pull]
+    rebase = true
+
+[log]
+  date = iso
+
+[push]
+  autoSetupRemote = true
+
+[init]
+    defaultBranch = main
+
+[color]
+    ui = auto
+
+# OS-specific configurations
+{{ if eq .chezmoi.os "windows" }}
+# Windows-specific settings
+[core]
+    sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
+
+[gpg "ssh"]
+    program = C:/Windows/System32/OpenSSH/ssh-keygen.exe
+
+[credential "helperselector"]
+	selected = wincred
+
+{{ else if eq .chezmoi.os "linux" }}
+# Linux-specific settings
+[credential "https://github.com"]
+    helper =
+    helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+    helper =
+    helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+{{ end }}
+
+{{/*[url "git@github.com:"]*/}}
+{{/*    insteadOf = https://github.com/*/}}
+
+[diff]
+    colorMoved = default
+
+[merge]
+conflictstyle = diff3
+
+[pager]
+    diff = delta
+    log = delta
+    reflog = delta
+    show = delta
+
+[delta]
+    navigate = true
+    light = false
+    line-numbers = true
+    side-by-side = false
+    hyperlinks = true
+    features = catppuccin-mocha
+    show-syntax-themes = true
+
+[interactive]
+    diffFilter = delta --color-only
+
+[include]
+    path = ~/.config/delta/catppuccin.gitconfig

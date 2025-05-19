@@ -1,0 +1,37 @@
+{{ if eq .osId "windows" }}
+
+##########################################
+[".config/cursor/Windows-11-Cursor-by-rosea92"]
+type = "git-repo"
+url = "https://github.com/YT-Advanced/Windows-11-Cursor-by-rosea92.git"
+{{ .externalGitArgs }}
+
+[".config/wakatime/posh-wakatime"]
+type = "git-repo"
+url = "https://github.com/Gravifer/posh-wakatime.git"
+{{ .externalGitArgs }}
+
+[".config/komorebi/applications.json"]
+type = "file"
+url = "https://raw.githubusercontent.com/LGUG2Z/komorebi-application-specific-configuration/refs/heads/master/applications.json"
+
+[".config/autohotkey/komorebic.lib.ahk"]
+type = "file"
+url = "https://raw.githubusercontent.com/LGUG2Z/komorebi/master/komorebic.lib.ahk"
+
+[".config/autohotkey/hidecursor.ahk"]
+type = "file"
+url = "https://raw.githubusercontent.com/steveseguin/hide-cursor/refs/heads/main/hidecursor.ahk"
+
+["Documents/PowerShell/Modules/Catppuccin"]
+type = "git-repo"
+url = "https://github.com/catppuccin/powershell.git"
+{{ .externalGitArgs }}
+
+["home/dot_local/bin"]
+type = "file"
+url = "https://github.com/99designs/aws-vault/releases/download/v7.2.0/aws-vault-windows-386.exe"
+
+##########################################
+
+{{ end }}

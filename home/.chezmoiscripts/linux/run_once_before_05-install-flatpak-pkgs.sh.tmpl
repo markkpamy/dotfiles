@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Install Flatpak applications
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+{{ if and (eq .chezmoi.os "linux") .isDesktop -}}
+# Only execute on Linux desktop systems
+
+set -eufo pipefail
+
+print_header "Flatpak Applications Installation" "Installing Flatpak applications for desktop" "$ICON_PACKAGE"
+
+print_section "Flatpak Setup" "$ICON_CONFIG"
+
+# Check if flatpak is installed, if not install it
+if ! command -v flatpak &> /dev/null; then
+    print_action "Installing" "Flatpak package manager" "$ICON_INSTALL"
+    {{ if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "linuxmint") (eq .chezmoi.osRelease.id "pop") -}}
+    sudo apt-get update
+    sudo apt-get install -y flatpak gnome-software-plugin-flatpak
+    {{ else if or (eq .chezmoi.osRelease.id "arch") (eq .chezmoi.osRelease.id "manjaro") (eq .chezmoi.osRelease.id "endeavouros") -}}
+    sudo pacman -Syu --noconfirm flatpak
+    {{ else if or (eq .chezmoi.osRelease.id "fedora") (eq .chezmoi.osRelease.id "rhel") (eq .chezmoi.osRelease.id "centos") (eq .chezmoi.osRelease.id "rocky") (eq .chezmoi.osRelease.id "alma") -}}
+    sudo dnf install -y flatpak
+    {{ end -}}
+
+    print_action "Adding" "Flathub repository" "$ICON_CONFIG"
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    print_success "Flatpak installed and configured"
+else
+    print_success "Flatpak is already installed"
+    print_action "Ensuring" "Flathub repository is added" "$ICON_CONFIG"
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+fi
+
+print_section "Common Applications" "$ICON_PACKAGE"
+print_action "Installing" "common Flatpak applications" "$ICON_INSTALL"
+
+# Install common Flatpak applications
+{{ range .pkgs.linuxDesktop.flatpak.common -}}
+print_action "Installing" "{{ . }}" "$ICON_DOWNLOAD"
+flatpak install -y flathub {{ . }}
+{{ end -}}
+
+# Install distribution-specific Flatpak applications
+{{ if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "linuxmint") (eq .chezmoi.osRelease.id "pop") -}}
+print_section "Debian-based Applications" "$ICON_PACKAGE"
+{{ range .pkgs.linuxDesktop.flatpak.debian -}}
+print_action "Installing" "{{ . }}" "$ICON_DOWNLOAD"
+flatpak install -y flathub {{ . }}
+{{ end -}}
+{{ else if or (eq .chezmoi.osRelease.id "arch") (eq .chezmoi.osRelease.id "manjaro") (eq .chezmoi.osRelease.id "endeavouros") -}}
+print_section "Arch-based Applications" "$ICON_PACKAGE"
+{{ range .pkgs.linuxDesktop.flatpak.arch -}}
+print_action "Installing" "{{ . }}" "$ICON_DOWNLOAD"
+flatpak install -y flathub {{ . }}
+{{ end -}}
+{{ end -}}
+
+print_success "Flatpak applications installation completed!"
+print_footer "Flatpak Applications Installation" "completed"
+
+{{ else }}
+print_header "Flatpak Applications Installation" "Skipping - not a Linux desktop system" "$ICON_PACKAGE"
+print_warning "This script is designed for Linux desktop systems only"
+print_footer "Flatpak Applications Installation" "skipped"
+{{ end -}}

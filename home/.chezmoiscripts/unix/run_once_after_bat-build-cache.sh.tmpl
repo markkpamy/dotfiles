@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "Bat Cache Build" "Building bat syntax highlighting cache" "$ICON_CONFIG"
+
+if ! command -v bat &>/dev/null; then
+  print_warning "Bat is not installed, skipping cache build..."
+  print_footer "Bat Cache Build" "skipped"
+  exit 0
+fi
+
+print_section "Cache Building" "$ICON_CONFIG"
+
+print_action "Building" "bat cache" "$ICON_CONFIG"
+bat cache --build
+
+print_success "Bat cache built successfully!"
+print_footer "Bat Cache Build" "completed"

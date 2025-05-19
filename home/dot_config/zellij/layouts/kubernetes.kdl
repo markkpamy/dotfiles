@@ -1,0 +1,82 @@
+session_name "k8s-session"
+attach_to_session true
+
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="K8s Main" {
+    // Main split: kubectl command area on the left (50%), k9s on the right (50%)
+        pane split_direction="vertical" {
+        // Left side: Command pane for kubectl commands
+            pane name="kubectl" size="50%" {
+            // Starting with kubectl version to verify connection
+                command "echo 'Kubernetes Command Center' && kubectl version --short && echo 'Ready for kubectl commands...'"
+            }
+
+        // Right side: K9s for interactive cluster management
+            pane name="K9s" size="50%" {
+                command "k9s"
+            }
+        }
+    }
+
+    tab name="Cluster Overview" {
+        pane split_direction="horizontal" {
+        // Top: Nodes overview
+            pane name="Nodes" size="33%" {
+                command "watch -n 5 kubectl get nodes -o wide"
+            }
+
+        // Middle: Pods across all namespaces
+            pane name="Pods" size="33%" {
+                command "watch -n 5 kubectl get pods -A"
+            }
+
+        // Bottom: Services and deployments
+            pane split_direction="vertical" size="34%" {
+                pane name="Services" {
+                    command "watch -n 5 kubectl get svc -A"
+                }
+                pane name="Deployments" {
+                    command "watch -n 5 kubectl get deployments -A"
+                }
+            }
+        }
+    }
+
+    tab name="Resource Monitoring" {
+        pane split_direction="vertical" {
+        // Pod resource usage
+            pane name="Pod Resources" size="50%" {
+                command "watch -n 10 kubectl top pods -A"
+            }
+
+        // Node resource usage
+            pane name="Node Resources" size="50%" {
+                command "watch -n 10 kubectl top nodes"
+            }
+        }
+    }
+
+    tab name="Logs & Events" {
+        pane split_direction="vertical" {
+        // Events - useful for troubleshooting
+            pane name="Cluster Events" size="50%" {
+                command "watch -n 10 kubectl get events --sort-by='.lastTimestamp'"
+            }
+
+        // Terminal for fetching specific logs
+            pane name="Log Access" size="50%" {
+                command "echo 'Use this pane to check logs, e.g.:' && echo 'kubectl logs -f deployment/your-deployment'"
+            }
+        }
+    }
+}

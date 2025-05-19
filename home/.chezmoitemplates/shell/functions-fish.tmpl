@@ -1,0 +1,29 @@
+# Reconcile a specific resource or all resources in a namespace (Fish version)
+function fxrecall
+  set NAMESPACE $argv[1]
+  if test -z "$NAMESPACE"
+    set NAMESPACE flux-system
+  end
+
+  echo "Reconciling all resources in namespace: $NAMESPACE"
+
+  # Reconcile sources first
+  echo "Reconciling sources..."
+  flux get sources all -n $NAMESPACE -o name | xargs -r -I{} flux reconcile {} -n $NAMESPACE
+
+  # Then kustomizations
+  echo "Reconciling kustomizations..."
+  flux get kustomizations -n $NAMESPACE -o name | xargs -r -I{} flux reconcile {} -n $NAMESPACE
+
+  # Finally helm releases
+  echo "Reconciling helm releases..."
+  flux get helmreleases -n $NAMESPACE -o name | xargs -r -I{} flux reconcile {} -n $NAMESPACE
+
+  echo "Reconciliation complete!"
+end
+
+
+# Enhanced logs with grep (Fish version)
+function fxglog
+  flux logs --all-namespaces | grep "$argv[1]"
+end

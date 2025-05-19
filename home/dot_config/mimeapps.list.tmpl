@@ -1,0 +1,80 @@
+{{ if .isDesktop -}}
+[Default Applications]
+# Documents
+application/pdf=org.gnome.Evince.desktop
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-writer.desktop
+application/msword=libreoffice-writer.desktop
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=libreoffice-calc.desktop
+application/vnd.ms-excel=libreoffice-calc.desktop
+application/vnd.openxmlformats-officedocument.presentationml.presentation=libreoffice-impress.desktop
+application/vnd.ms-powerpoint=libreoffice-impress.desktop
+application/rtf=libreoffice-writer.desktop
+text/plain=org.gnome.gedit.desktop
+text/html=firefox.desktop
+text/x-csrc=org.gnome.gedit.desktop
+text/x-python=org.gnome.gedit.desktop
+text/x-shellscript=org.gnome.gedit.desktop
+application/json=org.gnome.gedit.desktop
+
+# Images
+image/jpeg=org.gnome.eog.desktop
+image/png=org.gnome.eog.desktop
+image/gif=org.gnome.eog.desktop
+image/webp=org.gnome.eog.desktop
+image/svg+xml=org.gnome.eog.desktop
+image/tiff=org.gnome.eog.desktop
+
+# Audio
+audio/mpeg=vlc.desktop
+audio/x-wav=vlc.desktop
+audio/mp4=vlc.desktop
+audio/x-flac=vlc.desktop
+audio/ogg=vlc.desktop
+
+# Video
+video/mp4=vlc.desktop
+video/x-matroska=vlc.desktop
+video/x-msvideo=vlc.desktop
+video/quicktime=vlc.desktop
+video/webm=vlc.desktop
+
+# Web
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
+x-scheme-handler/mailto=thunderbird.desktop
+
+# Archives
+application/zip=org.gnome.FileRoller.desktop
+application/x-7z-compressed=org.gnome.FileRoller.desktop
+application/x-rar=org.gnome.FileRoller.desktop
+application/x-tar=org.gnome.FileRoller.desktop
+application/gzip=org.gnome.FileRoller.desktop
+
+# Desktop-environment specific
+{{ if eq .desktopEnv "gnome" -}}
+inode/directory=org.gnome.Nautilus.desktop
+{{ else if eq .desktopEnv "kde" -}}
+inode/directory=org.kde.dolphin.desktop
+{{ else if eq .desktopEnv "xfce" -}}
+inode/directory=org.xfce.thunar.desktop
+{{ else if eq .desktopEnv "cinnamon" -}}
+inode/directory=nemo.desktop
+{{ else if eq .desktopEnv "mate" -}}
+inode/directory=caja.desktop
+{{ else -}}
+inode/directory=org.gnome.Nautilus.desktop
+{{ end -}}
+
+[Added Associations]
+# Documents
+application/pdf=org.gnome.Evince.desktop;
+text/plain=org.gnome.gedit.desktop;
+
+# Images
+image/jpeg=org.gnome.eog.desktop;gimp.desktop;
+image/png=org.gnome.eog.desktop;gimp.desktop;
+
+# Audio/Video
+audio/mpeg=vlc.desktop;
+video/mp4=vlc.desktop;
+{{ end -}}

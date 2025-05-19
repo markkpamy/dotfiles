@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+# Install desktop packages for Ubuntu/Debian-based systems
+
+{{ if and (eq .chezmoi.os "linux") (or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "linuxmint") (eq .chezmoi.osRelease.id "pop")) .isDesktop -}}
+# Only execute on Debian-based desktop systems
+
+set -eufo pipefail
+
+echo "Installing desktop packages for Ubuntu/Debian..."
+
+# Install common desktop packages
+sudo apt-get update
+{{ if .pkgs.linuxDesktop.common }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.common -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No common desktop packages defined for installation."
+{{ end }}
+
+# Install desktop environment specific packages
+{{ if eq .desktopEnv "gnome" -}}
+echo "Installing GNOME-specific packages..."
+{{ if .pkgs.linuxDesktop.gnome }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.gnome -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No GNOME packages defined for installation."
+{{ end -}}
+{{ else if eq .desktopEnv "kde" -}}
+echo "Installing KDE-specific packages..."
+{{ if .pkgs.linuxDesktop.kde }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.kde -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No KDE packages defined for installation."
+{{ end -}}
+{{ else if eq .desktopEnv "xfce" -}}
+echo "Installing Xfce-specific packages..."
+{{ if .pkgs.linuxDesktop.xfce }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.xfce -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No Xfce packages defined for installation."
+{{ end -}}
+{{ else if eq .desktopEnv "cinnamon" -}}
+echo "Installing Cinnamon-specific packages..."
+{{ if .pkgs.linuxDesktop.cinnamon }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.cinnamon -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No Cinnamon packages defined for installation."
+{{ end -}}
+{{ else if eq .desktopEnv "mate" -}}
+echo "Installing MATE-specific packages..."
+{{ if .pkgs.linuxDesktop.mate }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.mate -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No MATE packages defined for installation."
+{{ end -}}
+{{ else if eq .desktopEnv "i3" -}}
+echo "Installing i3-specific packages..."
+{{ if .pkgs.linuxDesktop.i3 }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.i3 -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No i3 packages defined for installation."
+{{ end -}}
+{{ else if eq .desktopEnv "sway" -}}
+echo "Installing Sway-specific packages..."
+{{ if .pkgs.linuxDesktop.sway }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.sway -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No Sway packages defined for installation."
+{{ end -}}
+{{ end -}}
+
+# Install shared category packages
+echo "Installing desktop themes..."
+{{ if .pkgs.linuxDesktop.themes }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.themes -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No theme packages defined for installation."
+{{ end }}
+
+echo "Installing additional fonts..."
+{{ if .pkgs.linuxDesktop.fonts }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.fonts -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No font packages defined for installation."
+{{ end }}
+
+echo "Installing desktop utilities..."
+{{ if .pkgs.linuxDesktop.utilities }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.utilities -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No utility packages defined for installation."
+{{ end }}
+
+echo "Installing multimedia applications..."
+{{ if .pkgs.linuxDesktop.multimedia }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.multimedia -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No multimedia packages defined for installation."
+{{ end }}
+
+echo "Installing development tools..."
+{{ if .pkgs.linuxDesktop.development }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.development -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No development packages defined for installation."
+{{ end }}
+
+echo "Installing productivity applications..."
+{{ if .pkgs.linuxDesktop.productivity }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.productivity -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No productivity packages defined for installation."
+{{ end }}
+
+echo "Installing communication applications..."
+{{ if .pkgs.linuxDesktop.communication }}
+sudo apt-get install -y \
+  {{ range .pkgs.linuxDesktop.communication -}}
+  {{ . }} \
+  {{ end -}}
+{{ else }}
+echo "No communication packages defined for installation."
+{{ end }}
+
+echo "Desktop packages installation complete for Ubuntu/Debian!"
+{{ end -}}

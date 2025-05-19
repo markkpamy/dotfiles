@@ -1,0 +1,108 @@
+session_name "docker-session"
+attach_to_session true
+
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="Docker Dashboard" {
+    // Main split: Command area on the left (50%), monitoring on the right (50%)
+        pane split_direction="vertical" {
+        // Left side: Command pane (for your docker commands)
+            pane name="Command" size="50%" {
+            // Starting with docker version to verify connection
+                command "echo 'Docker Command Center' && docker version && echo ''"
+            }
+
+        // Right side: Split into multiple monitoring panes
+            pane split_direction="horizontal" size="50%" {
+            // Top: Container overview
+                pane name="Containers" size="34%" {
+                    command "watch -n 3 'docker ps -a --format \"table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}\"'"
+                }
+
+            // Middle: Images
+                pane name="Images" size="33%" {
+                    command "watch -n 5 'docker images --format \"table {{.Repository}}\\t{{.Tag}}\\t{{.Size}}\"'"
+                }
+
+            // Bottom: System info
+                pane name="System" size="33%" {
+                    command "watch -n 10 'docker system df -v | head -n 20'"
+                }
+            }
+        }
+    }
+
+    tab name="Resource Monitoring" {
+        pane split_direction="vertical" {
+        // Container stats (CPU, memory, network, etc.)
+            pane name="Container Stats" {
+                command "docker stats"
+            }
+        }
+    }
+
+    tab name="Networks & Volumes" {
+        pane split_direction="horizontal" {
+        // Networks
+            pane name="Networks" size="50%" {
+                command "watch -n 5 'docker network ls && echo \"\" && echo \"Network Details:\" && echo \"\" && docker network inspect bridge | grep -A 10 \"Containers\" | head -n 15'"
+            }
+
+        // Volumes
+            pane name="Volumes" size="50%" {
+                command "watch -n 5 'docker volume ls && echo \"\" && echo \"Disk Usage:\" && echo \"\" && docker system df -v | grep -A 10 \"Volumes\" | head -n 10'"
+            }
+        }
+    }
+
+    tab name="Logs & Events" {
+        pane split_direction="vertical" {
+        // Docker events - useful for troubleshooting
+            pane name="Docker Events" size="50%" {
+                command "docker events"
+            }
+
+        // Terminal for fetching specific container logs
+            pane name="Container Logs" size="50%" {
+                command "echo 'Use this pane to check logs, e.g.:' && echo 'docker logs -f container_name' && echo '' && echo 'Available containers:' && docker ps --format '{{.Names}}'"
+            }
+        }
+    }
+
+    tab name="Compose Projects" {
+        pane split_direction="horizontal" {
+        // Compose commands
+            pane name="Compose Control" size="50%" {
+                command "echo 'Docker Compose Control Center' && echo '' && echo 'Example commands:' && echo '- docker-compose up -d' && echo '- docker-compose ps' && echo '- docker-compose down' && echo '- docker-compose logs -f'"
+            }
+
+        // Compose services status
+            pane name="Compose Services" size="50%" {
+                command "echo 'No compose project detected.' && echo 'Navigate to a directory with docker-compose.yml and run:' && echo 'docker-compose ps'"
+            }
+        }
+    }
+
+    tab name="Docker Build" {
+        pane split_direction="vertical" {
+        // Dockerfile editing
+            pane name="Edit Dockerfile" size="50%" {
+                command "echo 'Create or edit a Dockerfile here' && echo '' && echo 'Example basic Dockerfile:' && echo 'FROM alpine:latest' && echo 'WORKDIR /app' && echo 'COPY . .' && echo 'CMD [\"echo\", \"Hello World\"]'"
+            }
+
+        // Build command area
+            pane name="Build" size="50%" {
+                command "echo 'Build your Docker image:' && echo 'docker build -t myimage:latest .'"
+            }
+        }
+    }
+}

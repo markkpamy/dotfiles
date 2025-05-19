@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Install Snap applications
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+{{ if and (eq .chezmoi.os "linux") .isDesktop (or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "linuxmint") (eq .chezmoi.osRelease.id "pop")) -}}
+# Only execute on Debian-based Linux desktop systems (where Snap is most commonly used)
+
+set -eufo pipefail
+
+print_header "Snap Applications Installation" "Installing Snap applications for desktop" "$ICON_PACKAGE"
+
+print_section "Snap Setup" "$ICON_CONFIG"
+
+# Check if snapd is installed, if not install it
+if ! command -v snap &> /dev/null; then
+    print_action "Installing" "snapd package manager" "$ICON_INSTALL"
+    sudo apt-get update
+    sudo apt-get install -y snapd
+
+    print_action "Enabling" "snapd service" "$ICON_CONFIG"
+    # Ensure the snap socket is enabled
+    sudo systemctl enable --now snapd.socket
+
+    print_action "Creating" "symbolic link for Classic Snaps" "$ICON_CONFIG"
+    # Create the symbolic link to /var/lib/snapd/snap for Classic Snaps
+    if [ ! -e /snap ]; then
+        sudo ln -s /var/lib/snapd/snap /snap
+    fi
+
+    print_action "Waiting" "for snapd service to start" "$ICON_CONFIG"
+    # Wait for snapd service to start
+    sleep 5
+    print_success "Snap installed and configured"
+else
+    print_success "Snap is already installed"
+fi
+
+print_section "Common Applications" "$ICON_PACKAGE"
+print_action "Installing" "common Snap applications" "$ICON_INSTALL"
+
+# Install common Snap applications
+{{ range .pkgs.linuxDesktop.snap.common -}}
+print_action "Installing" "{{ . }}" "$ICON_DOWNLOAD"
+sudo snap install {{ . }}
+{{ end -}}
+
+# Install Ubuntu-specific Snap applications
+{{ if eq .chezmoi.osRelease.id "ubuntu" -}}
+print_section "Ubuntu-specific Applications" "$ICON_PACKAGE"
+{{ range .pkgs.linuxDesktop.snap.ubuntu -}}
+print_action "Installing" "{{ . }}" "$ICON_DOWNLOAD"
+sudo snap install {{ . }}
+{{ end -}}
+{{ end -}}
+
+print_success "Snap applications installation completed!"
+print_footer "Snap Applications Installation" "completed"
+
+{{ else }}
+print_header "Snap Applications Installation" "Skipping - not a supported Linux desktop system" "$ICON_PACKAGE"
+print_warning "This script is designed for Debian-based Linux desktop systems only"
+print_footer "Snap Applications Installation" "skipped"
+{{ end -}}

@@ -1,0 +1,20 @@
+# Check if scoop package installation is enabled
+{{ if not (hasKey . "installScoopPackages") }}
+$installScoopPackages = $true
+{{ else }}
+$installScoopPackages = [System.Convert]::ToBoolean("{{ .installScoopPackages }}")
+{{ end }}
+
+if (-not $installScoopPackages) {
+  Write-Host 'SKIPPING SCOOP INSTALLATION (disabled by config)'
+  exit
+}
+
+if (Get-Command 'scoop')
+{
+  exit
+}
+
+Write-Host 'INSTALLING SCOOP...'
+
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression

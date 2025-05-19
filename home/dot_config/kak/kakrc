@@ -1,0 +1,31 @@
+# Kakoune configuration file
+
+# Enable line numbers
+add-highlighter global/ number-lines -relative -hlcursor
+
+# Enable indent guides
+add-highlighter global/ show-whitespaces -lf ' ' -tab '›' -spc '·'
+
+# Set the indentation level
+set-option global tabstop 4
+set-option global indentwidth 4
+
+# Soft tabs
+hook global InsertChar \t %{ exec -draft h@ }
+
+# Use Catppuccin color scheme
+colorscheme catppuccin_mocha
+
+# Some useful key mappings
+map global normal '<c-s>' ': write<ret>' -docstring 'save'
+map global normal '<c-q>' ': quit<ret>' -docstring 'quit'
+map global normal '<c-f>' '/(?i)' -docstring 'search (case insensitive)'
+
+# Highlight trailing whitespace
+add-highlighter global/ regex '\h+$' 0:Error
+
+
+# Improve user experience
+set-option global ui_options ncurses_assistant=none
+set-option global ui_options ncurses_status_on_top=false
+set-option global ui_options ncurses_set_title=true

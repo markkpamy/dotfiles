@@ -1,0 +1,24 @@
+# Reconcile a specific resource or all resources in a namespace (Bash version)
+fxrecall() {
+  NAMESPACE=${1:-flux-system}
+  echo "Reconciling all resources in namespace: $NAMESPACE"
+
+  # Reconcile sources first
+  echo "Reconciling sources..."
+  flux get sources all -n $NAMESPACE -o name | xargs -r -I{} flux reconcile {} -n $NAMESPACE
+
+  # Then kustomizations
+  echo "Reconciling kustomizations..."
+  flux get kustomizations -n $NAMESPACE -o name | xargs -r -I{} flux reconcile {} -n $NAMESPACE
+
+  # Finally helm releases
+  echo "Reconciling helm releases..."
+  flux get helmreleases -n $NAMESPACE -o name | xargs -r -I{} flux reconcile {} -n $NAMESPACE
+
+  echo "Reconciliation complete!"
+}
+
+# Enhanced logs with grep (Bash version)
+fxglog() {
+  flux logs --all-namespaces | grep "$1"
+}

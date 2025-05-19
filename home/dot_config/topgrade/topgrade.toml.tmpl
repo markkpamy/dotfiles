@@ -1,0 +1,145 @@
+# Topgrade Configuration
+# Cross-platform system upgrade tool
+# https://github.com/topgrade-rs/topgrade
+
+[misc]
+# Run upgrades in parallel when possible
+assume_yes = true
+cleanup = true
+display_time = true
+
+# Behavior
+disable = ["vim", "chezmoi"
+# "system",           # Disable OS updates
+# "brew_formula",     # Disable Homebrew formulas
+# "cargo",            # Disable Cargo updates
+]
+
+# Ignore failures for specific steps
+ignore_failures = [
+# "gems",             # Ignore gem update failures
+# "npm",              # Ignore npm update failures
+]
+# Pre-hooks run before any upgrades
+{{- if eq .chezmoi.os "windows" }}
+pre_commands = [
+    # "echo 'Starting Topgrade on Windows...'"
+]
+{{- else }}
+pre_commands = [
+    # "echo 'Starting Topgrade on Linux...'"
+]
+{{- end }}
+
+# Post-hooks run after all upgrades
+post_commands = [
+    # "echo 'Topgrade completed!'"
+]
+
+[pre_commands]
+# Commands to run before specific steps
+
+[post_commands]
+# Commands to run after specific steps
+
+{{- if eq .chezmoi.os "windows" }}
+# Windows-specific configuration
+[windows]
+# Enable Windows features
+accept_all_updates = false
+open_remotes_in_new_terminal = true
+
+# Chocolatey
+[chocolatey]
+use_http = false
+
+# Scoop
+[scoop]
+# No specific configuration needed
+
+# WinGet
+[winget]
+# No specific configuration needed
+
+# PowerShell Gallery
+[powershell]
+# No specific configuration needed
+
+{{- else }}
+# Linux/Unix-specific configuration
+
+# Package managers
+[linux]
+# Use sudo for package managers that need it
+use_sudo = true
+
+# APT (Ubuntu/Debian)
+[apt]
+enable_tlmgr = false
+
+# Snap packages
+[snap]
+use_sudo = true
+
+# Flatpak
+[flatpak]
+use_sudo = false
+
+# Homebrew (if installed on Linux)
+[brew]
+# Use system Homebrew if available
+autoremove = true
+{{- end }}
+
+# Git repositories
+[git]
+
+# Python pip
+[pip3]
+# No specific configuration needed
+
+# Node.js npm
+[npm]
+use_sudo = false
+
+# Cargo (Rust)
+[cargo]
+# No specific configuration needed
+
+# Docker
+[containers]
+# Update Docker images
+use_sudo = false
+
+# Vim/Neovim
+[vim]
+# Update Vim plugins
+
+# General behavior
+[misc]
+no_retry = false
+run_in_tmux = false
+tmux_arguments = "-S /tmp/topgrade"
+
+# Cleanup settings
+cleanup = true
+keep_going = false
+
+# Step configuration
+[commands]
+# Custom commands to run during upgrade
+
+
+
+# Remote execution
+[remote]
+# Configuration for running topgrade on remote machines
+# max_concurrency = 4
+
+# Custom titles for different categories
+[misc]
+display_time = true
+
+# Set custom upgrade order (optional)
+# [step_order]
+# Optional: Define custom order for upgrade steps

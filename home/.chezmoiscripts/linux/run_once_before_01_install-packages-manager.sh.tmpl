@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+# Script header
+print_header "Package Managers Installation" "Installing Homebrew, fnm, pipx and setting up repositories" "$ICON_BREW"
+
+# Set total steps for progress tracking
+set_total_steps 7
+
+# Step 1: System Update
+print_step 1 "System Update"
+print_action "Updating" "apt packages" "$ICON_UPDATE"
+sudo apt update
+
+# Step 2: Homebrew Installation
+print_step 2 "Homebrew Installation"
+print_action "Installing" "Homebrew" "$ICON_INSTALL"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+#Install fnm
+#curl -fsSL https://fnm.vercel.app/install | bash
+
+print_action "Configuring" "Homebrew PATH" "$ICON_CONFIG"
+# Add Homebrew to PATH
+(echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ~/.profile
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+#source ~/.bashrc
+
+#Install cargo
+
+# Step 3: Homebrew Taps
+print_step 3 "Homebrew Taps"
+print_action "Adding" "Homebrew taps" "$ICON_CONFIG"
+
+# List of taps to add
+taps=(
+    "blacktop/tap"
+    "browsh-org/homebrew-browsh"
+    "espanso/espanso"
+    "jesseduffield/lazygit"
+    "koekeishiya/formulae"
+    "kdash-rs/kdash"
+    "c-bata/kube-prompt"
+    "knqyf263/pet"
+    "trendyol/trendyol-tap"
+    "derailed/k9s"
+    "kubeshark/kubeshark"
+    "hashicorp/tap"
+    "arttor/tap"
+    "jandedobbeleer/oh-my-posh"
+    "jorgerojas26/lazysql"
+    "davep/homebrew"
+)
+
+# Add taps with progress bar
+for i in "${!taps[@]}"; do
+    print_progress $((i+1)) ${#taps[@]} "Adding tap: ${taps[$i]}"
+    brew tap "${taps[$i]}"
+done
+
+print_action "Updating" "Homebrew" "$ICON_UPDATE"
+brew update
+
+# Step 4: Python Tools
+print_step 4 "Python Tools"
+print_action "Installing" "pipx" "$ICON_PYTHON"
+brew install pipx
+pipx ensurepath
+
+# Step 5: Essential Packages
+print_step 5 "Essential Packages"
+packages=("build-essential" "git")
+
+for i in "${!packages[@]}"; do
+    print_progress $((i+1)) ${#packages[@]} "Installing: ${packages[$i]}"
+    if [ "${packages[$i]}" = "build-essential" ]; then
+        sudo apt-get install build-essential
+    else
+        sudo apt install "${packages[$i]}"
+    fi
+done
+
+# Step 6: Docker Repository Setup
+print_step 6 "Docker Repository Setup"
+print_action "Adding" "Docker's official GPG key" "$ICON_CONFIG"
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+print_action "Adding" "Docker repository" "$ICON_CONFIG"
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+# Step 7: Additional Repositories
+print_step 7 "Additional Repositories"
+print_action "Adding" "Tabby repository" "$ICON_CONFIG"
+# Add tabby repository
+curl -s https://packagecloud.io/install/repositories/eugeny/tabby/script.deb.sh | sudo bash
+sudo apt-get update
+
+print_success "Package managers installation completed successfully!"
+print_footer "Package Managers Installation" "completed"

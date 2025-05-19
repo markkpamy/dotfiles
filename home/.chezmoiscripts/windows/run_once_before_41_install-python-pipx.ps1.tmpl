@@ -1,0 +1,37 @@
+{{- if and .pkgs.python.windows.pipx .installPythonPackages }}
+
+# Refresh environment variables to ensure pipx is in PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Check if pipx is installed
+if (-not (Get-Command "pipx" -ErrorAction SilentlyContinue)) {
+    Write-Error "pipx is not installed. Please install pipx via pip first (pip install pipx)."
+    exit 1
+}
+
+Write-Host "INSTALLING PIPX PACKAGES (Windows)..." -ForegroundColor Green
+
+# Ensure pipx paths are set up
+Write-Host "Ensuring pipx is properly configured..." -ForegroundColor Yellow
+pipx ensurepath
+
+# Install each package
+{{ range $pkg := .pkgs.python.windows.pipx }}
+Write-Host "Installing {{ $pkg }} via pipx..." -ForegroundColor Cyan
+pipx install {{ $pkg }}
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Failed to install {{ $pkg }} via pipx"
+} else {
+    Write-Host "Successfully installed {{ $pkg }} via pipx" -ForegroundColor Green
+}
+{{ end }}
+
+# Refresh PATH to include pipx-installed binaries
+Write-Host "Refreshing PATH..." -ForegroundColor Yellow
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+Write-Host "PIPX PACKAGES INSTALLATION COMPLETED" -ForegroundColor Green
+
+{{- else }}
+Write-Host "SKIPPING PIPX PACKAGES INSTALLATION" -ForegroundColor Yellow
+{{- end }}

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "Nerd Fonts Installation" "Installing JetBrains Mono Nerd Font for terminal" "$ICON_FONT"
+
+# Set total steps for progress tracking
+set_total_steps 3
+
+REPO="ryanoasis/nerd-fonts"
+
+latest_release() {
+  local repo=$1
+  local result=$(curl --silent "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+  echo "$result"
+}
+
+# Step 1: Version Detection
+print_step 1 "Version Detection"
+print_action "Fetching" "latest release version of $REPO" "$ICON_DOWNLOAD"
+version=$(latest_release $REPO)
+print_success "Latest version is: $version"
+
+install_font() {
+  local fontname=$1
+
+  # Step 2: Font Download
+  print_step 2 "Font Download"
+  print_action "Downloading" "$fontname font" "$ICON_DOWNLOAD"
+  print_info "URL: https://github.com/$REPO/releases/download/$version/$fontname.zip"
+
+  # Create progress indicator for download
+  wget --progress=bar:force:noscroll https://github.com/$REPO/releases/download/$version/$fontname.zip 2>&1 | \
+    while IFS= read -r line; do
+      if [[ $line =~ [0-9]+% ]]; then
+        percent=$(echo "$line" | grep -o '[0-9]\+%' | tail -1 | tr -d '%')
+        print_progress $percent 100 "Downloading $fontname.zip"
+      fi
+    done
+
+  # Step 3: Font Installation
+  print_step 3 "Font Installation"
+  print_action "Extracting" "$fontname.zip" "$ICON_CONFIG"
+  unzip -q "$fontname".zip -d ~/.local/share/fonts
+
+  print_action "Updating" "font cache" "$ICON_CONFIG"
+  fc-cache -fv >/dev/null 2>&1
+
+  # Clean up
+  rm -f "$fontname".zip
+
+  print_success "$fontname installation completed!"
+}
+
+# install_font FiraCode
+# install_font Iosevka
+# install_font FantasqueSansMono
+# install_font Lekton
+# install_font Inconsolata
+# install_font VictorMono
+# install_font InconsolataGo
+# install_font Monofur
+ install_font JetBrainsMono
+# install_font CascadiaCode
+# install_font SourceCodePro
+# install_font Monaspace
+# install_font IosevkaTermSlab
+# install_font MesloLG
+# install_font AnonymousPro
+
+print_footer "Nerd Fonts Installation" "completed"

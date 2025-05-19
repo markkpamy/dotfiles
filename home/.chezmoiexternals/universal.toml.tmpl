@@ -1,0 +1,62 @@
+{{ if eq .osId "windows" }}
+["vimfile/autoload/plug.vim"]
+{{ else }}
+[".vim/autoload/plug.vim"]
+{{ end }}
+type = "file"
+url = "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+
+{{ if eq .osId "windows" }}
+["AppData/Local/nvim"]
+{{ else }}
+[".config/nvim"]
+{{ end }}
+type = "git-repo"
+url = "https://github.com/LazyVim/starter.git"
+
+[".config/git/githelpers.sh"]
+type = "file"
+url = "https://raw.githubusercontent.com/stevearc/dotfiles/master/.githelpers"
+
+{{ if eq .osId "windows" }}
+["AppData/Roaming/bat/themes"]
+{{ else }}
+[".config/bat/themes"]
+{{ end }}
+type = "archive"
+url = "https://github.com/catppuccin/bat/archive/refs/heads/main.zip"
+stripComponents = 2
+include = ["bat-main/themes/Catppuccin *.tmTheme"]
+
+[".config/delta/catppuccin.gitconfig"]
+type = "file"
+url = "https://raw.githubusercontent.com/catppuccin/delta/refs/heads/main/catppuccin.gitconfig"
+
+{{ if eq .osId "windows" }}
+["AppData/Local/k9s/skins"]
+{{ else }}
+[".config/k9s/skins"]
+{{ end }}
+type = "archive"
+url = "https://github.com/catppuccin/k9s/archive/refs/heads/main.zip"
+stripComponents = 2
+include = ["k9s-main/dist/*.yaml"]
+
+{{ if eq .osId "windows" }}
+["AppData/Local/glow/Config/themes"]
+{{ else }}
+[".config/glow/themes"]
+{{ end }}
+type = "archive"
+url = "https://github.com/catppuccin/glamour/archive/refs/heads/main.zip"
+stripComponents = 2
+include = ["glamour-main/themes/catppuccin-*.json"]
+
+# Midnight Commander Catppuccin theme
+{{ if eq .osId "windows" }}
+["AppData/Local/mc/skins/catppuccin.ini"]
+{{ else }}
+[".local/share/mc/skins/catppuccin.ini"]
+{{ end }}
+type = "file"
+url = "https://raw.githubusercontent.com/catppuccin/mc/main/catppuccin.ini"

@@ -1,0 +1,9 @@
+{
+  "document": {
+    "margin": 2
+  },
+  "theme": "catppuccin-glamour",
+  "styles": {
+    "catppuccin-glamour": "themes/catppuccin-glamour.json"
+  }
+}

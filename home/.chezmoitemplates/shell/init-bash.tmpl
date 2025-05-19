@@ -1,0 +1,30 @@
+# Bash initialization
+# Source additional config files
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# Initialize prompt
+if command -v oh-my-posh &> /dev/null; then
+    eval "$(oh-my-posh init bash --config $HOME/.oh-my-posh.json)"
+fi
+{{/*elif command -v starship &>/dev/null*/}}
+{{/*    starship init fish | source*/}}
+{{/*end*/}}
+
+# Initialize tools
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init bash)"
+fi
+
+if command -v direnv &> /dev/null; then
+    eval "$(direnv hook bash)"
+fi
+
+{{/*if command -v atuin &> /dev/null; then*/}}
+{{/*    eval "$(atuin init bash)"*/}}
+{{/*fi*/}}
+
+if command -v kubectl &> /dev/null; then
+    source <(kubectl completion bash)
+fi

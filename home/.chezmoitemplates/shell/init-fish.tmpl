@@ -1,0 +1,37 @@
+# Fish initialization
+fish_config theme choose "Catppuccin Mocha"
+if status is-interactive
+# Initialize tools
+    if command -v atuin &>/dev/null
+        atuin init fish | source
+    end
+end
+
+# Initialize prompt
+if command -v oh-my-posh &>/dev/null
+    oh-my-posh init fish --config $HOME/.oh-my-posh.json | source
+end
+{{/* Comment out this block since it's causing issues
+elif command -v starship &>/dev/null
+    starship init fish | source
+end
+*/}}
+
+if command -v zoxide &>/dev/null
+    zoxide init fish | source
+end
+
+if command -v jump &>/dev/null
+    jump shell fish | source
+end
+
+if command -v direnv &>/dev/null
+    direnv hook fish | source
+end
+
+if command -v kubectl &>/dev/null
+    kubectl completion fish | source
+end
+
+# Fish-specific settings
+export ENHANCD_ENABLE_DOUBLE_DOT=false

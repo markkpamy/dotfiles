@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+# Configure desktop environment preferences
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+{{ if and (eq .chezmoi.os "linux") .isDesktop -}}
+# Only execute on Linux desktop systems
+
+set -eufo pipefail
+
+print_header "Desktop Environment Configuration" "Configuring desktop environment preferences" "$ICON_CONFIG"
+
+# Configure based on detected desktop environment
+{{ if eq .desktopEnv "gnome" -}}
+print_section "GNOME Configuration" "$ICON_CONFIG"
+
+# Check if gsettings command exists
+if command -v gsettings &> /dev/null; then
+    print_action "Applying" "GNOME settings" "$ICON_CONFIG"
+
+    # Set dark theme if available
+    if gsettings list-schemas | grep -q org.gnome.desktop.interface; then
+        print_action "Setting" "dark theme" "$ICON_CONFIG"
+        # Try to use dark theme
+        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+        gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+
+        print_action "Setting" "monospace font" "$ICON_FONT"
+        # Set monospace font
+        gsettings set org.gnome.desktop.interface monospace-font-name 'JetBrains Mono 10'
+
+        print_action "Configuring" "interface preferences" "$ICON_CONFIG"
+        # Set other preferences
+        gsettings set org.gnome.desktop.interface show-battery-percentage true
+        gsettings set org.gnome.desktop.interface clock-show-seconds true
+        gsettings set org.gnome.desktop.interface clock-show-weekday true
+
+        print_action "Configuring" "window management" "$ICON_CONFIG"
+        # Window management
+        gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
+        gsettings set org.gnome.desktop.wm.preferences action-middle-click-titlebar 'minimize'
+
+        print_action "Configuring" "file manager settings" "$ICON_CONFIG"
+        # File manager settings
+        gsettings set org.gnome.nautilus.preferences show-hidden-files true
+        gsettings set org.gnome.nautilus.list-view use-tree-view true
+
+        print_success "GNOME settings applied successfully"
+    else
+        print_warning "org.gnome.desktop.interface schema not found. Skipping GNOME settings."
+    fi
+
+    # Enable GNOME extensions if installed
+    if [ -d "$HOME/.local/share/gnome-shell/extensions" ]; then
+        print_info "GNOME extensions directory found. You may want to enable extensions with the Extensions app."
+    fi
+else
+    print_warning "gsettings command not found. Skipping GNOME settings."
+fi
+
+{{ else if eq .desktopEnv "kde" -}}
+print_section "KDE Configuration" "$ICON_CONFIG"
+
+# KDE-specific configurations
+if command -v kwriteconfig5 &> /dev/null; then
+    print_action "Configuring" "Konsole" "$ICON_CONFIG"
+    # Configure Konsole
+    mkdir -p "$HOME/.local/share/konsole"
+
+    print_action "Configuring" "Dolphin file manager" "$ICON_CONFIG"
+    # Configure Dolphin
+    kwriteconfig5 --file dolphinrc --group "General" --key "ShowFullPath" "true"
+    kwriteconfig5 --file dolphinrc --group "PreviewSettings" --key "Plugins" "directorythumbnail,fontthumbnail,imagethumbnail,jpegthumbnail,svgthumbnail,textthumbnail"
+
+    print_action "Configuring" "KWin window manager" "$ICON_CONFIG"
+    # Configure KWin
+    kwriteconfig5 --file kwinrc --group "Windows" --key "BorderlessMaximizedWindows" "true"
+
+    print_success "KDE settings applied successfully"
+else
+    print_warning "kwriteconfig5 command not found. Skipping KDE settings."
+fi
+
+{{ else if eq .desktopEnv "xfce" -}}
+print_section "Xfce Configuration" "$ICON_CONFIG"
+
+# Xfce-specific configurations
+if command -v xfconf-query &> /dev/null; then
+    print_action "Configuring" "Xfce panels" "$ICON_CONFIG"
+    # Configure panels
+    xfconf-query -c xfce4-panel -p /panels/panel-1/autohide-behavior -n -t int -s 0
+
+    print_action "Configuring" "window manager" "$ICON_CONFIG"
+    # Configure window manager
+    xfconf-query -c xfwm4 -p /general/use_compositing -s true
+    xfconf-query -c xfwm4 -p /general/shadow_opacity -s 80
+
+    print_action "Configuring" "desktop icons" "$ICON_CONFIG"
+    # Configure desktop
+    xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-filesystem -s false
+    xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-home -s true
+
+    print_success "Xfce settings applied successfully"
+else
+    print_warning "xfconf-query command not found. Skipping Xfce settings."
+fi
+
+{{ else if eq .desktopEnv "i3" -}}
+print_section "i3 Window Manager Configuration" "$ICON_CONFIG"
+
+# i3-specific configurations
+if [ -d "$HOME/.config/i3" ]; then
+    print_info "i3 config directory found. You may want to customize your i3 configuration."
+fi
+
+{{ else if eq .desktopEnv "sway" -}}
+print_section "Sway Window Manager Configuration" "$ICON_CONFIG"
+
+# Sway-specific configurations
+if [ -d "$HOME/.config/sway" ]; then
+    print_info "Sway config directory found. You may want to customize your Sway configuration."
+fi
+
+{{ end -}}
+
+print_success "Desktop environment configuration completed!"
+print_footer "Desktop Environment Configuration" "completed"
+
+{{ else }}
+print_header "Desktop Environment Configuration" "Skipping - not a Linux desktop system" "$ICON_CONFIG"
+print_warning "This script is designed for Linux desktop systems only"
+print_footer "Desktop Environment Configuration" "skipped"
+{{ end -}}

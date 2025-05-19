@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+set -eufo pipefail
+
+DISTRO=$(lsb_release -i | awk '{print $NF}')
+
+print_header "Ubuntu Package Installation" "Installing packages via APT package manager" "$ICON_PACKAGE"
+
+case "$DISTRO" in
+"Ubuntu")
+    print_success "Detected Ubuntu distribution"
+    ;;
+*)
+    print_warning "Not an Ubuntu system (detected: $DISTRO), skipping..."
+    print_footer "Ubuntu Package Installation" "skipped"
+    exit 0
+    ;;
+esac
+
+# Set total steps for progress tracking
+set_total_steps {{ if .pkgs.ubuntu.repositories }}4{{ else }}3{{ end }}
+
+# Step 1: Initial Setup
+print_step 1 "Initial Setup"
+print_action "Installing" "software-properties-common" "$ICON_INSTALL"
+sudo apt-get install software-properties-common
+
+{{ if .pkgs.ubuntu.repositories }}
+# Step 2: Repository Configuration
+print_step 2 "Repository Configuration"
+print_action "Adding" "repositories" "$ICON_CONFIG"
+
+repositories=({{ range $repository := .pkgs.ubuntu.repositories }}"{{ $repository }}" {{ end }})
+
+for i in "${!repositories[@]}"; do
+    print_progress $((i+1)) ${#repositories[@]} "Adding repository: ${repositories[$i]}"
+    sudo add-apt-repository "${repositories[$i]}"
+done
+{{ end }}
+
+# Step {{ if .pkgs.ubuntu.repositories }}3{{ else }}2{{ end }}: Package Source Update
+print_step {{ if .pkgs.ubuntu.repositories }}3{{ else }}2{{ end }} "Package Source Update"
+print_action "Updating" "package sources" "$ICON_UPDATE"
+sudo apt update
+
+# Step {{ if .pkgs.ubuntu.repositories }}4{{ else }}3{{ end }}: Package Installation
+print_step {{ if .pkgs.ubuntu.repositories }}4{{ else }}3{{ end }} "Package Installation"
+
+packages=({{ range $pkg := .pkgs.ubuntu.pkgs }}"{{ $pkg }}" {{ end }})
+
+if [ ${#packages[@]} -eq 0 ]; then
+    print_warning "No packages configured for installation"
+else
+    print_info "Installing ${#packages[@]} packages..."
+
+    # Install packages with progress tracking
+    for i in "${!packages[@]}"; do
+        pkg="${packages[$i]}"
+        print_progress $((i+1)) ${#packages[@]} "Installing: $pkg"
+        sudo apt install -y "$pkg" || print_warning "Failed to install $pkg"
+    done
+
+    print_success "Package installation completed"
+fi
+
+{{ if .pkgs.ubuntu.oneScriptInstall }}
+# Additional step for one-script installations
+print_section "One-Script Installations" "$ICON_DOWNLOAD"
+
+scripts=({{ range $script := .pkgs.ubuntu.oneScriptInstall }}"{{ $script }}" {{ end }})
+
+for i in "${!scripts[@]}"; do
+    script="${scripts[$i]}"
+    print_progress $((i+1)) ${#scripts[@]} "Running script: $script"
+    curl -sSfL "$script" | sh
+done
+{{ end }}
+
+print_success "Ubuntu package installation completed successfully!"
+print_footer "Ubuntu Package Installation" "completed"
+
+# Ensure script exits with success code
+ensure_success_exit

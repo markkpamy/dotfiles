@@ -1,0 +1,176 @@
+# Catppuccin Latte theme for Helix
+
+# Palette
+"rosewater" = "#dc8a78"
+"flamingo" = "#dd7878"
+"pink" = "#ea76cb"
+"mauve" = "#8839ef"
+"red" = "#d20f39"
+"maroon" = "#e64553"
+"peach" = "#fe640b"
+"yellow" = "#df8e1d"
+"green" = "#40a02b"
+"teal" = "#179299"
+"sky" = "#04a5e5"
+"sapphire" = "#209fb5"
+"blue" = "#1e66f5"
+"lavender" = "#7287fd"
+"text" = "#4c4f69"
+"subtext1" = "#5c5f77"
+"subtext0" = "#6c6f85"
+"overlay2" = "#7c7f93"
+"overlay1" = "#8c8fa1"
+"overlay0" = "#9ca0b0"
+"surface2" = "#acb0be"
+"surface1" = "#bcc0cc"
+"surface0" = "#ccd0da"
+"base" = "#eff1f5"
+"mantle" = "#e6e9ef"
+"crust" = "#dce0e8"
+
+# UI
+"ui.background" = { bg = "base" }
+"ui.background.separator" = { fg = "surface0" }
+"ui.bufferline" = { fg = "subtext0", bg = "mantle" }
+"ui.bufferline.active" = { fg = "mauve", bg = "base", modifiers = ["bold"] }
+"ui.bufferline.background" = { bg = "mantle" }
+"ui.cursor" = { fg = "base", bg = "text" }
+"ui.cursor.insert" = { fg = "base", bg = "rosewater" }
+"ui.cursor.match" = { fg = "peach", bg = "surface0", modifiers = ["bold"] }
+"ui.cursor.primary" = { fg = "base", bg = "lavender" }
+"ui.cursor.select" = { fg = "base", bg = "flamingo" }
+"ui.cursorline.primary" = { bg = "surface0" }
+"ui.debug" = { fg = "pink" }
+"ui.diff.addition" = { bg = "surface0", fg = "green" }
+"ui.diff.change" = { bg = "surface0", fg = "blue" }
+"ui.diff.deletion" = { bg = "surface0", fg = "red" }
+"ui.gutter" = { bg = "base" }
+"ui.gutter.selected" = { bg = "surface0" }
+"ui.help" = { fg = "overlay2", bg = "surface0" }
+"ui.hint" = { fg = "teal" }
+"ui.linenr" = { fg = "surface1" }
+"ui.linenr.selected" = { fg = "lavender" }
+"ui.menu" = { fg = "overlay2", bg = "surface0" }
+"ui.menu.selected" = { fg = "text", bg = "surface1", modifiers = ["bold"] }
+"ui.popup" = { bg = "surface0" }
+"ui.popup.info" = { bg = "surface0" }
+"ui.selection" = { bg = "surface1" }
+"ui.selection.primary" = { bg = "surface1" }
+"ui.statusline" = { fg = "subtext1", bg = "mantle" }
+"ui.statusline.inactive" = { fg = "surface2", bg = "mantle" }
+"ui.statusline.insert" = { fg = "base", bg = "blue" }
+"ui.statusline.normal" = { fg = "base", bg = "lavender" }
+"ui.statusline.select" = { fg = "base", bg = "flamingo" }
+"ui.text" = { fg = "text" }
+"ui.text.focus" = { fg = "text", modifiers = ["bold"] }
+"ui.text.inactive" = { fg = "overlay1" }
+"ui.text.info" = { fg = "text" }
+"ui.virtual.indent-guide" = { fg = "surface0" }
+"ui.virtual.inlay-hint" = { fg = "overlay1", bg = "mantle" }
+"ui.virtual.ruler" = { bg = "surface0" }
+"ui.window" = { bg = "base" }
+
+# Syntax highlighting
+"comment" = { fg = "overlay0", modifiers = ["italic"] }
+"constant" = { fg = "peach" }
+"constant.builtin" = { fg = "peach", modifiers = ["bold"] }
+"constant.builtin.boolean" = { fg = "sky", modifiers = ["bold"] }
+"constant.character" = { fg = "teal" }
+"constant.character.escape" = { fg = "pink", modifiers = ["bold"] }
+"constant.numeric" = { fg = "peach", modifiers = ["bold"] }
+"constructor" = { fg = "sapphire", modifiers = ["bold"] }
+"debug" = { fg = "pink" }
+"diagnostic" = { modifiers = ["underlined"] }
+"diagnostic.error" = { fg = "red" }
+"diagnostic.hint" = { fg = "teal" }
+"diagnostic.info" = { fg = "sky" }
+"diagnostic.warning" = { fg = "yellow" }
+"error" = { fg = "red" }
+"function" = { fg = "blue" }
+"function.builtin" = { fg = "sky" }
+"function.macro" = { fg = "teal" }
+"hint" = { fg = "teal" }
+"info" = { fg = "sky" }
+"keyword" = { fg = "mauve", modifiers = ["italic"] }
+"keyword.control" = { fg = "mauve" }
+"keyword.control.conditional" = { fg = "mauve" }
+"keyword.control.exception" = { fg = "mauve" }
+"keyword.control.import" = { fg = "teal" }
+"keyword.control.repeat" = { fg = "mauve" }
+"keyword.control.return" = { fg = "mauve" }
+"keyword.directive" = { fg = "mauve" }
+"keyword.function" = { fg = "mauve" }
+"keyword.operator" = { fg = "maroon" }
+"label" = { fg = "sapphire" }
+"markup.bold" = { fg = "peach", modifiers = ["bold"] }
+"markup.heading" = { fg = "pink", modifiers = ["bold"] }
+"markup.italic" = { fg = "peach", modifiers = ["italic"] }
+"markup.link" = { fg = "blue", modifiers = ["underlined"] }
+"markup.link.label" = { fg = "pink" }
+"markup.link.text" = { fg = "flamingo" }
+"markup.link.url" = { fg = "rosewater", modifiers = ["italic", "underlined"] }
+"markup.list" = { fg = "mauve" }
+"markup.quote" = { fg = "sky", modifiers = ["italic"] }
+"markup.raw" = { fg = "flamingo" }
+"markup.strikethrough" = { modifiers = ["crossed_out"] }
+"namespace" = { fg = "blue" }
+"operator" = { fg = "sky" }
+"punctuation" = { fg = "overlay2" }
+"punctuation.bracket" = { fg = "overlay2" }
+"punctuation.delimiter" = { fg = "overlay2" }
+"punctuation.special" = { fg = "maroon" }
+"special" = { fg = "blue" }
+"storage.modifier" = { fg = "mauve" }
+"storage.type" = { fg = "red", modifiers = ["italic"] }
+"string" = { fg = "green", modifiers = ["italic"] }
+"string.regexp" = { fg = "peach", modifiers = ["italic"] }
+"string.special" = { fg = "blue" }
+"string.special.path" = { fg = "blue" }
+"string.special.symbol" = { fg = "flamingo", modifiers = ["bold"] }
+"string.special.url" = { fg = "blue", modifiers = ["italic", "underlined"] }
+"tag" = { fg = "mauve" }
+"type" = { fg = "yellow" }
+"type.builtin" = { fg = "yellow", modifiers = ["italic"] }
+"type.enum.variant" = { fg = "flamingo" }
+"variable" = { fg = "text" }
+"variable.builtin" = { fg = "red", modifiers = ["italic"] }
+"variable.other.member" = { fg = "teal" }
+"variable.parameter" = { fg = "rosewater", modifiers = ["italic"] }
+"warning" = { fg = "yellow" }
+
+# Languages
+
+# Diff
+"diff.plus" = { fg = "green" }
+"diff.delta" = { fg = "blue" }
+"diff.minus" = { fg = "red" }
+
+# Git
+"gitcommit.text" = { fg = "text" }
+
+# CSS
+"css.property" = { fg = "blue" }
+"css.selector" = { fg = "green" }
+"css.separator" = { fg = "overlay2" }
+
+# HTML
+"markup.heading.marker" = { fg = "peach", modifiers = ["bold"] }
+"markup.heading.1" = { fg = "red", modifiers = ["bold"] }
+"markup.heading.2" = { fg = "peach", modifiers = ["bold"] }
+"markup.heading.3" = { fg = "yellow", modifiers = ["bold"] }
+"markup.heading.4" = { fg = "green", modifiers = ["bold"] }
+"markup.heading.5" = { fg = "blue", modifiers = ["bold"] }
+"markup.heading.6" = { fg = "lavender", modifiers = ["bold"] }
+
+# Markdown
+"markdown.list.bullet" = { fg = "maroon" }
+"markdown.text.literal" = { fg = "green" }
+
+# Rust
+"keyword.storage.lifetime" = { fg = "maroon", modifiers = ["italic"] }
+"entity.name.function.macro" = { fg = "teal" }
+"markup.raw.block" = { fg = "mauve" }
+
+# JSON
+"string.escape" = { fg = "pink", modifiers = ["bold"] }
+"keyword.control.anchor" = { fg = "pink" }

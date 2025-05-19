@@ -380,7 +380,7 @@ xdg-mime default firefox.desktop text/html
    ```bash
    # Rebuild font cache
    fc-cache -fv
-   
+
    # Check font installation
    fc-list | grep "Font Name"
    ```
@@ -403,7 +403,7 @@ xdg-mime default firefox.desktop text/html
    ```bash
    # Flatpak permissions
    flatpak permission-reset
-   
+
    # Snap refresh
    sudo snap refresh
    ```

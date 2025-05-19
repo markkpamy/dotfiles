@@ -45,7 +45,7 @@ The Windows dotfiles setup includes comprehensive automated package management u
 During `chezmoi apply`, you'll be prompted for package installation:
 
 ```
-Install Scoop packages? This may take some time [y/N]: 
+Install Scoop packages? This may take some time [y/N]:
 Install Choco packages? This may take some time [y/N]:
 Install Python packages (pip and pipx)? This may take some time [y/N]:
 ```

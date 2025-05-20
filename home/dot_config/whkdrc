@@ -1,0 +1,80 @@
+.shell powershell
+# WHKD Configuration for Komorebi
+# Converted from komorebi.ahk
+
+# Basic Controls
+alt + q : komorebic close
+alt + m : komorebic minimize
+alt + shift + o : komorebic reload-configuration
+
+# Focus windows
+alt + h : komorebic focus left
+alt + j : komorebic focus down
+alt + k : komorebic focus up
+alt + l : komorebic focus right
+alt + shift + a     : komorebic cycle-focus previous # oem_4 is [
+alt + shift + z     : komorebic cycle-focus next # oem_6 is ]
+
+# Move windows
+alt + shift + h : komorebic move left
+alt + shift + j : komorebic move down
+alt + shift + k : komorebic move up
+alt + shift + l : komorebic move right
+
+# Stack windows
+alt + left : komorebic stack left
+alt + down : komorebic stack down
+alt + u : komorebic stack up
+alt + right : komorebic stack right
+alt + shift + u : komorebic unstack
+alt + e : komorebic cycle-stack previous
+alt + shift + e : komorebic cycle-stack next
+
+# # Resize
+alt + shift + left : komorebic resize-window left
+alt + shift + down : komorebic resize-window down
+alt + shift + up : komorebic resize-window up
+alt + shift + right : komorebic resize-window right
+
+# # Workspaces (0-8)
+alt + 1 : komorebic focus-workspace 0
+alt + 2 : komorebic focus-workspace 1
+alt + 3 : komorebic focus-workspace 2
+alt + 4 : komorebic focus-workspace 3
+alt + 5 : komorebic focus-workspace 4
+alt + 6 : komorebic focus-workspace 5
+alt + 7 : komorebic focus-workspace 6
+alt + 8 : komorebic focus-workspace 7
+alt + 9 : komorebic focus-workspace 8
+
+# # Move windows across workspaces
+alt + shift + 1 : komorebic move-to-workspace 0
+alt + shift + 2 : komorebic move-to-workspace 1
+alt + shift + 3 : komorebic move-to-workspace 2
+alt + shift + 4 : komorebic move-to-workspace 3
+alt + shift + 5 : komorebic move-to-workspace 4
+alt + shift + 6 : komorebic move-to-workspace 5
+alt + shift + 7 : komorebic move-to-workspace 6
+alt + shift + 8 : komorebic move-to-workspace 7
+alt + shift + 9 : komorebic move-to-workspace 8
+
+# # Cycle through workspaces
+alt + tab : komorebic cycle-workspace next
+alt + shift + tab : komorebic cycle-workspace previous
+
+# # Layout adjustments
+alt + x : komorebic flip-layout horizontal
+alt + y : komorebic flip-layout vertical
+alt + c : komorebic promote
+alt + shift + back : komorebic retile
+alt + back : komorebic toggle-float
+alt + t : komorebic toggle-float-all
+alt + w : komorebic toggle-monocle
+alt + shift + r : komorebic toggle-tiling-direction
+alt + s : komorebic toggle-maximize
+
+# Application shortcuts (commented out as in original file)
+# Uncomment and modify these if needed
+# Note: Application launching requires different syntax in WHKD
+# alt + f : ...
+# alt + b : ...

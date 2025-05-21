@@ -220,7 +220,8 @@ args = ["--paging=never"]
 [merge]
 command = "nvim"
 args = ["-d", "{{ "{{" }} .Destination {{ "}}" }}", "{{ "{{" }} .Source {{ "}}" }}", "{{ "{{" }} .Target {{ "}}" }}"]
-{{- writeToStdout "==== END CHEZMOI CONFIG ====\n" -}}
 
 [bitwardenSecrets]
-command = "./local/bin/bws"
+command = "$HOME/.local/bin/bws"
+
+{{- writeToStdout "==== END CHEZMOI CONFIG ====\n" -}}

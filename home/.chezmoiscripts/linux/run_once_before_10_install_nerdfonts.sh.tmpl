@@ -10,17 +10,25 @@ set_total_steps 3
 
 REPO="ryanoasis/nerd-fonts"
 
-latest_release() {
-  local repo=$1
-  local result=$(curl --silent "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-  echo "$result"
-}
-
 # Step 1: Version Detection
 print_step 1 "Version Detection"
 print_action "Fetching" "latest release version of $REPO" "$ICON_DOWNLOAD"
-version=$(latest_release $REPO)
-print_success "Latest version is: $version"
+
+# Check if jq is installed, install it if not
+if ! command -v jq &> /dev/null; then
+    print_action "Installing" "jq for JSON parsing" "$ICON_INSTALL"
+    sudo apt-get update -y
+    sudo apt-get install -y jq
+fi
+
+# Use jq to parse GitHub API response
+version=$(curl -s 'https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest' | jq -r '.name')
+if [ -z "$version" ] || [ "$version" = "null" ]; then
+    version="v3.2.1"
+    print_warning "Could not retrieve latest version from GitHub. Using fallback version: $version"
+else
+    print_success "Latest version is: $version"
+fi
 
 install_font() {
   local fontname=$1
@@ -29,6 +37,12 @@ install_font() {
   print_step 2 "Font Download"
   print_action "Downloading" "$fontname font" "$ICON_DOWNLOAD"
   print_info "URL: https://github.com/$REPO/releases/download/$version/$fontname.zip"
+
+  # Ensure ~/.local/share/fonts directory exists
+  if [ ! -d "$HOME/.local/share/fonts" ]; then
+    mkdir -p "$HOME/.local/share/fonts"
+    print_info "Created ~/.local/share/fonts directory"
+  fi
 
   # Create progress indicator for download
   wget --progress=bar:force:noscroll https://github.com/$REPO/releases/download/$version/$fontname.zip 2>&1 | \
@@ -45,7 +59,7 @@ install_font() {
   unzip -q "$fontname".zip -d ~/.local/share/fonts
 
   print_action "Updating" "font cache" "$ICON_CONFIG"
-  fc-cache -fv >/dev/null 2>&1
+  fc-cache -fv >/dev/null 2>&1 || sudo fc-cache -fv >/dev/null 2>&1
 
   # Clean up
   rm -f "$fontname".zip

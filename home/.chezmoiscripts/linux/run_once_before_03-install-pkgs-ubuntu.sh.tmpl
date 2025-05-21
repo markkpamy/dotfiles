@@ -75,7 +75,7 @@ scripts=({{ range $script := .pkgs.ubuntu.oneScriptInstall }}"{{ $script }}" {{ 
 for i in "${!scripts[@]}"; do
     script="${scripts[$i]}"
     print_progress $((i+1)) ${#scripts[@]} "Running script: $script"
-    curl -sSfL "$script" | sh
+    curl -sSfL "$script" | bash
 done
 {{ end }}
 

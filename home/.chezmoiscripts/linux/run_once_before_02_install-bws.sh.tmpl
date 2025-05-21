@@ -21,7 +21,9 @@ log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-alias bws="{{ .chezmoi.destDir }}/.local/bin/bws"
+bws() {
+"{{ .chezmoi.destDir }}/.local/bin/bws" "$@"
+}
 
 # Function to check if a command exists
 command_exists() {
@@ -127,6 +129,7 @@ install_bws() {
   chmod +x "$INSTALL_DIR/bws"
 
   # Verify installation
+
   if command_exists bws; then
     print_success "Bitwarden Secrets Manager CLI has been successfully installed!"
     print_info "Version: $(bws --version)"

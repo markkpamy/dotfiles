@@ -222,6 +222,6 @@ command = "nvim"
 args = ["-d", "{{ "{{" }} .Destination {{ "}}" }}", "{{ "{{" }} .Source {{ "}}" }}", "{{ "{{" }} .Target {{ "}}" }}"]
 
 [bitwardenSecrets]
-command = "$HOME/.local/bin/bws"
+command = "${{ .chezmoi.destDir }}/.local/bin/bws"
 
 {{- writeToStdout "==== END CHEZMOI CONFIG ====\n" -}}

@@ -14,7 +14,7 @@ fi
 print_section "Key Import" "$ICON_DOWNLOAD"
 
 print_action "Importing" "GitHub web-flow GPG key" "$ICON_DOWNLOAD"
-curl 'https://github.com/web-flow.gpg' | gpg --import
+curl 'https://github.com/web-flow.gpg' | gpg --import --batch --yes
 
 print_success "GPG public keys imported successfully!"
 print_footer "GPG Public Keys Import" "completed"

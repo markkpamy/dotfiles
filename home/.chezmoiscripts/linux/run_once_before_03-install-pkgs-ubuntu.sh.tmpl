@@ -26,7 +26,7 @@ set_total_steps {{ if .pkgs.ubuntu.repositories }}4{{ else }}3{{ end }}
 # Step 1: Initial Setup
 print_step 1 "Initial Setup"
 print_action "Installing" "software-properties-common" "$ICON_INSTALL"
-sudo apt-get install software-properties-common
+sudo apt-get install -y software-properties-common
 
 {{ if .pkgs.ubuntu.repositories }}
 # Step 2: Repository Configuration
@@ -37,14 +37,14 @@ repositories=({{ range $repository := .pkgs.ubuntu.repositories }}"{{ $repositor
 
 for i in "${!repositories[@]}"; do
     print_progress $((i+1)) ${#repositories[@]} "Adding repository: ${repositories[$i]}"
-    sudo add-apt-repository "${repositories[$i]}"
+    sudo add-apt-repository -y "${repositories[$i]}"
 done
 {{ end }}
 
 # Step {{ if .pkgs.ubuntu.repositories }}3{{ else }}2{{ end }}: Package Source Update
 print_step {{ if .pkgs.ubuntu.repositories }}3{{ else }}2{{ end }} "Package Source Update"
 print_action "Updating" "package sources" "$ICON_UPDATE"
-sudo apt update
+sudo apt update -y
 
 # Step {{ if .pkgs.ubuntu.repositories }}4{{ else }}3{{ end }}: Package Installation
 print_step {{ if .pkgs.ubuntu.repositories }}4{{ else }}3{{ end }} "Package Installation"

@@ -17,7 +17,7 @@ print_section "Flatpak Setup" "$ICON_CONFIG"
 if ! command -v flatpak &> /dev/null; then
     print_action "Installing" "Flatpak package manager" "$ICON_INSTALL"
     {{ if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "linuxmint") (eq .chezmoi.osRelease.id "pop") -}}
-    sudo apt-get update
+    sudo apt-get update -y
     sudo apt-get install -y flatpak gnome-software-plugin-flatpak
     {{ else if or (eq .chezmoi.osRelease.id "arch") (eq .chezmoi.osRelease.id "manjaro") (eq .chezmoi.osRelease.id "endeavouros") -}}
     sudo pacman -Syu --noconfirm flatpak

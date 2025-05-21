@@ -26,7 +26,7 @@ set_total_steps 4
 # Step 1: System Update
 print_step 1 "System Update"
 print_action "Updating" "package sources" "$ICON_UPDATE"
-sudo pacman -Sy
+sudo pacman -Sy --noconfirm
 
 # Step 2: AUR Helper Setup
 print_step 2 "AUR Helper Setup"
@@ -35,7 +35,7 @@ if ! command -v yay &>/dev/null; then
     sudo pacman -S --needed git base-devel --noconfirm
     git clone https://aur.archlinux.org/yay-bin.git
     cd yay-bin
-    makepkg -si
+    makepkg -si --noconfirm
     cd ..
     print_success "yay installed successfully"
 else

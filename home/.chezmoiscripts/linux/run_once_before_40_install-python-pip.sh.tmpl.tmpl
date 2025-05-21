@@ -32,7 +32,7 @@ print_success "Python3 and pip3 are available"
 # Step 2: Pip Upgrade
 print_step 2 "Pip Upgrade"
 print_action "Upgrading" "pip to latest version" "$ICON_UPDATE"
-python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade pip --no-input
 
 # Step 3: Package Installation
 print_step 3 "Package Installation"
@@ -45,7 +45,7 @@ print_info "Installing ${#packages[@]} packages via pip..."
 for i in "${!packages[@]}"; do
     pkg="${packages[$i]}"
     print_progress $((i+1)) ${#packages[@]} "Installing: $pkg"
-    python3 -m pip install --user "$pkg"
+    python3 -m pip install --user "$pkg" --no-input
     if [ $? -ne 0 ]; then
         print_warning "Failed to install $pkg"
     else

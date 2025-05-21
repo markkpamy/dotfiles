@@ -7,15 +7,40 @@ source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
 print_header "Package Managers Installation" "Installing Homebrew, fnm, pipx and setting up repositories" "$ICON_BREW"
 
 # Set total steps for progress tracking
-set_total_steps 7
+set_total_steps 9
 
 # Step 1: System Update
 print_step 1 "System Update"
 print_action "Updating" "apt packages" "$ICON_UPDATE"
-sudo apt update
+sudo apt update -y
 
-# Step 2: Homebrew Installation
-print_step 2 "Homebrew Installation"
+# Step 2: Check and create ~/.local/bin directory
+print_step 2 "Local bin directory setup"
+if [ ! -d "$HOME/.local/bin" ]; then
+    print_action "Creating" "~/.local/bin directory" "$ICON_CONFIG"
+    mkdir -p "$HOME/.local/bin"
+    print_success "Created ~/.local/bin directory"
+else
+    print_success "~/.local/bin directory already exists"
+fi
+
+# Add ~/.local/bin to PATH if not already there
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    print_action "Adding" "~/.local/bin to PATH" "$ICON_CONFIG"
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.profile
+    export PATH="$HOME/.local/bin:$PATH"
+    print_success "Added ~/.local/bin to PATH"
+else
+    print_success "~/.local/bin is already in PATH"
+fi
+
+# Step 3: Install Git (Required by Homebrew)
+print_step 3 "Git Installation"
+print_action "Installing" "Git" "$ICON_INSTALL"
+sudo apt install -y git
+
+# Step 4: Homebrew Installation
+print_step 4 "Homebrew Installation"
 print_action "Installing" "Homebrew" "$ICON_INSTALL"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -30,8 +55,8 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 #Install cargo
 
-# Step 3: Homebrew Taps
-print_step 3 "Homebrew Taps"
+# Step 5: Homebrew Taps
+print_step 5 "Homebrew Taps"
 print_action "Adding" "Homebrew taps" "$ICON_CONFIG"
 
 # List of taps to add
@@ -63,15 +88,15 @@ done
 print_action "Updating" "Homebrew" "$ICON_UPDATE"
 brew update
 
-# Step 4: Python Tools
-print_step 4 "Python Tools"
+# Step 6: Python Tools
+print_step 6 "Python Tools"
 print_action "Installing" "pipx" "$ICON_PYTHON"
 brew install pipx
 pipx ensurepath
 
-# Step 5: Essential Packages
-print_step 5 "Essential Packages"
-packages=("build-essential" "git")
+# Step 7: Essential Packages
+print_step 7 "Essential Packages"
+packages=("build-essential")
 
 for i in "${!packages[@]}"; do
     print_progress $((i+1)) ${#packages[@]} "Installing: ${packages[$i]}"
@@ -82,8 +107,8 @@ for i in "${!packages[@]}"; do
     fi
 done
 
-# Step 6: Docker Repository Setup
-print_step 6 "Docker Repository Setup"
+# Step 8: Docker Repository Setup
+print_step 8 "Docker Repository Setup"
 print_action "Adding" "Docker's official GPG key" "$ICON_CONFIG"
 # Add Docker's official GPG key:
 sudo apt-get update
@@ -100,8 +125,8 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 
-# Step 7: Additional Repositories
-print_step 7 "Additional Repositories"
+# Step 9: Additional Repositories
+print_step 9 "Additional Repositories"
 print_action "Adding" "Tabby repository" "$ICON_CONFIG"
 # Add tabby repository
 curl -s https://packagecloud.io/install/repositories/eugeny/tabby/script.deb.sh | sudo bash

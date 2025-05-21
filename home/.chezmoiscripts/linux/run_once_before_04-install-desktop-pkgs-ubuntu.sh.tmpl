@@ -9,7 +9,7 @@ set -eufo pipefail
 echo "Installing desktop packages for Ubuntu/Debian..."
 
 # Install common desktop packages
-sudo apt-get update
+sudo apt-get update -y
 {{ if .pkgs.linuxDesktop.common }}
 sudo apt-get install -y \
   {{ range .pkgs.linuxDesktop.common -}}

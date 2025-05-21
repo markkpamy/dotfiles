@@ -61,7 +61,7 @@ while IFS= read -r line; do
 done < "$BREWFILE"
 
 # Install from the temporary Brewfile
-HOMEBREW_NO_AUTO_UPDATE=1 brew bundle --file="$BREWFILE" --no-lock
+HOMEBREW_NO_AUTO_UPDATE=1 brew bundle --file="$BREWFILE"
 
 # Clean up
 rm "$BREWFILE"

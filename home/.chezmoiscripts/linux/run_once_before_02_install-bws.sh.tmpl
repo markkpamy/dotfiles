@@ -21,11 +21,11 @@ log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-alias bws="$HOME/.local/bin/bws"
+alias bws="{{ .chezmoi.destDir }}/.local/bin/bws"
 
 # Function to check if a command exists
 command_exists() {
-  command -v "$HOME/.local/bin/bws" >/dev/null 2>&1
+  command -v "$1" >/dev/null 2>&1
 }
 
 # Clean up on exit

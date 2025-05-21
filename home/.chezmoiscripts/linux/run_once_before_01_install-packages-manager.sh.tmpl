@@ -49,9 +49,9 @@ print_action "Installing" "Homebrew" "$ICON_INSTALL"
 
 print_action "Configuring" "Homebrew PATH" "$ICON_CONFIG"
 # Add Homebrew to PATH
-(echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ~/.profile
+(echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> $HOME/.profile
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-source ~/.profile
+source $HOME/.profile
 
 #Install cargo
 

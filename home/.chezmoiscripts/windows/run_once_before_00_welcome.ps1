@@ -16,9 +16,9 @@ function Show-WelcomeArt {
 # Show welcome information
 function Show-WelcomeInfo {
     Write-Host ""
-    Write-Host -ForegroundColor Cyan "ℹ️  Welcome, $($env:USERNAME)! Setting up your dotfiles..."
-    Write-Host -ForegroundColor Cyan "ℹ️  Detected OS: Windows $(Get-ComputerInfo | Select-Object WindowsProductName).WindowsProductName"
-    Write-Host -ForegroundColor Cyan "ℹ️  Timestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    Write-Host -ForegroundColor Cyan "[INFO] Welcome, $($env:USERNAME)! Setting up your dotfiles..."
+    Write-Host -ForegroundColor Cyan "[INFO] Detected OS: Windows $(Get-ComputerInfo | Select-Object WindowsProductName).WindowsProductName"
+    Write-Host -ForegroundColor Cyan "[INFO] Timestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Write-Host ""
 }
 

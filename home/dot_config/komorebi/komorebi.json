@@ -1,18 +1,131 @@
 {
-  "app_specific_configuration_path": "$Env:USERPROFILE/.config/komorebi/applications.json",
+  "app_specific_configuration_path": "C:/Users/mark.kpamy/.config/komorebi/applications.json",
   "border": true,
   "cross_monitor_move_behaviour": "Insert",
   "border_padding": 0,
   "border_offset": -2,
   "border_width": 6,
-  "transparency": false,
+  "transparency": true,
   "transparency_alpha": 240,
   "default_container_padding": 0,
   "default_workspace_padding": 6,
   "manage_rules": [
+    {
+      "id": "Messenger.exe",
+      "kind": "Exe"
+    },
+    {
+      "id": "MicrosoftWhiteboard.exe",
+      "kind": "Exe"
+    }
+  ],
+  "ignore_rules": [
+    {
+      "kind" : "Exe",
+      "id": "RemoteDesktopManager.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Exe",
+      "id": "ms-teams.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Title",
+      "id": "Cisco Secure Client User Interface",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Exe",
+      "id": "csc_ui.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Exe",
+      "id": "acwebhelper.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Exe",
+      "id": "CyveraConsole.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Title",
+      "id": "Rappels – Mark Kpamy – Outlook",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Class",
+      "id": "TLoginDialog",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Class",
+      "id": "TfrmMain",
+      "matching_strategy": "Equals"
+    }
   ],
   "floating_applications": [
-
+    {
+      "kind" : "Title",
+      "id": "Cisco Secure Client User Interface",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Exe",
+      "id": "csc_ui.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Exe",
+      "id": "acwebhelper.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Exe",
+      "id": "CyveraConsole.exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "kind" : "Class",
+      "id": "XamlWindow",
+      "matching_strategy": "Contains"
+    },
+    {
+      "id": "Authy Desktop.exe",
+      "kind": "Exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "id": "Cloudflare WARP.exe",
+      "kind": "Exe",
+      "matching_strategy": "Equals"
+    },
+    {
+      "id": "Photoshop.exe",
+      "kind": "Exe"
+    },
+    {
+      "id": "Illustrator.exe",
+      "kind": "Exe"
+    },
+    {
+      "id": "lightroom.exe",
+      "kind": "Exe"
+    },
+    {
+      "id": "Adobe Premiere Pro.exe",
+      "kind": "Exe"
+    },
+    {
+      "id": "vmware.exe",
+      "kind": "Exe"
+    },
+    {
+      "id": "Wpf.Ui.Gallery.exe",
+      "kind": "Exe"
+    }
   ],
   "monitors": [
     {
@@ -23,13 +136,7 @@
         },
         {
           "layout": "BSP",
-          "name": "2",
-          "workspace_rules": [
-            {
-              "id": "explorer.exe",
-              "kind": "Exe"
-            }
-          ]
+          "name": "2"
         },
         {
           "name": "3",
@@ -49,6 +156,94 @@
         },
         {
           "name": "7",
+          "layout": "BSP"
+        },
+        {
+          "name": "8",
+          "layout": "BSP"
+        },
+        {
+          "name": "9",
+          "layout": "BSP"
+        }
+      ]
+    },
+    {
+      "workspaces": [
+        {
+          "name": "1",
+          "layout": "BSP"
+        },
+        {
+          "layout": "BSP",
+          "name": "2"
+        },
+        {
+          "name": "3",
+          "layout": "BSP"
+        },
+        {
+          "name": "4",
+          "layout": "BSP"
+        },
+        {
+          "name": "5",
+          "layout": "BSP"
+        },
+        {
+          "name": "6",
+          "layout": "BSP"
+        },
+        {
+          "name": "7",
+          "layout": "BSP"
+        },
+        {
+          "name": "8",
+          "layout": "BSP"
+        },
+        {
+          "name": "9",
+          "layout": "BSP"
+        }
+      ]
+    },
+    {
+      "workspaces": [
+        {
+          "name": "1",
+          "layout": "BSP"
+        },
+        {
+          "layout": "BSP",
+          "name": "2"
+        },
+        {
+          "name": "3",
+          "layout": "BSP"
+        },
+        {
+          "name": "4",
+          "layout": "BSP"
+        },
+        {
+          "name": "5",
+          "layout": "BSP"
+        },
+        {
+          "name": "6",
+          "layout": "BSP"
+        },
+        {
+          "name": "7",
+          "layout": "BSP"
+        },
+        {
+          "name": "8",
+          "layout": "BSP"
+        },
+        {
+          "name": "9",
           "layout": "BSP"
         }
       ]

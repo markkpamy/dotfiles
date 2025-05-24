@@ -10,7 +10,7 @@
     "closer": "p:os",
     "pink": "#F5C2E7",
     "lavender": "#B4BEFE",
-    "blue":  "#89B4FA"
+    "blue": "#89B4FA"
   },
   "blocks": [
     {
@@ -46,6 +46,15 @@
           "style": "diamond",
           "template": " {{ .HEAD }} {{ if .Working.Changed }}{{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}<#ef5350> \uf046 {{ .Staging.String }}</>{{ end }} ",
           "type": "git"
+        },
+        {
+          "type": "python",
+          "style": "diamond",
+          "trailing_diamond": "\ue0b0",
+          "powerline_symbol": "",
+          "foreground": "#100e23",
+          "background": "#906cff",
+          "template": "  {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }} "
         }
       ],
       "type": "prompt"

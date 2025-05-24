@@ -34,6 +34,7 @@ pkgs:
       - 'Microsoft.PowerShell'
       # Languages and Development
       - 'Python.Python.3.12'
+      - 'astral-sh.uv'
       - 'jdx.mise'
       - 'Schniz.fnm'
       - 'DEVCOM.JetBrainsMonoNerdFont'

@@ -114,8 +114,8 @@ pkgs:
         #        - com.discordapp.Discord
         - org.localsend.localsend_app
         - md.obsidian.Obsidian
-        - com.quexten.Goldwarden
-        #        - com.bitwarden.desktop
+        #- com.quexten.Goldwarden
+        #- com.bitwarden.desktop
         - org.remmina.Remmina
         - net.devolutions.RDM
         - org.libreoffice.LibreOffice

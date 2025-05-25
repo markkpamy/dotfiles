@@ -22,7 +22,7 @@
           "background": "#444444",
           "foreground": "#E4E4E4",
           "properties": {
-            "style": "full"
+            "style": "agnoster"
           },
           "style": "diamond",
           "template": " {{ .Path }} ",

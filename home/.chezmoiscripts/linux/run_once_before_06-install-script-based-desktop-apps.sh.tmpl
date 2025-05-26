@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Install desktop applications via script installation
+
+{{ if and (eq .chezmoi.os "linux") .isDesktop .pkgs.linuxDesktop.onScriptInstall -}}
+# Only execute on Linux desktop systems with script-based packages defined
+
+set -eufo pipefail
+
+echo "Installing script-based desktop applications..."
+
+# Install each script defined in onScriptInstall
+{{ range .pkgs.linuxDesktop.onScriptInstall -}}
+echo "Executing script: {{ . }}"
+if curl -fsSL "{{ . }}" | bash; then
+    echo "✓ Script executed successfully: {{ . }}"
+else
+    echo "✗ Failed to execute script: {{ . }}"
+fi
+{{ end -}}
+
+echo "Script-based desktop applications installation complete!"
+
+{{ else -}}
+echo "No script-based desktop packages defined for installation or not a desktop system."
+{{ end -}}

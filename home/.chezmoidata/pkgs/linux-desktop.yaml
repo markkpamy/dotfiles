@@ -11,6 +11,9 @@ pkgs:
       - flameshot # Screenshot tool
       - tabby-terminal
 
+    onScriptInstall:
+      - 'https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh' # Ghostty
+
     gnome: # GNOME-specific packages
     #      - gnome-tweaks
     #      - gnome-shell-extensions

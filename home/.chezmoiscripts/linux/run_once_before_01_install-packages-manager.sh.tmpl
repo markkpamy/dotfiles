@@ -97,14 +97,11 @@ pipx ensurepath
 
 # Step 7: Essential Packages
 print_step 7 "Essential Packages"
-packages=("build-essential")
+packages=("build-essential, libreadline-dev, unzip")
 
 for i in "${!packages[@]}"; do
     print_progress $((i+1)) ${#packages[@]} "Installing: ${packages[$i]}"
-    if [ "${packages[$i]}" = "build-essential" ]; then
-        sudo apt-get install build-essential
-    else
-        sudo apt install "${packages[$i]}"
+        sudo apt install -y "${packages[$i]}"
     fi
 done
 

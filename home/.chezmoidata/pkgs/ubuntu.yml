@@ -15,6 +15,8 @@ pkgs:
       - 'containerd.io'
       - 'docker-buildx-plugin'
       - 'docker-compose-plugin'
+      - 'unzip'
+      - 'luarocks'
     #      - 'elinks'
     oneScriptInstall:
       #- 'https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh'

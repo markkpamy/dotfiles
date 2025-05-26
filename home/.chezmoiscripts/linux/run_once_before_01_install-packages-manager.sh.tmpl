@@ -97,7 +97,7 @@ pipx ensurepath
 
 # Step 7: Essential Packages
 print_step 7 "Essential Packages"
-packages=("build-essential, libreadline-dev, unzip")
+packages=("build-essential" "libreadline-dev" "unzip")
 
 for i in "${!packages[@]}"; do
     print_progress $((i+1)) ${#packages[@]} "Installing: ${packages[$i]}"

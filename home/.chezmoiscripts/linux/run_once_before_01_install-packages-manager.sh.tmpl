@@ -102,7 +102,6 @@ packages=("build-essential, libreadline-dev, unzip")
 for i in "${!packages[@]}"; do
     print_progress $((i+1)) ${#packages[@]} "Installing: ${packages[$i]}"
         sudo apt install -y "${packages[$i]}"
-    fi
 done
 
 # Step 8: Docker Repository Setup

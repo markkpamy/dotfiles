@@ -145,7 +145,7 @@ pkgs:
       #      - 'asdf' # Version manager
       - 'direnv' # Environment variable manager
       - 'cidr'
-      - 'Mayowa-Ojo/tap/chmod-cli'
+      - 'mayowa-ojo/tap/chmod-cli'
       - 'superfile' # Beautiful file manager
       - 'gitleaks' # Secret scanning
       - 'ggshield'

@@ -538,6 +538,9 @@ function flushdns {
 function cpy { Set-Clipboard $args[0] }
 function pst { Get-Clipboard }
 
+# Clear screen alias
+Set-Alias -Name cr -Value Clear-Host
+
 ##########################################
 # Initialize Tools
 ##########################################

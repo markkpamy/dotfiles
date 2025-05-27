@@ -1,0 +1,41 @@
+{{- if and .pkgs.python.windows.uvx .installPythonPackages }}
+
+# Refresh environment variables to ensure uv is in PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Check if uv is installed (uvx is part of uv)
+if (-not (Get-Command "uv" -ErrorAction SilentlyContinue)) {
+    Write-Host "uv is not installed. Installing uv..." -ForegroundColor Yellow
+    powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+    # Refresh environment
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+    # Check again after installation
+    if (-not (Get-Command "uv" -ErrorAction SilentlyContinue)) {
+        Write-Error "Failed to install uv. Please install manually."
+        exit 1
+    }
+}
+
+Write-Host "INSTALLING UVX PACKAGES (Windows)..." -ForegroundColor Green
+
+# Install each package
+{{ range $pkg := .pkgs.python.windows.uvx }}
+Write-Host "Installing {{ $pkg }} via uvx..." -ForegroundColor Cyan
+uv tool install {{ $pkg }} --quiet --force
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Failed to install {{ $pkg }} via uvx"
+} else {
+    Write-Host "Successfully installed {{ $pkg }} via uvx" -ForegroundColor Green
+}
+{{ end }}
+
+# Refresh PATH to include uv-installed binaries
+Write-Host "Refreshing PATH..." -ForegroundColor Yellow
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+Write-Host "UVX PACKAGES INSTALLATION COMPLETED" -ForegroundColor Green
+
+{{- else }}
+Write-Host "SKIPPING UVX PACKAGES INSTALLATION" -ForegroundColor Yellow
+{{- end }}

@@ -1,8 +1,6 @@
 # Common aliases for both Bash and Fish
-{{ if eq .chezmoi.os "linux" -}}
 # Linux-specific aliases
 alias ls="eza"
-{{ end -}}
 
 # General aliases
 alias cr='clear'
@@ -119,13 +117,14 @@ alias kgda='kubectl get deploy --all-namespaces'
 # Nodes
 alias kgn='kubectl get nodes'
 
-{{ if eq .chezmoi.os "linux" -}}
-    # Ceph (Linux only)
-    alias ceph="kubectl rook-ceph ceph"
-{{ end -}}
+# GAMA
+GITHUB_TOKEN="$(gh auth token)" gama
+
+
+# Ceph (Linux only)
+alias ceph="kubectl rook-ceph ceph"
 
 # System commands
-{{ if eq .chezmoi.os "linux" -}}
 # Linux system commands
 alias reboot='sudo /sbin/reboot'
 alias poweroff='sudo /sbin/poweroff'
@@ -140,4 +139,3 @@ alias pscpu='ps auxf | sort -nr -k 3'
 alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
 alias cpuinfo='lscpu'
 alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
-{{ end -}}

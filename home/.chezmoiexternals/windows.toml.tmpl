@@ -28,9 +28,13 @@ type = "git-repo"
 url = "https://github.com/catppuccin/powershell.git"
 {{ .externalGitArgs }}
 
-["home/dot_local/bin"]
+["home/dot_local/bin/aws-vault-windows-386.exe"]
 type = "file"
 url = "https://github.com/99designs/aws-vault/releases/download/v7.2.0/aws-vault-windows-386.exe"
+
+["home/dot_local/bin/gama-windows-amd64.exe"]
+type = "file"
+url = "https://github.com/termkit/gama/releases/download/v1.2.1/gama-windows-amd64.exe"
 ##########################################
 
 {{ end }}

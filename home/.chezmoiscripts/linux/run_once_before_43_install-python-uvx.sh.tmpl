@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+{{- if and .pkgs.python.linux.uvx .installPythonPackages }}
+
+print_header "Python UVX Package Installation" "Installing Python applications via uvx (fast pipx replacement)" "$ICON_PYTHON"
+
+# Set total steps for progress tracking
+set_total_steps 3
+
+# Step 1: Environment Check
+print_step 1 "Environment Check"
+
+# Check if uv is installed (uvx is part of uv)
+if ! command -v uv &> /dev/null; then
+    print_error "uv is not installed. Please install uv first (curl -LsSf https://astral.sh/uv/install.sh | sh)."
+    print_footer "Python UVX Package Installation" "failed"
+    exit 1
+fi
+
+# Check if uvx command is available
+if ! uv tool --help &> /dev/null; then
+    print_error "uv tool commands are not available. Please update uv to the latest version."
+    print_footer "Python UVX Package Installation" "failed"
+    exit 1
+fi
+
+print_success "uv and uvx functionality are available"
+
+# Step 2: UVX Configuration
+print_step 2 "UVX Configuration"
+print_action "Checking" "uv tool directory" "$ICON_CONFIG"
+
+# Ensure tool bin directory is in PATH
+UV_TOOL_DIR="$HOME/.local/bin"
+if [[ ":$PATH:" != *":$UV_TOOL_DIR:"* ]]; then
+    print_action "Adding" "uv tool bin directory to PATH" "$ICON_CONFIG"
+    export PATH="$UV_TOOL_DIR:$PATH"
+    print_success "PATH updated for current session"
+else
+    print_info "UV tool bin directory is already in PATH"
+fi
+
+# Step 3: Application Installation
+print_step 3 "Application Installation"
+
+packages=({{ range $pkg := .pkgs.python.linux.uvx }}"{{ $pkg }}"{{ end }})
+
+print_info "Installing ${#packages[@]} applications via uvx..."
+
+# Install each application with progress tracking
+for i in "${!packages[@]}"; do
+    pkg="${packages[$i]}"
+    print_progress $((i+1)) ${#packages[@]} "Installing: $pkg"
+
+    # Use uv tool install (equivalent to uvx install)
+    uv tool install "$pkg" --quiet --force
+
+    if [ $? -ne 0 ]; then
+        print_warning "Failed to install $pkg via uvx"
+    else
+        print_success "Successfully installed $pkg via uvx"
+    fi
+done
+
+print_success "UVX applications installation completed!"
+print_footer "Python UVX Package Installation" "completed"
+
+{{- else }}
+print_header "Python UVX Package Installation" "Skipping uvx application installation" "$ICON_PYTHON"
+print_warning "UVX applications installation is disabled or no packages configured"
+print_footer "Python UVX Package Installation" "skipped"
+{{- end }}

@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+{{- if and .pkgs.python.linux.uv .installPythonPackages }}
+
+print_header "Python UV Package Installation" "Installing Python packages via uv (fast pip replacement)" "$ICON_PYTHON"
+
+# Set total steps for progress tracking
+set_total_steps 4
+
+# Step 1: Environment Check
+print_step 1 "Environment Check"
+
+# Check if Python is installed
+if ! command -v python3 &> /dev/null; then
+    print_error "Python3 is not installed. Please install Python first."
+    print_footer "Python UV Package Installation" "failed"
+    exit 1
+fi
+
+# Check if uv is installed
+if ! command -v uv &> /dev/null; then
+    print_error "uv is not installed. Please install uv first (curl -LsSf https://astral.sh/uv/install.sh | sh)."
+    print_footer "Python UV Package Installation" "failed"
+    exit 1
+fi
+
+print_success "Python3 and uv are available"
+
+# Step 2: UV Configuration
+print_step 2 "UV Configuration"
+print_action "Checking" "uv version and configuration" "$ICON_CHECK"
+uv --version
+
+# Initialize project if pyproject.toml doesn't exist
+if [ ! -f "pyproject.toml" ]; then
+    print_action "Initializing" "uv project in current directory" "$ICON_CONFIG"
+    uv init --no-readme --quiet
+    print_success "UV project initialized"
+else
+    print_info "Existing pyproject.toml found"
+fi
+
+# Step 3: Package Installation
+print_step 3 "Package Installation"
+
+packages=({{ range $pkg := .pkgs.python.linux.uv }}"{{ $pkg }}"{{ end }})
+
+print_info "Installing ${#packages[@]} packages via uv..."
+
+# Install each package with progress tracking
+for i in "${!packages[@]}"; do
+    pkg="${packages[$i]}"
+    print_progress $((i+1)) ${#packages[@]} "Installing: $pkg"
+
+    # Check if package specification includes extras or version constraints
+    if [[ "$pkg" == *"["* ]] || [[ "$pkg" == *"=="* ]] || [[ "$pkg" == *">="* ]] || [[ "$pkg" == *"<="* ]]; then
+        uv add "$pkg" --quiet
+    else
+        uv add "$pkg" --quiet
+    fi
+
+    if [ $? -ne 0 ]; then
+        print_warning "Failed to install $pkg"
+    else
+        print_success "Successfully installed $pkg"
+    fi
+done
+
+# Step 4: Environment Sync
+print_step 4 "Environment Sync"
+print_action "Syncing" "environment with lock file" "$ICON_UPDATE"
+uv sync --quiet
+
+print_success "UV packages installation completed!"
+print_footer "Python UV Package Installation" "completed"
+
+{{- else }}
+print_header "Python UV Package Installation" "Skipping uv package installation" "$ICON_PYTHON"
+print_warning "UV packages installation is disabled or no packages configured"
+print_footer "Python UV Package Installation" "skipped"
+{{- end }}

@@ -80,6 +80,7 @@ pkgs:
     productivity:
       - 'khal' # Calendar client
       - 'pandoc' # Pandoc multi format converter
+      - 'termscp' # Terminal file transfer client
 
     development:
       - 'httpie' # HTTP / API testing client

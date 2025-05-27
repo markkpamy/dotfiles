@@ -38,6 +38,7 @@ This repository contains personal dotfiles for:
 - **Windows**: Scoop, Chocolatey, WinGet, PowerShell Gallery
 - **Linux**: Homebrew, APT, Pacman, Flatpak, Snap
 - **Cross-platform**: pip, pipx for Python packages
+- **Modern Python**: UV (fast pip replacement) and UVX (fast pipx replacement)
 
 ### 🔒 **Security & Quality**
 - **Secret management**: Bitwarden integration
@@ -149,13 +150,13 @@ During the initial setup, you'll be prompted for:
 ### 🐧 **Linux**
 - **Shell preference**: bash/zsh/fish (auto-detected)
 - **Desktop environment**: Automatically detected (GNOME, KDE, XFCE, etc.)
-- **Package installation**: Python packages via pip/pipx
+- **Package installation**: Python packages via pip/pipx and modern UV/UVX
 
 ### 🪟 **Windows**  
 - **Scoop packages**: Development tools, CLI utilities
 - **Chocolatey packages**: Additional Windows applications
 - **WinGet packages**: Microsoft Store and system tools
-- **Python packages**: Development tools and CLI applications
+- **Python packages**: Development tools and CLI applications via pip/pipx and UV/UVX
 
 ### 🔐 **Both Platforms**
 - **Bitwarden access token**: For secret management (optional but recommended)
@@ -185,7 +186,7 @@ dotfiles/
     │       ├── ubuntu.yml           # Ubuntu packages
     │       ├── arch-based.yml       # Arch packages
     │       ├── homebrew.yml         # Homebrew packages
-    │       └── python.yml           # Python packages
+    │       └── python.yml           # Python packages (pip, pipx, uv, uvx)
     ├── .chezmoiexternals/           # External dependencies
     ├── AppData/                     # Windows-specific configs
     │   └── Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/
@@ -222,6 +223,47 @@ dotfiles/
 
 ## Package Management
 
+## Package Management
+
+This dotfiles setup includes comprehensive package management across platforms:
+
+### Modern Python Package Management (NEW)
+
+**UV - Fast Pip Replacement:**
+- ⚡ **10-100x faster** than pip for package resolution and installation
+- 🔄 **Project-based dependencies** with automatic virtual environment management
+- 📁 **pyproject.toml integration** for modern Python project structure
+- 🔒 **Lock file generation** for reproducible environments
+
+**UVX - Fast Pipx Replacement:**
+- ⚡ **Instant tool execution** with minimal overhead
+- 🛠️ **Persistent tool installation** using `uv tool install`
+- 🔒 **Isolated environments** for each CLI application
+- 🔄 **Easy upgrades** with `uv tool upgrade`
+
+**Example UV/UVX configuration:**
+```yaml
+# python.yml
+pkgs:
+  python:
+    linux:
+      uv:                    # Project dependencies
+        - 'requests'
+        - 'click[dev]>=8.0'   # With extras and version constraints
+        - 'pydantic>=2.0'
+      uvx:                   # CLI applications
+        - 'black'            # Code formatter
+        - 'ruff'             # Fast linter
+        - 'pre-commit'       # Git hooks
+```
+
+### Traditional Python Package Management
+
+**Standard pip/pipx support** (for compatibility):
+- pip for global packages and legacy workflows
+- pipx for isolated CLI applications
+- Both coexist with UV/UVX seamlessly
+
 This dotfiles setup includes comprehensive package management across platforms:
 
 ### Windows Packages
@@ -253,12 +295,18 @@ This dotfiles setup includes comprehensive package management across platforms:
 
 ### Python Packages
 
-**Global packages** (via pip):
-- Development: black, flake8, mypy, pytest, poetry
-- Utilities: requests, rich, typer, click
+**Traditional Python package management:**
+- **Global packages** (via pip): Development tools and libraries
+- **Isolated CLI tools** (via pipx): Command-line applications
 
-**Isolated CLI tools** (via pipx):
-- httpie, yt-dlp, pre-commit, cookiecutter, ansible
+**Modern Python package management** (faster alternatives):
+- **UV packages** (via uv): Fast pip replacement for project dependencies
+- **UVX tools** (via uv tool): Fast pipx replacement for CLI applications
+
+**Package categories:**
+- Development: black, flake8, mypy, pytest, poetry, ruff
+- Utilities: requests, rich, typer, click, httpx
+- CLI tools: pre-commit, commitizen, elia-chat, ggshield
 
 ## Daily Usage
 
@@ -345,6 +393,7 @@ theme = "dark"
 ## Documentation
 
 - [Chezmoi Usage Guide](docs/CHEZMOI.md) - Understanding file organization and templating
+- [UV/UVX Implementation](UV_UVX_README.md) - Modern Python package management setup
 - [Pre-commit Setup](docs/pre-commit-setup.md) - Code quality and security automation  
 - [Windows Configuration](docs/windows.md) - Windows-specific notes and utilities
 - [Linux Configuration](docs/linux.md) - Linux-specific guides and troubleshooting

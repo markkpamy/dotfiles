@@ -11,8 +11,16 @@ pkgs:
         - 'poetry'
         - 'elia-chat'
         - 'ggshield' #GitGuardian CLI
+      uv:
+        # Fast pip replacement - project dependencies
+      uvx:
+        # Fast pipx replacement - CLI applications (isolated)
     linux:
       pip:
         # Package management and environments
       pipx:
         # CLI applications (isolated)
+      uv:
+        # Fast pip replacement - project dependencies
+      uvx:
+        # Fast pipx replacement - CLI applications (isolated)

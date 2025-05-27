@@ -62,6 +62,7 @@ pkgs:
       - 'macchina'
       - 'braindrop'
       - 'sampler'
+      - 'lsd'
 
     secrets_mgmt:
       - 'bitwarden-cli' # Bitwarden command-line client
@@ -83,6 +84,9 @@ pkgs:
       - 'termscp' # Terminal file transfer client
       - 'harlequin' # Database client for SQLite, Postgres, MySQL, and more
       - 'sttr' # String manipulation tool
+      - 'presenterm' # Terminal presentation tool
+      - 'slides' # Terminal presentation tool
+      - 'wtfutil' # Terminal dashboard
 
     development:
       - 'httpie' # HTTP / API testing client
@@ -152,6 +156,7 @@ pkgs:
       - 'superfile' # Beautiful file manager
       - 'gitleaks' # Secret scanning
       - 'ggshield'
+      - 'leg100/tap/pug' # Pug is a CLI tool for managing terraform resources
 
     dev_utils:
       - 'gh' # GitHub CLI

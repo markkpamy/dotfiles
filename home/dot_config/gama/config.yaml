@@ -9,5 +9,5 @@ keys:
 
 settings:
   live_mode:
-    enabled: true # Enable live mode at startup
+    enabled: false # Enable live mode at startup
     interval: 15s # Refresh interval for live updates

@@ -27,3 +27,9 @@ end
 function fxglog
   flux logs --all-namespaces | grep "$argv[1]"
 end
+
+# GAMA CLI command with GitHub token (Fish version)
+function gama
+  set -lx GITHUB_TOKEN (gh auth token)
+  command gama $argv
+end

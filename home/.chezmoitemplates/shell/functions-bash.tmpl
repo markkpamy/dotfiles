@@ -22,3 +22,8 @@ fxrecall() {
 fxglog() {
   flux logs --all-namespaces | grep "$1"
 }
+
+# GAMA CLI command with GitHub token (Bash version)
+gama() {
+  GITHUB_TOKEN="$(gh auth token)" command gama "$@"
+}

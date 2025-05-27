@@ -14,6 +14,8 @@ pkgs:
       uv:
         # Fast pip replacement - project dependencies
       uvx:
+        - 'harlequin' # Database client for SQLite, Postgres, MySQL, and more
+        - 'harlequin[postgres,mysql,s3]' # Database client for SQLite, Postgres, MySQL, and more
         # Fast pipx replacement - CLI applications (isolated)
     linux:
       pip:

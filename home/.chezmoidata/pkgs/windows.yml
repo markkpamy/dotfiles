@@ -109,6 +109,7 @@ pkgs:
       - 'Watfaq.PowerSession'
       - 'direnv.direnv'
       - 'GitHub.GitLFS'
+      - 'abhimanyu003.sttr'
       # DevOps Tools
       - 'Kubernetes.kwokctl'
       - 'Kubernetes.krew'

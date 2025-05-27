@@ -7,6 +7,9 @@ if status is-interactive
     end
 end
 
+# Increase file descriptor limit
+ulimit -n 4096
+
 # Initialize prompt
 if command -v oh-my-posh &>/dev/null
     oh-my-posh init fish --config $HOME/.oh-my-posh.json | source

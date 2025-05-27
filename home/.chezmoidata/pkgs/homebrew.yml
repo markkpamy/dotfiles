@@ -81,6 +81,8 @@ pkgs:
       - 'khal' # Calendar client
       - 'pandoc' # Pandoc multi format converter
       - 'termscp' # Terminal file transfer client
+      - 'harlequin' # Database client for SQLite, Postgres, MySQL, and more
+      - 'sttr' # String manipulation tool
 
     development:
       - 'httpie' # HTTP / API testing client

@@ -21,12 +21,8 @@ pkgs:
     #        - '$env:USERPROFILE\scoop\apps\pwsh\current\install-file-context.reg'
     #        - '$env:USERPROFILE\scoop\apps\7zip\current\install-context.reg'
     choco:
-    #     - 'everythingpowertoys'
-    #     - 'ultraviewer'
-    #     - 'internet-download-manager'
-    #     - 'tailscale'
-    #     - 'warp'
-    #     - 'elinks'
+      - 'mingw'
+      - 'luarocks'
     winget:
       # Core Tools
       - 'Git.Git'
@@ -37,9 +33,9 @@ pkgs:
       - 'astral-sh.uv'
       - 'jdx.mise'
       - 'Schniz.fnm'
-      - 'DEVCOM.JetBrainsMonoNerdFont'
       - 'Notepad++.Notepad++'
       # Fonts
+      - 'DEVCOM.JetBrainsMonoNerdFont'
       # Shells and Terminal
       - 'Eugeny.Tabby'
       - 'Microsoft.OpenSSH.Preview'

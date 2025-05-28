@@ -13,7 +13,7 @@ Write-Host "INSTALLING WINGET PACKAGES..."
 #winget install {{ .pkgs.windows.winget | quoteList | join " " }} --accept-source-agreements --accept-package-agreements
   {{ range $pkg := .pkgs.windows.winget }}
 Write-Host "INSTALLING {{ $pkg }}..."
-winget install '{{ $pkg }}' --accept-source-agreements --accept-package-agreements
+winget install '{{ $pkg }}' --accept-source-agreements --accept-package-agreements --scope machine
   {{ end }}
 
 {{ end }}

@@ -126,10 +126,12 @@ pkgs:
       - 'xpipe-io.xpipe'
       - 'Gitleaks.Gitleaks'
       - 'lsd-rs.lsd'
+      - 'DevToys-app.DevToys'
       # Others
       - 'Microsoft.PowerToys'
       - 'WinSCP.WinSCP'
       - 'ShiningLight.OpenSSL.Dev'
+      - 'localsend'
     psGallery:
       - 'DockerCompletion'
       - 'PsReadLine'

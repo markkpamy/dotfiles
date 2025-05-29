@@ -577,3 +577,13 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
 if (Get-Command thefuck -ErrorAction SilentlyContinue) {
   Invoke-Expression "$(thefuck --alias)"
 }
+
+# Initialize UV completion if installed
+if (Get-Command uv -ErrorAction SilentlyContinue) {
+    (& uv generate-shell-completion powershell) | Out-String | Invoke-Expression
+}
+
+# Initialize UVX completion if installed
+if (Get-Command uvx -ErrorAction SilentlyContinue) {
+    (& uvx generate-shell-completion powershell) | Out-String | Invoke-Expression
+}

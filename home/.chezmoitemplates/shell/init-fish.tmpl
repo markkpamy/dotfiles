@@ -36,5 +36,15 @@ if command -v kubectl &>/dev/null
     kubectl completion fish | source
 end
 
+# UV completion
+if command -v uv &>/dev/null
+    uv generate-shell-completion fish | source
+end
+
+# UVX completion
+if command -v uvx &>/dev/null
+    uvx generate-shell-completion fish | source
+end
+
 # Fish-specific settings
 export ENHANCD_ENABLE_DOUBLE_DOT=false

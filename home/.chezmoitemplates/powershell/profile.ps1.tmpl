@@ -587,3 +587,46 @@ if (Get-Command uv -ErrorAction SilentlyContinue) {
 if (Get-Command uvx -ErrorAction SilentlyContinue) {
     (& uvx generate-shell-completion powershell) | Out-String | Invoke-Expression
 }
+
+# Initialize Terraform completion if installed
+if (Get-Command terraform -ErrorAction SilentlyContinue) {
+    # Terraform completion for PowerShell requires manual setup
+    # Register-ArgumentCompleter can be used for basic completion
+}
+
+# Initialize Helm completion if installed
+if (Get-Command helm -ErrorAction SilentlyContinue) {
+    Invoke-Expression (helm completion powershell | Out-String)
+}
+
+# Initialize Azure CLI completion if installed
+if (Get-Command az -ErrorAction SilentlyContinue) {
+    Register-ArgumentCompleter -Native -CommandName az -ScriptBlock {
+        param($commandName, $wordToComplete, $cursorPosition)
+        $completion_file = New-TemporaryFile
+        $env:ARGCOMPLETE_USE_TEMPFILES = 1
+        $env:_ARGCOMPLETE_STDOUT_FILENAME = $completion_file
+        $env:COMP_LINE = $wordToComplete
+        $env:COMP_POINT = $cursorPosition
+        $env:_ARGCOMPLETE = 1
+        $env:_ARGCOMPLETE_SUPPRESS_SPACE = 0
+        $env:_ARGCOMPLETE_IFS = "`n"
+        try {
+            az 2>&1 | Out-Null
+        } catch {}
+        Get-Content $completion_file | Sort-Object | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, "ParameterValue", $_)
+        }
+        Remove-Item $completion_file -ErrorAction SilentlyContinue
+    }
+}
+
+# Initialize GitHub CLI completion if installed
+if (Get-Command gh -ErrorAction SilentlyContinue) {
+    Invoke-Expression (gh completion -s powershell | Out-String)
+}
+
+# Initialize Flux CD completion if installed
+if (Get-Command flux -ErrorAction SilentlyContinue) {
+    Invoke-Expression (flux completion powershell | Out-String)
+}

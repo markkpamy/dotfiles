@@ -46,5 +46,30 @@ if command -v uvx &>/dev/null
     uvx generate-shell-completion fish | source
 end
 
+# Terraform completion
+if command -v terraform &>/dev/null
+    terraform -install-autocomplete &>/dev/null
+end
+
+# Helm completion
+if command -v helm &>/dev/null
+    helm completion fish | source
+end
+
+# Azure CLI completion
+if command -v az &>/dev/null
+    az completion --shell fish | source
+end
+
+# GitHub CLI completion
+if command -v gh &>/dev/null
+    gh completion -s fish | source
+end
+
+# Flux CD completion
+if command -v flux &>/dev/null
+    flux completion fish | source
+end
+
 # Fish-specific settings
 export ENHANCD_ENABLE_DOUBLE_DOT=false

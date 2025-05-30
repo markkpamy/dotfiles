@@ -128,6 +128,8 @@ pkgs:
       - 'WinSCP.WinSCP'
       - 'ShiningLight.OpenSSL.Dev'
       - 'localsend'
+      - 'MilosParipovic.OneCommander'
+      - 'WinDirStat.WinDirStat.Beta'
     psGallery:
       - 'DockerCompletion'
       - 'PsReadLine'

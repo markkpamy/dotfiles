@@ -11,10 +11,14 @@ pkgs:
 
     ui_themes:
       - 'starship' # Customizable prompt
+      - 'cmatrix' # rain in the terminal
 
     cli_basics:
+      - 'lf' # Terminal file manager
+      - 'walk' # Terminal file manager
+      - 'bit-git' # Git cli alternative
       - 'television' # Fzf tui
-      - 'glow'
+      - 'glow' # Mardown viewer
       - 'atuin' # Better shell history
       - 'aria2' # Resuming download util (better wget)
       - 'bat' # Output highlighting (better cat)
@@ -56,13 +60,13 @@ pkgs:
       - 'topgrade' # Update manager
       - 'eget'
       - 'g-ls'
-      - 'gama'
+      - 'gama' # Giithub actions viewer
       - 'halp'
-      - 'felinks'
-      - 'macchina'
-      - 'braindrop'
+      - 'felinks' # Browser in Terminal
+      - 'macchina' #
+      - 'braindrop' # Raindrop TUI
       - 'sampler'
-      - 'lsd'
+      - 'lsd' # Better ls
 
     secrets_mgmt:
       - 'bitwarden-cli' # Bitwarden command-line client

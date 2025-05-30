@@ -17,7 +17,6 @@ pkgs:
         - 'harlequin' # Database client for SQLite, Postgres, MySQL, and more
         - 'harlequin[postgres,mysql,s3]' # Database client for SQLite, Postgres, MySQL, and more
         - 'spiel' # Spiel is a framework for building and presenting richly-styled presentations in your terminal using Python
-        - 'pysentation' # pysentation is a framework for building and presenting richly-styled presentations in your terminal using Python
         # Fast pipx replacement - CLI applications (isolated)
     linux:
       pip:
@@ -29,4 +28,3 @@ pkgs:
       uvx:
         # Fast pipx replacement - CLI applications (isolated)
         - 'spiel' # Spiel is a framework for building and presenting richly-styled presentations in your terminal using Python
-        - 'pysentation' # pysentation is a framework for building and presenting richly-styled presentations in your terminal using Python

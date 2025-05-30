@@ -114,6 +114,7 @@ pkgs:
       - 'figlet' # Output text as big ASCII art text
       - 'lolcat' # Make console output rainbow colored
       - 'neofetch' # Show system data and distro info
+      - 'nbsdgames' # Terminal bsd games
 
     programming_languages:
       - 'gcc' # GNU C++ compilers

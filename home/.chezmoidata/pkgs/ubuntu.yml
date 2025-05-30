@@ -17,6 +17,7 @@ pkgs:
       - 'docker-compose-plugin'
       - 'unzip'
       - 'luarocks'
+      - 'bsdgames'
     #      - 'elinks'
     oneScriptInstall:
       #- 'https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh'

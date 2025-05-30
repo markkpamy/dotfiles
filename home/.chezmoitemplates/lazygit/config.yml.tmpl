@@ -48,8 +48,7 @@ customCommands:
     command: 'vim {{ "{{" }} .SelectedFile.Name | quote {{ "}}" }}'
     description: 'Edit with vim'
     loadingText: 'Editing with vim'
-    showOutput: true
-    subprocess: true
+    output: terminal
 
   - key: 'F'
     context: 'files'
@@ -79,7 +78,7 @@ customCommands:
         title: 'Cleanup'
         body: 'Are you sure you want to unnecessary files, reflog, optimize the repo?'
     loadingText: 'Cleaning up'
-    stream: true
+    output: log
 
   - key: 'u'
     context: 'files'

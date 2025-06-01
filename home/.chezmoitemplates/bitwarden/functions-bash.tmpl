@@ -204,10 +204,20 @@ bw-info() {
     echo "Status: $(bw-status)"
     echo "Session: $(bw-is-unlocked && echo "Active" || echo "None")"
 
-    if command -v bws &> /dev/null && bws-get-token >/dev/null 2>&1; then
-        echo "BWS Access: ✅ Available"
+    # Check BWS availability without triggering unlock
+    if command -v bws &> /dev/null; then
+        if bw-is-unlocked; then
+            # Only test BWS token if vault is already unlocked
+            if bws-get-token >/dev/null 2>&1; then
+                echo "BWS Access: ✅ Available"
+            else
+                echo "BWS Access: ⚠️  Token not found in vault"
+            fi
+        else
+            echo "BWS Access: 🔒 Vault locked (unlock to test BWS token)"
+        fi
     else
-        echo "BWS Access: ❌ Not configured"
+        echo "BWS Access: ❌ BWS CLI not installed"
     fi
 }
 # Help function

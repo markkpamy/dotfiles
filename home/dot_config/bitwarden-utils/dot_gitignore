@@ -1,0 +1,6 @@
+# Ignore sensitive Bitwarden files
+session
+cache
+*.env
+*.key
+*.token

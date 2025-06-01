@@ -1,0 +1,283 @@
+# Bitwarden Utilities for Fish Shell - Chezmoi Template
+
+{{- if .bitwarden.enabled }}
+# =============================================================================
+# BITWARDEN UTILITIES - CORE FUNCTIONS (FISH)
+# =============================================================================
+
+# Configuration from Chezmoi data
+set -g BW_UTILS_CONFIG_DIR "$HOME/.config/bitwarden-utils"
+set -g BW_UTILS_SESSION_FILE "$BW_UTILS_CONFIG_DIR/session"
+set -g BWS_TOKEN_ITEM "{{ .bitwarden.token_item | default "BWS Access Token" }}"
+set -g BWS_STORAGE_METHOD "{{ .bitwarden.storage_method | default "login" }}"
+set -g BWS_PROJECT_ID "{{ .bitwarden.default_project | default "" }}"
+
+# Colors
+set -g _BW_RED '\033[0;31m'
+set -g _BW_GREEN '\033[0;32m'
+set -g _BW_YELLOW '\033[1;33m'
+set -g _BW_NC '\033[0m'
+
+# Ensure config directory exists
+mkdir -p "$BW_UTILS_CONFIG_DIR"
+
+# Core authentication functions
+function bw-check
+    command -v bw >/dev/null 2>&1; and command -v jq >/dev/null 2>&1
+end
+
+function bw-status
+    if not bw-check
+        return 1
+    end
+    bw status 2>/dev/null | jq -r '.status // "error"'
+end
+
+function bw-is-unlocked
+    test (bw-status) = "unlocked"
+end
+
+function bw-ensure-unlocked
+    if bw-is-unlocked
+        return 0
+    end
+
+    if test (bw-status) = "locked"
+        echo -e "$_BW_YELLOW🔓 Unlocking Bitwarden vault...$_BW_NC"
+        set session (bw unlock --raw)
+        if test $status -eq 0; and test -n "$session"
+            echo "$session" > "$BW_UTILS_SESSION_FILE"
+            chmod 600 "$BW_UTILS_SESSION_FILE"
+            set -gx BW_SESSION "$session"
+            echo -e "$_BW_GREEN✅ Vault unlocked$_BW_NC"
+            return 0
+        end
+    end
+    echo -e "$_BW_RED❌ Please login and unlock Bitwarden first$_BW_NC"
+    return 1
+end
+
+# Session management
+function bw-get-session
+    if test -f "$BW_UTILS_SESSION_FILE"
+        cat "$BW_UTILS_SESSION_FILE"
+    end
+end
+
+function bw-unlock
+    bw-ensure-unlocked
+end
+
+function bw-lock
+    bw lock 2>/dev/null
+    rm -f "$BW_UTILS_SESSION_FILE"
+    set -e BW_SESSION
+    echo -e "$_BW_GREEN🔒 Vault locked$_BW_NC"
+end
+
+# Secrets retrieval
+function bw-get-password
+    set item_name $argv[1]
+    if not bw-ensure-unlocked
+        return 1
+    end
+    set -gx BW_SESSION (bw-get-session)
+    bw get password "$item_name" --session "$BW_SESSION" 2>/dev/null
+end
+
+function bw-get-username
+    set item_name $argv[1]
+    if not bw-ensure-unlocked
+        return 1
+    end
+    set -gx BW_SESSION (bw-get-session)
+    bw get username "$item_name" --session "$BW_SESSION" 2>/dev/null
+end
+
+function bw-get-field
+    set item_name $argv[1]
+    set field_name $argv[2]
+    if not bw-ensure-unlocked
+        return 1
+    end
+    set -gx BW_SESSION (bw-get-session)
+    set item_json (bw get item "$item_name" --session "$BW_SESSION" 2>/dev/null)
+    echo "$item_json" | jq -r ".fields[]? | select(.name==\"$field_name\") | .value" 2>/dev/null
+end
+# BWS integration
+function bws-get-token
+    set token_item $argv[1]
+    set storage_method $argv[2]
+
+    if test -z "$token_item"
+        set token_item $BWS_TOKEN_ITEM
+    end
+    if test -z "$storage_method"
+        set storage_method $BWS_STORAGE_METHOD
+    end
+
+    switch "$storage_method"
+        case "login"
+            bw-get-password "$token_item"
+        case "field"
+            bw-get-field "$token_item" "token"
+        case '*'
+            echo -e "$_BW_RED❌ Invalid storage method$_BW_NC" >&2
+            return 1
+    end
+end
+
+function bws-run
+    if not command -v bws >/dev/null 2>&1
+        echo -e "$_BW_RED❌ BWS CLI not found$_BW_NC" >&2
+        return 1
+    end
+
+    set token (bws-get-token)
+    if test -z "$token"
+        echo -e "$_BW_RED❌ Failed to get BWS token$_BW_NC" >&2
+        return 1
+    end
+
+    bws --access-token "$token" $argv
+end
+
+function bws-inject
+    if not command -v bws >/dev/null 2>&1
+        echo -e "$_BW_RED❌ BWS CLI not found$_BW_NC" >&2
+        return 1
+    end
+
+    set token (bws-get-token)
+    if test -z "$token"
+        echo -e "$_BW_RED❌ Failed to get BWS token$_BW_NC" >&2
+        return 1
+    end
+
+    if test -n "$BWS_PROJECT_ID"
+        bws run --project-id "$BWS_PROJECT_ID" --access-token "$token" -- $argv
+    else
+        bws run --access-token "$token" -- $argv
+    end
+end
+
+# Docker Compose integration
+function bws-compose-up
+    echo -e "$_BW_GREEN🚀 Starting Docker Compose with BWS secrets...$_BW_NC"
+    bws-inject docker-compose up -d
+end
+
+function bws-compose-down
+    docker-compose down
+end
+# Environment variable management
+function bw-export-env
+    for arg in $argv
+        if string match -q "*:*" $arg
+            set item_name (string split ":" $arg)[1]
+            set env_name (string split ":" $arg)[2]
+        else
+            set env_name (string replace -a " " "_" (string upper $arg))
+            set item_name $arg
+        end
+
+        set value (bw-get-password "$item_name" 2>/dev/null)
+        if test -n "$value"
+            set -gx $env_name "$value"
+            echo -e "$_BW_GREEN✅ Exported $env_name$_BW_NC"
+        else
+            echo -e "$_BW_RED❌ Failed to export $env_name$_BW_NC"
+        end
+    end
+end
+
+function bw-clear-env
+    for var in $argv
+        set -e $var
+        echo -e "$_BW_YELLOW🧹 Cleared $var$_BW_NC"
+    end
+end
+
+# Generate .env file from Bitwarden
+function bw-generate-env
+    set env_file $argv[1]
+    if test -z "$env_file"
+        set env_file ".env"
+    end
+
+    echo "# Generated by bw-generate-env on "(date) > "$env_file"
+    echo "# DO NOT COMMIT THIS FILE" >> "$env_file"
+    echo "" >> "$env_file"
+
+    for arg in $argv[2..-1]
+        if string match -q "*:*" $arg
+            set item_name (string split ":" $arg)[1]
+            set env_name (string split ":" $arg)[2]
+        else
+            set env_name (string replace -a " " "_" (string upper $arg))
+            set item_name $arg
+        end
+
+        set value (bw-get-password "$item_name" 2>/dev/null)
+        if test -n "$value"
+            echo "$env_name=\"$value\"" >> "$env_file"
+            echo -e "$_BW_GREEN✅ Added $env_name to $env_file$_BW_NC"
+        else
+            echo "# $env_name=# FAILED TO RETRIEVE FROM: $item_name" >> "$env_file"
+            echo -e "$_BW_RED❌ Failed to retrieve $env_name$_BW_NC"
+        end
+    end
+
+    echo -e "$_BW_GREEN📄 Environment file generated: $env_file$_BW_NC"
+end
+# Quick info
+function bw-info
+    echo -e "$_BW_YELLOW=== Bitwarden Status ===$_BW_NC"
+    echo "Status: "(bw-status)
+    if bw-is-unlocked
+        echo "Session: Active"
+    else
+        echo "Session: None"
+    end
+
+    if command -v bws >/dev/null 2>&1; and bws-get-token >/dev/null 2>&1
+        echo "BWS Access: ✅ Available"
+    else
+        echo "BWS Access: ❌ Not configured"
+    end
+end
+
+# Help function
+function bw-help
+    echo '🔐 Bitwarden Utilities Help
+
+AUTHENTICATION:
+  bw-unlock             Unlock vault
+  bw-lock               Lock vault and clear session
+  bw-info               Show status information
+
+SECRETS RETRIEVAL:
+  bw-get-password <item>        Get password from item
+  bw-get-username <item>        Get username from item
+  bw-get-field <item> <field>   Get custom field from item
+
+BWS (SECRETS MANAGER):
+  bws-run <command>             Run BWS command with token from vault
+  bws-inject <command>          Run command with BWS secrets injected
+  bws-compose-up                Start compose with BWS secrets
+  bws-compose-down              Stop compose
+
+ENVIRONMENT VARIABLES:
+  bw-export-env <items...>      Export passwords as env vars
+  bw-clear-env <vars...>        Clear exported environment variables
+  bw-generate-env <file> <mappings...>  Generate .env file from vault
+
+EXAMPLES:
+  bw-unlock
+  bw-get-password "Database Password"
+  bw-export-env "API Key:API_KEY" "DB Password:DB_PASS"
+  bws-compose-up
+  bw-generate-env .env "Database:DB_URL" "Redis:REDIS_URL"'
+end
+
+{{- end }}

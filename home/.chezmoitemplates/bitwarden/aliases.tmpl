@@ -1,0 +1,22 @@
+# Bitwarden-specific aliases
+
+{{- if .bitwarden.enabled }}
+
+# Quick Bitwarden commands
+alias bwu='bw-unlock'
+alias bwl='bw-lock'
+alias bwi='bw-info'
+alias bwp='bw-get-password'
+alias bwh='bw-help'
+
+{{- if .bitwarden.aliases.docker_secure }}
+# Enhanced Docker Compose with BWS secrets
+alias dcus='bws-compose-up'
+alias dcds='bws-compose-down'
+alias dcubs='bws-inject docker-compose up -d --build'
+alias dcss='bws-inject docker-compose stop'
+alias dcrs='bws-inject docker-compose restart'
+alias dcls='bws-inject docker-compose logs'
+{{- end }}
+
+{{- end }}

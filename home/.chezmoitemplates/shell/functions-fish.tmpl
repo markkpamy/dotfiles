@@ -33,3 +33,8 @@ function gama
   set -lx GITHUB_TOKEN (gh auth token)
   command gama $argv
 end
+
+# Include Bitwarden utilities if enabled
+{{- if .bitwarden.enabled }}
+{{ includeTemplate "bitwarden/functions-fish.tmpl" . }}
+{{- end }}

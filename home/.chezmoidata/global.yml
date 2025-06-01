@@ -1,2 +1,19 @@
 githubUsername: markkpamy
 externalGitArgs: "clone.args = ['--depth', '1']\npull.args = ['--depth', '1']"
+
+# Bitwarden utilities configuration
+bitwarden:
+  enabled: true
+  auto_install: true
+  token_item: 'BWS Access Token'
+  storage_method: 'login'
+  default_project: '' # Set your default BWS project ID
+  auto_lock_timeout: '15m'
+
+  aliases:
+    docker_secure: true
+
+  item_mappings:
+    database: 'Production Database'
+    api_key: 'Main API Key'
+    redis: 'Redis Password'

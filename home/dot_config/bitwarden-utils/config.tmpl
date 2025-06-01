@@ -1,0 +1,15 @@
+{{- if .bitwarden.enabled }}
+# Bitwarden Utils User Configuration
+# This file is sourced by the utilities
+
+# BWS Configuration
+export BWS_TOKEN_ITEM="{{ .bitwarden.token_item | default "BWS Access Token" }}"
+export BWS_STORAGE_METHOD="{{ .bitwarden.storage_method | default "login" }}"
+export BWS_PROJECT_ID="{{ .bitwarden.default_project | default "" }}"
+
+# Common item mappings (customize for your vault)
+{{- range $key, $value := .bitwarden.item_mappings }}
+export BW_{{ $key | upper }}_ITEM="{{ $value }}"
+{{- end }}
+
+{{- end }}

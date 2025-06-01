@@ -27,3 +27,8 @@ fxglog() {
 gama() {
   GITHUB_TOKEN="$(gh auth token)" command gama "$@"
 }
+
+# Include Bitwarden utilities if enabled
+{{- if .bitwarden.enabled }}
+{{ includeTemplate "bitwarden/functions-bash.tmpl" . }}
+{{- end }}

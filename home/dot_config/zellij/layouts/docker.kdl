@@ -82,12 +82,12 @@ layout {
         pane split_direction="horizontal" {
         // Compose commands
             pane name="Compose Control" size="50%" {
-                command "echo 'Docker Compose Control Center' && echo '' && echo 'Example commands:' && echo '- docker-compose up -d' && echo '- docker-compose ps' && echo '- docker-compose down' && echo '- docker-compose logs -f'"
+                command "echo 'Docker Compose Control Center' && echo '' && echo 'Example commands:' && echo '- docker compose up -d' && echo '- docker compose ps' && echo '- docker compose down' && echo '- docker compose logs -f'"
             }
 
         // Compose services status
             pane name="Compose Services" size="50%" {
-                command "echo 'No compose project detected.' && echo 'Navigate to a directory with docker-compose.yml and run:' && echo 'docker-compose ps'"
+                command "echo 'No compose project detected.' && echo 'Navigate to a directory with docker compose.yml and run:' && echo 'docker compose ps'"
             }
         }
     }

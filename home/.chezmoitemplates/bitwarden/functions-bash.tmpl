@@ -133,11 +133,11 @@ bws-inject() {
 # Docker Compose integration
 bws-compose-up() {
     echo -e "${_BW_GREEN}🚀 Starting Docker Compose with BWS secrets...${_BW_NC}"
-    bws-inject docker-compose up -d
+    bws-inject docker compose up -d
 }
 
 bws-compose-down() {
-    docker-compose down
+    docker compose down
 }
 
 # Environment variable management

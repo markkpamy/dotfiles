@@ -164,11 +164,11 @@ end
 # Docker Compose integration
 function bws-compose-up
     echo -e "$_BW_GREEN🚀 Starting Docker Compose with BWS secrets...$_BW_NC"
-    bws-inject docker-compose up -d
+    bws-inject docker compose up -d
 end
 
 function bws-compose-down
-    docker-compose down
+    docker compose down
 end
 # Environment variable management
 function bw-export-env

@@ -249,7 +249,7 @@ Set-Alias -Name fxres -Value Get-FluxResume
 
 # Docker aliases (similar to your bash/fish setup)
 function Invoke-DockerComposeUp { docker compose up -d $args }
-function Invoke-DockerComposeUpBuild { docker-compose up -d --build $args }
+function Invoke-DockerComposeUpBuild { docker compose up -d --build $args }
 function Invoke-DockerComposeStop { docker compose stop $args }
 function Invoke-DockerComposeDown { docker compose down $args }
 function Invoke-DockerComposeRestart { docker compose restart $args }

@@ -1,0 +1,317 @@
+# BWS Helper Functions - PowerShell Implementation
+# Add this to your PowerShell profile template
+
+{{- if .bitwarden.enabled }}
+# =============================================================================
+# BITWARDEN UTILITIES - CORE FUNCTIONS (POWERSHELL)
+# =============================================================================
+
+# Configuration from Chezmoi data
+$env:BW_UTILS_CONFIG_DIR = "$env:USERPROFILE\.config\bitwarden-utils"
+$env:BW_UTILS_SESSION_FILE = "$env:BW_UTILS_CONFIG_DIR\session"
+$env:BWS_TOKEN_ITEM = "{{ .bitwarden.token_item | default "BWS Access Token" }}"
+$env:BWS_STORAGE_METHOD = "{{ .bitwarden.storage_method | default "login" }}"
+$env:BWS_PROJECT_ID = "{{ .bitwarden.default_project | default "" }}"
+
+# Colors for PowerShell
+$Script:BWColors = @{
+    Red    = "`e[0;31m"
+    Green  = "`e[0;32m"
+    Yellow = "`e[1;33m"
+    Reset  = "`e[0m"
+}
+
+# Ensure config directory exists
+if (-not (Test-Path $env:BW_UTILS_CONFIG_DIR)) {
+    New-Item -Path $env:BW_UTILS_CONFIG_DIR -ItemType Directory -Force | Out-Null
+}
+
+# Core authentication functions
+function Test-Bitwarden {
+    return (Get-Command bw -ErrorAction SilentlyContinue) -and (Get-Command jq -ErrorAction SilentlyContinue)
+}
+
+function Get-BitwardenStatus {
+    if (-not (Test-Bitwarden)) {
+        return $null
+    }
+
+    try {
+        $status = bw status 2>$null | jq -r '.status // "error"'
+        return $status
+    }
+    catch {
+        return "error"
+    }
+}
+
+function Test-BitwardenUnlocked {
+    $status = Get-BitwardenStatus
+    return $status -eq "unlocked"
+}
+
+function Invoke-BitwardenEnsureUnlocked {
+    if (Test-BitwardenUnlocked) {
+        return $true
+    }
+
+    $status = Get-BitwardenStatus
+    if ($status -eq "locked") {
+        Write-Host "$($BWColors.Yellow)🔓 Unlocking Bitwarden vault...$($BWColors.Reset)"
+        try {
+            $session = bw unlock --raw
+            if ($LASTEXITCODE -eq 0 -and $session) {
+                $session | Out-File -FilePath $env:BW_UTILS_SESSION_FILE -Encoding utf8
+
+                # Set restrictive permissions (Windows equivalent of chmod 600)
+                $acl = Get-Acl $env:BW_UTILS_SESSION_FILE
+                $acl.SetAccessRuleProtection($true, $false)
+                $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+                    [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
+                    "FullControl",
+                    "Allow"
+                )
+                $acl.SetAccessRule($accessRule)
+                Set-Acl $env:BW_UTILS_SESSION_FILE $acl
+
+                $env:BW_SESSION = $session
+                Write-Host "$($BWColors.Green)✅ Vault unlocked$($BWColors.Reset)"
+                return $true
+            }
+        }
+        catch {
+            # Fall through to error message
+        }
+    }
+
+    Write-Host "$($BWColors.Red)❌ Please login and unlock Bitwarden first$($BWColors.Reset)"
+    return $false
+}
+
+# Session management
+function Get-BitwardenSession {
+    if (Test-Path $env:BW_UTILS_SESSION_FILE) {
+        return Get-Content $env:BW_UTILS_SESSION_FILE -Raw
+    }
+    return $null
+}
+
+function Invoke-BitwardenUnlock {
+    return Invoke-BitwardenEnsureUnlocked
+}
+
+function Invoke-BitwardenLock {
+    try {
+        bw lock 2>$null
+    }
+    catch {
+        # Ignore errors
+    }
+
+    if (Test-Path $env:BW_UTILS_SESSION_FILE) {
+        Remove-Item $env:BW_UTILS_SESSION_FILE -Force
+    }
+
+    if ($env:BW_SESSION) {
+        Remove-Item env:BW_SESSION -ErrorAction SilentlyContinue
+    }
+
+    Write-Host "$($BWColors.Green)🔒 Vault locked$($BWColors.Reset)"
+}
+# Secrets retrieval
+function Get-BitwardenPassword {
+    param([string]$ItemName)
+
+    if (-not (Invoke-BitwardenEnsureUnlocked)) {
+        return $null
+    }
+
+    $session = Get-BitwardenSession
+    $env:BW_SESSION = $session
+
+    try {
+        return bw get password $ItemName --session $session 2>$null
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-BitwardenField {
+    param(
+        [string]$ItemName,
+        [string]$FieldName
+    )
+
+    if (-not (Invoke-BitwardenEnsureUnlocked)) {
+        return $null
+    }
+
+    $session = Get-BitwardenSession
+    $env:BW_SESSION = $session
+
+    try {
+        $itemJson = bw get item $ItemName --session $session 2>$null
+        if ($itemJson) {
+            $item = $itemJson | ConvertFrom-Json
+            $field = $item.fields | Where-Object { $_.name -eq $FieldName }
+            return $field.value
+        }
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-BitwardenInfo {
+    Write-Host "$($BWColors.Yellow)=== Bitwarden Status ===$($BWColors.Reset)"
+
+    $status = Get-BitwardenStatus
+    Write-Host "Status: $status"
+
+    if (Test-BitwardenUnlocked) {
+        Write-Host "Session: Active"
+    } else {
+        Write-Host "Session: None"
+    }
+
+    # Check BWS availability without triggering unlock
+    if (Get-Command bws -ErrorAction SilentlyContinue) {
+        if (Test-BitwardenUnlocked) {
+            # Only test BWS token if vault is already unlocked
+            $token = Get-BWSToken
+            if ($token) {
+                Write-Host "BWS Access: ✅ Available"
+            } else {
+                Write-Host "BWS Access: ⚠️  Token not found in vault"
+            }
+        } else {
+            Write-Host "BWS Access: 🔒 Vault locked (unlock to test BWS token)"
+        }
+    } else {
+        Write-Host "BWS Access: ❌ BWS CLI not installed"
+    }
+}
+
+function Show-BitwardenHelp {
+    Write-Host @"
+🔐 Bitwarden Utilities Help (PowerShell)
+
+AUTHENTICATION:
+  bw-unlock             Unlock vault
+  bw-lock               Lock vault and clear session
+  bw-info               Show status information
+
+SECRETS RETRIEVAL:
+  bw-get-password <item>        Get password from item
+  Get-BitwardenField <item> <field>   Get custom field from item
+
+BWS (SECRETS MANAGER):
+  bws-run <command>             Run BWS command with token from vault
+  bws-inject <command>          Run command with BWS secrets injected
+
+EXAMPLES:
+  bws-run secret list
+  bws-run project list
+  bws-run secret get <secret-id>
+  bws-inject npm start
+  bws-inject dotnet run
+"@
+}
+
+# BWS integration - The core bws-run function
+function Get-BWSToken {
+    param(
+        [string]$TokenItem = $env:BWS_TOKEN_ITEM,
+        [string]$StorageMethod = $env:BWS_STORAGE_METHOD
+    )
+
+    switch ($StorageMethod) {
+        "login" {
+            return Get-BitwardenPassword $TokenItem
+        }
+        "field" {
+            return Get-BitwardenField $TokenItem "token"
+        }
+        default {
+            Write-Host "$($BWColors.Red)❌ Invalid storage method$($BWColors.Reset)"
+            return $null
+        }
+    }
+}
+
+function Invoke-BWSRun {
+    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
+
+    if (-not (Get-Command bws -ErrorAction SilentlyContinue)) {
+        Write-Host "$($BWColors.Red)❌ BWS CLI not found$($BWColors.Reset)"
+        return
+    }
+
+    $token = Get-BWSToken
+    if (-not $token) {
+        Write-Host "$($BWColors.Red)❌ Failed to get BWS token$($BWColors.Reset)"
+        return
+    }
+
+    & bws --access-token $token @Arguments
+}
+
+function Invoke-BWSInject {
+    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
+
+    if (-not (Get-Command bws -ErrorAction SilentlyContinue)) {
+        Write-Host "$($BWColors.Red)❌ BWS CLI not found$($BWColors.Reset)"
+        return
+    }
+
+    $token = Get-BWSToken
+    if (-not $token) {
+        Write-Host "$($BWColors.Red)❌ Failed to get BWS token$($BWColors.Reset)"
+        return
+    }
+
+    if ($env:BWS_PROJECT_ID) {
+        & bws run --project-id $env:BWS_PROJECT_ID --access-token $token -- @Arguments
+    } else {
+        & bws run --access-token $token -- @Arguments
+    }
+}
+# =============================================================================
+# POWERSHELL ALIASES - The same clean interface as Bash/Fish
+# =============================================================================
+
+# Core Bitwarden functions
+Set-Alias -Name bw-unlock -Value Invoke-BitwardenUnlock
+Set-Alias -Name bw-lock -Value Invoke-BitwardenLock
+Set-Alias -Name bw-info -Value Get-BitwardenInfo
+Set-Alias -Name bw-get-password -Value Get-BitwardenPassword
+Set-Alias -Name bw-help -Value Show-BitwardenHelp
+
+# BWS functions - Your core bws-run implementation
+Set-Alias -Name bws-run -Value Invoke-BWSRun
+Set-Alias -Name bws-inject -Value Invoke-BWSInject
+
+# Quick access aliases
+Set-Alias -Name bwu -Value Invoke-BitwardenUnlock
+Set-Alias -Name bwl -Value Invoke-BitwardenLock
+Set-Alias -Name bwi -Value Get-BitwardenInfo
+Set-Alias -Name bwp -Value Get-BitwardenPassword
+Set-Alias -Name bwh -Value Show-BitwardenHelp
+
+{{- if .bitwarden.aliases.docker_secure }}
+# Docker Compose integration
+function Start-BWSCompose {
+    Write-Host "$($BWColors.Green)🚀 Starting Docker Compose with BWS secrets...$($BWColors.Reset)"
+    Invoke-BWSInject docker compose up -d
+}
+
+function Stop-BWSCompose { docker compose down }
+
+Set-Alias -Name bws-compose-up -Value Start-BWSCompose
+Set-Alias -Name bws-compose-down -Value Stop-BWSCompose
+Set-Alias -Name dcus -Value Start-BWSCompose
+Set-Alias -Name dcds -Value Stop-BWSCompose
+{{- end }}
+
+{{- end }}

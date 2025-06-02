@@ -630,3 +630,10 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
 if (Get-Command flux -ErrorAction SilentlyContinue) {
     Invoke-Expression (flux completion powershell | Out-String)
 }
+
+# =============================================================================
+# BITWARDEN BWS HELPER FUNCTIONS
+# =============================================================================
+
+# Include Bitwarden utilities if enabled
+{{- template "bitwarden/functions-powershell.tmpl" . }}

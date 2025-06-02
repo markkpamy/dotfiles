@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+set -eufo pipefail
+
+print_header "Cargo Package Installation" "Installing Rust crates via Cargo" "$ICON_RUST"
+
+# Set total steps for progress tracking
+set_total_steps 3
+
+# Step 1: Check cargo availability
+print_step 1 "Cargo Availability Check"
+if ! command -v cargo &>/dev/null; then
+  print_error "Cargo is not installed. Please install Rust first."
+  print_info "Run the rust toolchain installation script first"
+  print_footer "Cargo Package Installation" "failed"
+  exit 1
+fi
+
+print_success "Cargo is available: $(cargo --version)"
+
+# Step 2: Check installation preference
+print_step 2 "Configuration Check"
+{{ if not .installCargoPackages }}
+print_info "Cargo package installation disabled via configuration"
+print_info "To enable: Run 'chezmoi data set installCargoPackages true' or reconfigure with 'chezmoi init'"
+print_footer "Cargo Package Installation" "skipped"
+exit 0
+{{ end }}
+
+print_success "Cargo package installation enabled"
+
+# Step 3: Package installation
+print_step 3 "Package Installation"
+
+{{ if .pkgs.cargo }}
+# Count total packages
+total_packages=0
+{{ range $category, $packages := .pkgs.cargo }}
+{{ range $package := $packages }}
+total_packages=$((total_packages + 1))
+{{ end }}
+{{ end }}
+
+if [ $total_packages -eq 0 ]; then
+    print_info "No Cargo packages configured for installation"
+    print_footer "Cargo Package Installation" "completed"
+    exit 0
+fi
+
+print_action "Installing" "$total_packages Cargo packages" "$ICON_INSTALL"
+
+# Display packages to be installed
+{{ range $category, $packages := .pkgs.cargo }}
+{{ if $packages }}
+print_info "Category: {{ $category }}"
+{{ range $package := $packages }}
+echo "  - {{ $package }}"
+{{ end }}
+{{ end }}
+{{ end }}
+
+echo ""
+
+current=0
+{{ range $category, $packages := .pkgs.cargo }}
+{{ if $packages }}
+# {{ $category }}
+{{ range $package := $packages }}
+current=$((current + 1))
+print_progress $current $total_packages "Installing: {{ $package }}"
+if cargo install {{ $package }}; then
+    print_success "✓ {{ $package }} installed successfully"
+else
+    print_error "✗ Failed to install {{ $package }}"
+fi
+{{ end }}
+{{ end }}
+{{ end }}
+
+print_success "Cargo package installation completed!"
+print_info "Installed packages are available in ~/.cargo/bin"
+{{ else }}
+print_warning "No Cargo packages configured for installation"
+print_info "Add packages to home/.chezmoidata/pkgs/cargo.yml to install them"
+{{ end }}
+
+print_footer "Cargo Package Installation" "completed"

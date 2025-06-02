@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+print_header "Rust Toolchain Setup" "Initializing Rust via rustup" "$ICON_RUST"
+
+# Set total steps for progress tracking
+set_total_steps 3
+
+# Step 1: Check rustup availability
+print_step 1 "Rustup Availability Check"
+if ! command -v rustup >/dev/null 2>&1; then
+    print_error "rustup not found. Please install via Homebrew first."
+    print_info "Run: brew install rustup"
+    print_footer "Rust Toolchain Setup" "failed"
+    exit 1
+fi
+
+print_success "rustup is available"
+
+# Step 2: Check if Rust is already initialized
+print_step 2 "Rust Installation Check"
+if command -v cargo >/dev/null 2>&1; then
+    print_info "Rust toolchain already initialized"
+    cargo --version
+    rustc --version
+    print_success "Rust toolchain is ready"
+    print_footer "Rust Toolchain Setup" "already completed"
+    exit 0
+fi
+
+# Step 3: Initialize Rust toolchain
+print_step 3 "Rust Toolchain Initialization"
+print_action "Initializing" "Rust stable toolchain" "$ICON_INSTALL"
+rustup-init -y --default-toolchain stable --profile default
+
+print_action "Sourcing" "Cargo environment" "$ICON_CONFIG"
+source ~/.cargo/env
+
+# Verify installation
+if command -v cargo >/dev/null 2>&1; then
+    print_success "Rust toolchain initialized successfully"
+    print_info "Rust compiler: $(rustc --version)"
+    print_info "Cargo package manager: $(cargo --version)"
+    print_info "rustup version: $(rustup --version)"
+else
+    print_error "Rust installation verification failed"
+    print_footer "Rust Toolchain Setup" "failed"
+    exit 1
+fi
+
+print_success "Rust toolchain setup completed successfully!"
+print_info "Add ~/.cargo/bin to your PATH if not already done"
+print_footer "Rust Toolchain Setup" "completed"

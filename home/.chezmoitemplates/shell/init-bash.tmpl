@@ -63,3 +63,8 @@ fi
 if command -v flux &> /dev/null; then
     source <(flux completion bash)
 fi
+
+# Cargo (Rust package manager)
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi

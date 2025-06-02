@@ -1,0 +1,78 @@
+# Cargo Package Installation
+Write-Host "=== Cargo Package Installation ===" -ForegroundColor Cyan
+
+# Step 1: Check cargo availability
+Write-Host "Checking Cargo availability..." -ForegroundColor Yellow
+if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
+    Write-Host "Cargo is not installed. Please install Rust first." -ForegroundColor Red
+    Write-Host "Run the rust toolchain installation script first" -ForegroundColor Yellow
+    exit 1
+}
+
+Write-Host "Cargo is available: $(cargo --version)" -ForegroundColor Green
+
+# Step 2: Check installation preference
+Write-Host "Checking configuration..." -ForegroundColor Yellow
+{{ if not .installCargoPackages }}
+Write-Host "Cargo package installation disabled via configuration" -ForegroundColor Yellow
+Write-Host "To enable: Run 'chezmoi data set installCargoPackages true' or reconfigure with 'chezmoi init'" -ForegroundColor Yellow
+exit 0
+{{ end }}
+
+Write-Host "Cargo package installation enabled" -ForegroundColor Green
+
+# Step 3: Package installation
+Write-Host "Starting package installation..." -ForegroundColor Yellow
+
+{{ if .pkgs.cargo }}
+# Count total packages
+$totalPackages = 0
+{{ range $category, $packages := .pkgs.cargo }}
+{{ range $package := $packages }}
+$totalPackages++
+{{ end }}
+{{ end }}
+
+if ($totalPackages -eq 0) {
+    Write-Host "No Cargo packages configured for installation" -ForegroundColor Yellow
+    exit 0
+}
+
+Write-Host "Installing $totalPackages Cargo packages..." -ForegroundColor Yellow
+
+# Display packages to be installed
+{{ range $category, $packages := .pkgs.cargo }}
+{{ if $packages }}
+Write-Host "Category: {{ $category }}" -ForegroundColor Cyan
+{{ range $package := $packages }}
+Write-Host "  - {{ $package }}" -ForegroundColor White
+{{ end }}
+{{ end }}
+{{ end }}
+
+Write-Host ""
+
+$current = 0
+{{ range $category, $packages := .pkgs.cargo }}
+{{ if $packages }}
+# {{ $category }}
+{{ range $package := $packages }}
+$current++
+Write-Host "[$current/$totalPackages] Installing: {{ $package }}" -ForegroundColor Yellow
+try {
+    cargo install {{ $package }}
+    Write-Host "✓ {{ $package }} installed successfully" -ForegroundColor Green
+} catch {
+    Write-Host "✗ Failed to install {{ $package }}" -ForegroundColor Red
+    Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+}
+{{ end }}
+{{ end }}
+{{ end }}
+
+Write-Host "Cargo package installation completed!" -ForegroundColor Green
+Write-Host "Installed packages are available in ~/.cargo/bin" -ForegroundColor Cyan
+{{ else }}
+Write-Host "No Cargo packages configured for installation" -ForegroundColor Yellow
+Write-Host "Add packages to home/.chezmoidata/pkgs/cargo.yml to install them" -ForegroundColor Yellow
+{{ end }}

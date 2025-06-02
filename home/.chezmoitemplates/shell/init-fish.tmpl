@@ -71,5 +71,10 @@ if command -v flux &>/dev/null
     flux completion fish | source
 end
 
+# Cargo (Rust package manager)
+if test -d "$HOME/.cargo/bin"
+    fish_add_path "$HOME/.cargo/bin"
+end
+
 # Fish-specific settings
 export ENHANCD_ENABLE_DOUBLE_DOT=false

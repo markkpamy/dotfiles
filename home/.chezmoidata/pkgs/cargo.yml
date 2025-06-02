@@ -1,0 +1,15 @@
+# Cargo package configuration
+# Installation is controlled via Chezmoi data (.installCargoPackages)
+# To enable: Run 'chezmoi data set installCargoPackages true' or reconfigure with 'chezmoi init'
+
+# Package configuration
+pkgs:
+  cargo:
+    testing:
+      - 'pik' # Image picker utility - good for testing
+
+    # Empty sections ready for future expansion
+    cli_essentials: []
+    development: []
+    system_tools: []
+    utilities: []

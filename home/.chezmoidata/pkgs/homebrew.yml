@@ -125,6 +125,7 @@ pkgs:
       - 'python' # Python interpreter
       - 'virtualenv' # Python virtualenv
       - 'virtualfish' # Virtualenv for Fish shell
+      - 'rustup' # Rust toolchain installer
 
     devops:
       - 'ansible' # Automation
@@ -163,6 +164,7 @@ pkgs:
       - 'ggshield'
       - 'pug' # Pug is a CLI tool for managing terraform resources
       - 'rustscan' # Port scan tool
+      - 'mise'
 
     dev_utils:
       - 'gh' # GitHub CLI

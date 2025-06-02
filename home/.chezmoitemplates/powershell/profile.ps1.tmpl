@@ -631,6 +631,11 @@ if (Get-Command flux -ErrorAction SilentlyContinue) {
     Invoke-Expression (flux completion powershell | Out-String)
 }
 
+# Initialize Cargo (Rust package manager)
+if (Test-Path "$env:USERPROFILE\.cargo\bin") {
+    $env:PATH = "$env:USERPROFILE\.cargo\bin;" + $env:PATH
+}
+
 # =============================================================================
 # BITWARDEN BWS HELPER FUNCTIONS
 # =============================================================================

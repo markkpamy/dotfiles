@@ -1,5 +1,9 @@
 # BWS Helper Functions - Comprehensive Guide
 
+## 🌐 Cross-Platform Support
+
+This BWS integration works identically across **Linux**, **macOS**, and **Windows** with the same commands and aliases in Bash, Fish, and PowerShell!
+
 ## 🚀 Overview
 
 Your dotfiles include a powerful, secure BWS (Bitwarden Secrets Manager) integration built around the core `bws-run` function. This implementation follows the Unix philosophy of simple, composable tools while providing enterprise-grade security for secret management.
@@ -458,10 +462,13 @@ home/
 ├── .chezmoidata/
 │   └── global.yml                           # BWS configuration
 ├── .chezmoitemplates/
-│   └── bitwarden/
-│       ├── functions-bash.tmpl              # BWS functions
-│       ├── functions-fish.tmpl              # Fish shell version
-│       └── aliases.tmpl                     # BWS aliases
+│   ├── bitwarden/
+│   │   ├── functions-bash.tmpl              # BWS functions (Bash)
+│   │   ├── functions-fish.tmpl              # BWS functions (Fish)
+│   │   ├── functions-powershell.tmpl        # BWS functions (PowerShell)
+│   │   └── aliases.tmpl                     # BWS aliases (Bash/Fish)
+│   └── powershell/
+│       └── profile.ps1.tmpl                 # PowerShell profile (includes BWS)
 └── .config/
     └── bitwarden-utils/
         ├── config                           # Runtime config
@@ -490,3 +497,135 @@ BW_SESSION           # Bitwarden session (auto-managed)
 7. **Reliability**: Robust error handling and status checking
 
 Your BWS helper implementation is a perfect example of thoughtful system design! 🚀
+
+---
+
+## 🪟 Windows PowerShell Implementation
+
+Your BWS helper functions now work identically across **Linux**, **macOS**, and **Windows**!
+
+### Windows PowerShell Features
+
+Your `bws-run` function has been implemented natively for PowerShell with:
+
+- **Native PowerShell functions** (`Invoke-BWSRun`, `Get-BitwardenPassword`)
+- **Windows ACL file permissions** (equivalent to `chmod 600`)
+- **PowerShell parameter binding** and argument splatting
+- **Same aliases** as Unix systems for consistency
+
+### Cross-Platform Command Consistency
+
+```bash
+# Linux/macOS (Bash/Fish)
+bws-run secret list
+bws-run project list
+bws-inject npm start
+
+# Windows (PowerShell) - IDENTICAL COMMANDS!
+bws-run secret list
+bws-run project list  
+bws-inject npm start
+```
+
+### PowerShell-Specific Usage Examples
+
+```powershell
+# Daily development workflow
+bwu                                    # Unlock vault
+bws-run project list                   # Check available projects
+bws-run secret list                    # List secrets
+
+# Run development with secrets
+bws-inject npm start                   # Start dev server with secrets
+bws-inject dotnet run                  # Run .NET app with secrets
+bws-inject python manage.py runserver # Django with secrets
+
+# Secret management (same as Unix)
+bws-run secret create "DATABASE_URL" "postgresql://..."
+bws-run secret update <secret-id> "NEW_API_KEY" "updated-value"
+bws-run secret delete <old-secret-id>
+
+# Docker integration (same aliases)
+dcus         # docker compose up with BWS secrets
+dcds         # docker compose down
+```
+
+### PowerShell Implementation Details
+
+**File Permissions:**
+- Session files use Windows ACLs (equivalent to `chmod 600`)
+- Only current user has access to session files
+- Automatic cleanup on vault lock
+
+**Error Handling:**
+- PowerShell-native error handling with `try/catch`
+- Proper exit code checking with `$LASTEXITCODE`
+- Silent error redirection with `2>$null`
+
+**Environment Integration:**
+- Uses `$env:` PowerShell syntax for environment variables
+- Automatic configuration from Chezmoi templates
+- Seamless integration with existing PowerShell profile
+
+### Windows Setup & Installation
+
+**1. Apply Dotfiles Changes:**
+```powershell
+cd C:\Users\markk\Documents\GitRepos\dotfiles
+chezmoi apply
+```
+
+**2. Restart PowerShell:**
+```powershell
+# Restart your PowerShell session to load new functions
+```
+
+**3. Verify Installation:**
+```powershell
+# Check if functions are loaded
+Get-Command bws-run
+Get-Command bw-unlock
+
+# Test BWS integration
+bw-info
+bws-run project list
+```
+
+### Windows-Specific Troubleshooting
+
+**"bws-run not recognized":**
+```powershell
+# Restart PowerShell session or reload profile
+. $PROFILE
+```
+
+**"Execution Policy" errors:**
+```powershell
+# Check current policy
+Get-ExecutionPolicy
+
+# Set policy for current user (if needed)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**File permission issues:**
+```powershell
+# Check session file permissions
+Get-Acl $env:BW_UTILS_SESSION_FILE | Format-List
+```
+
+### Cross-Platform Compatibility Matrix
+
+| Feature | Bash | Fish | PowerShell |
+|---------|------|------|------------|
+| `bws-run secret list` | ✅ | ✅ | ✅ |
+| `bws-run project list` | ✅ | ✅ | ✅ |
+| `bws-inject <command>` | ✅ | ✅ | ✅ |
+| Token from vault | ✅ | ✅ | ✅ |
+| Session management | ✅ | ✅ | ✅ |
+| Docker integration | ✅ | ✅ | ✅ |
+| Same aliases (`bwu`, `bwl`, `bwi`) | ✅ | ✅ | ✅ |
+| Windows ACL permissions | ❌ | ❌ | ✅ |
+| PowerShell parameter binding | ❌ | ❌ | ✅ |
+
+Your excellent `bws-run` architecture scales perfectly across all platforms! 🎉

@@ -636,4 +636,4 @@ if (Get-Command flux -ErrorAction SilentlyContinue) {
 # =============================================================================
 
 # Include Bitwarden utilities if enabled
-{{- template "bitwarden/functions-powershell.tmpl" . }}
+{{- includeTemplate "bitwarden/functions-powershell.tmpl" . }}

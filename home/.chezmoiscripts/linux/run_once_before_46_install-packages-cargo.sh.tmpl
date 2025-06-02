@@ -15,6 +15,20 @@ print_step 1 "Cargo Availability Check"
 if ! command -v cargo &>/dev/null; then
   print_error "Cargo is not installed. Please install Rust first."
   print_info "Run the rust toolchain installation script first"
+  print_info "Or source the cargo environment: source ~/.cargo/env"
+  print_footer "Cargo Package Installation" "failed"
+  exit 1
+fi
+
+# Try to source cargo environment if not in PATH but installed
+if ! command -v cargo &>/dev/null && [ -f ~/.cargo/env ]; then
+    print_action "Sourcing" "Cargo environment" "$ICON_CONFIG"
+    source ~/.cargo/env
+fi
+
+# Final check
+if ! command -v cargo &>/dev/null; then
+  print_error "Cargo is not available. Rust toolchain may not be properly installed."
   print_footer "Cargo Package Installation" "failed"
   exit 1
 fi

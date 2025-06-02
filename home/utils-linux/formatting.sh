@@ -42,6 +42,7 @@ readonly ICON_PYTHON='🐍'
 readonly ICON_DOCKER='🐳'
 readonly ICON_NODE='📗'
 readonly ICON_FONT='🔤'
+readonly ICON_RUST='🦀'
 
 # Global variables for tracking
 SCRIPT_START_TIME=$(date +%s)

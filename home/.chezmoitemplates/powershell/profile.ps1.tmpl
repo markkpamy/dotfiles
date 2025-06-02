@@ -585,7 +585,7 @@ if (Get-Command uv -ErrorAction SilentlyContinue) {
 
 # Initialize UVX completion if installed
 if (Get-Command uvx -ErrorAction SilentlyContinue) {
-    (& uvx generate-shell-completion powershell) | Out-String | Invoke-Expression
+    (& uvx --generate-shell-completion powershell) | Out-String | Invoke-Expression
 }
 
 # Initialize Terraform completion if installed

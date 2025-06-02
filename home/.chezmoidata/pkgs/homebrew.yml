@@ -171,3 +171,4 @@ pkgs:
     security:
       - 'openssl' # Cryptography and SSL/TLS Toolkit
       - 'wget' # File downloader
+      - 'gpg-tui' # GPG Tui

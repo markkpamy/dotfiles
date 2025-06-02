@@ -130,6 +130,7 @@ pkgs:
       - 'localsend'
       - 'MilosParipovic.OneCommander'
       - 'WinDirStat.WinDirStat.Beta'
+      - 'Saturneric.GpgFrontend'
     psGallery:
       - 'DockerCompletion'
       - 'PsReadLine'

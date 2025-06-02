@@ -276,6 +276,7 @@ BWS (SECRETS MANAGER):
   bws-inject <command>          Run command with BWS secrets injected
   bws-compose-up                Start compose with BWS secrets
   bws-compose-down              Stop compose
+  bwst                          Export BWS token to BWS_ACCESS_TOKEN env var
 
 ENVIRONMENT VARIABLES:
   bw-export-env <items...>      Export passwords as env vars
@@ -287,7 +288,8 @@ EXAMPLES:
   bw-get-password "Database Password"
   bw-export-env "API Key:API_KEY" "DB Password:DB_PASS"
   bws-compose-up
-  bw-generate-env .env "Database:DB_URL" "Redis:REDIS_URL"'
+  bw-generate-env .env "Database:DB_URL" "Redis:REDIS_URL"
+  bwst
 end
 
 {{- end }}

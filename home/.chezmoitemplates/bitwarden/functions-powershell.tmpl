@@ -209,6 +209,7 @@ SECRETS RETRIEVAL:
 BWS (SECRETS MANAGER):
   bws-run <command>             Run BWS command with token from vault
   bws-inject <command>          Run command with BWS secrets injected
+  bwst                          Export BWS token to BWS_ACCESS_TOKEN env var
 
 EXAMPLES:
   bws-run secret list
@@ -216,6 +217,7 @@ EXAMPLES:
   bws-run secret get <secret-id>
   bws-inject npm start
   bws-inject dotnet run
+  bwst
 "@
 }
 
@@ -292,12 +294,26 @@ Set-Alias -Name bw-help -Value Show-BitwardenHelp
 Set-Alias -Name bws-run -Value Invoke-BWSRun
 Set-Alias -Name bws-inject -Value Invoke-BWSInject
 
+# BWS token export function and alias (short form)
+function Export-BWSTokenShort {
+    $token = Get-BWSToken
+    if ($token) {
+        $env:BWS_ACCESS_TOKEN = $token
+        Write-Host "$($BWColors.Green)✅ BWS_ACCESS_TOKEN exported to environment$($BWColors.Reset)"
+    } else {
+        Write-Host "$($BWColors.Red)❌ Failed to get BWS token$($BWColors.Reset)"
+    }
+}
+
+Set-Alias -Name bwst -Value Export-BWSTokenShort
+
 # Quick access aliases
 Set-Alias -Name bwu -Value Invoke-BitwardenUnlock
 Set-Alias -Name bwl -Value Invoke-BitwardenLock
 Set-Alias -Name bwi -Value Get-BitwardenInfo
 Set-Alias -Name bwp -Value Get-BitwardenPassword
 Set-Alias -Name bwh -Value Show-BitwardenHelp
+Set-Alias -Name bwst -Value Export-BWSTokenShort
 
 {{- if .bitwarden.aliases.docker_secure }}
 # Docker Compose integration

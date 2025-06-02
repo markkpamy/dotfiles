@@ -9,6 +9,9 @@ alias bwi='bw-info'
 alias bwp='bw-get-password'
 alias bwh='bw-help'
 
+# BWS token export alias
+alias bwst='export BWS_ACCESS_TOKEN="$(bws-get-token)"'
+
 {{- if .bitwarden.aliases.docker_secure }}
 # Enhanced Docker Compose with BWS secrets
 alias dcus='bws-compose-up'

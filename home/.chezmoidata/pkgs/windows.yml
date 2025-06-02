@@ -53,6 +53,7 @@ pkgs:
       - 'Neovim.Neovim'
       - 'Bitwarden.CLI'
       - 'Bitwarden.Bitwarden'
+      - 'FilesCommunity.Files'
       # CLI Tools
       - 'alexpasmantier.television'
       - 'RamenSoftware.Windhawk'

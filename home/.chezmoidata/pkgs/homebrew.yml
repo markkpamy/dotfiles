@@ -162,6 +162,7 @@ pkgs:
       - 'gitleaks' # Secret scanning
       - 'ggshield'
       - 'pug' # Pug is a CLI tool for managing terraform resources
+      - 'rustscan' # Port scan tool
 
     dev_utils:
       - 'gh' # GitHub CLI

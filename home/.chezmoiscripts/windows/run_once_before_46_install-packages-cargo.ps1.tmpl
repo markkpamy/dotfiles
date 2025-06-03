@@ -58,7 +58,7 @@ $current = 0
 # {{ $category }}
 {{ range $package := $packages }}
 $current++
-Write-Host "[$current/$totalPackages] Installing: {{ $package }}" -ForegroundColor Yellow
+{{/*Write-Host "[$current/$totalPackages] Installing: {{ $package }}" -ForegroundColor Yellow*/}}
 try {
     $packageName = "{{ $package }}"
     cargo install $packageName
@@ -74,7 +74,7 @@ catch {
 {{ end }}
 
 Write-Host "Cargo package installation completed!" -ForegroundColor Green
-Write-Host "Installed packages are available in ~/.cargo/bin" -ForegroundColor Cyan
+{{/*Write-Host "Installed packages are available in ~/.cargo/bin" -ForegroundColor Cyan*/}}
 {{ else }}
 Write-Host "No Cargo packages configured for installation" -ForegroundColor Yellow
 Write-Host "Add packages to home/.chezmoidata/pkgs/cargo.yml to install them" -ForegroundColor Yellow

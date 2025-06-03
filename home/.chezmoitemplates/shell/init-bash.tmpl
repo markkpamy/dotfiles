@@ -51,11 +51,6 @@ if command -v helm &> /dev/null; then
     source <(helm completion bash)
 fi
 
-# Azure CLI completion
-if command -v az &> /dev/null; then
-    source <(az completion --shell bash)
-fi
-
 # GitHub CLI completion
 if command -v gh &> /dev/null; then
     eval "$(gh completion -s bash)"

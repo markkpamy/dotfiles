@@ -56,11 +56,6 @@ if command -v helm &>/dev/null
     helm completion fish | source
 end
 
-# Azure CLI completion
-if command -v az &>/dev/null
-    az completion --shell fish | source
-end
-
 # GitHub CLI completion
 if command -v gh &>/dev/null
     gh completion -s fish | source

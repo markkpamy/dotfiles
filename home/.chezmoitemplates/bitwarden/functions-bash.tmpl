@@ -42,7 +42,8 @@ bw-ensure-unlocked() {
 
     if [[ "$(bw-status)" == "locked" ]]; then
         echo -e "${_BW_YELLOW}🔓 Unlocking Bitwarden vault...${_BW_NC}"
-        local session=$(bw unlock --raw)        if [[ $? -eq 0 && -n "$session" ]]; then
+        local session=$(bw unlock --raw)
+        if [[ $? -eq 0 && -n "$session" ]]; then
             echo "$session" > "$BW_UTILS_SESSION_FILE"
             chmod 600 "$BW_UTILS_SESSION_FILE"
             export BW_SESSION="$session"

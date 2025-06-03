@@ -23,16 +23,6 @@ ignore_failures = [
 # "gems",             # Ignore gem update failures
 # "npm",              # Ignore npm update failures
 ]
-# Pre-hooks run before any upgrades
-{{- if eq .chezmoi.os "windows" }}
-pre_commands = [
-    # "echo 'Starting Topgrade on Windows...'"
-]
-{{- else }}
-pre_commands = [
-    # "echo 'Starting Topgrade on Linux...'"
-]
-{{- end }}
 
 # Post-hooks run after all upgrades
 # post_commands = [# "echo 'Topgrade completed!'"]

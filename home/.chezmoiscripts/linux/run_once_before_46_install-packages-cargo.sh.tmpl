@@ -37,68 +37,62 @@ print_success "Cargo is available: $(cargo --version)"
 
 # Step 2: Check installation preference
 print_step 2 "Configuration Check"
-{{ if not .installCargoPackages }}
+{{- if not .installCargoPackages }}
 print_info "Cargo package installation disabled via configuration"
 print_info "To enable: Run 'chezmoi data set installCargoPackages true' or reconfigure with 'chezmoi init'"
 print_footer "Cargo Package Installation" "skipped"
 exit 0
-{{ end }}
+{{- end }}
 
 print_success "Cargo package installation enabled"
 
 # Step 3: Package installation
 print_step 3 "Package Installation"
 
-{{ if .pkgs.cargo }}
-# Count total packages
-total_packages=0
-{{ range $category, $packages := .pkgs.cargo }}
-{{ range $package := $packages }}
-total_packages=$((total_packages + 1))
-{{ end }}
-{{ end }}
+{{- if .pkgs.cargo }}
+# Collect all packages into an array
+packages=()
+{{- range $category, $pkgList := .pkgs.cargo }}
+{{- range $pkg := $pkgList }}
+packages+=("{{ $pkg }}")
+{{- end }}
+{{- end }}
 
-if [ $total_packages -eq 0 ]; then
+if [ ${#packages[@]} -eq 0 ]; then
     print_info "No Cargo packages configured for installation"
     print_footer "Cargo Package Installation" "completed"
     exit 0
 fi
 
+total_packages=${#packages[@]}
 print_action "Installing" "$total_packages Cargo packages" "$ICON_INSTALL"
 
 # Display packages to be installed
-{{ range $category, $packages := .pkgs.cargo }}
-{{ if $packages }}
-print_info "Category: {{ $category }}"
-{{ range $package := $packages }}
-echo "  - {{ $package }}"
-{{ end }}
-{{ end }}
-{{ end }}
+print_info "Packages to install:"
+for pkg in "${packages[@]}"; do
+    echo "  - $pkg"
+done
 
 echo ""
 
-current=0
-{{ range $category, $packages := .pkgs.cargo }}
-{{ if $packages }}
-# {{ $category }}
-{{ range $package := $packages }}
-current=$((current + 1))
-print_progress $current $total_packages "Installing: {{ $package }}"
-if cargo install {{ $package }}; then
-    print_success "✓ {{ $package }} installed successfully"
-else
-    print_error "✗ Failed to install {{ $package }}"
-fi
-{{ end }}
-{{ end }}
-{{ end }}
+# Install each package
+for i in "${!packages[@]}"; do
+    pkg="${packages[$i]}"
+    current=$((i + 1))
+    print_progress $current $total_packages "Installing: $pkg"
+
+    if cargo install "$pkg"; then
+        print_success "✓ $pkg installed successfully"
+    else
+        print_error "✗ Failed to install $pkg"
+    fi
+done
 
 print_success "Cargo package installation completed!"
 print_info "Installed packages are available in ~/.cargo/bin"
-{{ else }}
+{{- else }}
 print_warning "No Cargo packages configured for installation"
 print_info "Add packages to home/.chezmoidata/pkgs/cargo.yml to install them"
-{{ end }}
+{{- end }}
 
 print_footer "Cargo Package Installation" "completed"

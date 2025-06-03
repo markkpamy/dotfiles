@@ -7,6 +7,9 @@
 assume_yes = true
 cleanup = true
 display_time = true
+no_retry = false
+run_in_tmux = false
+tmux_arguments = "-S /tmp/topgrade"
 
 # Behavior
 disable = ["vim", "chezmoi", "uv"]
@@ -112,12 +115,6 @@ use_sudo = false
 # Vim/Neovim
 #[vim]
 # Update Vim plugins
-
-# General behavior
-[misc]
-no_retry = false
-run_in_tmux = false
-tmux_arguments = "-S /tmp/topgrade"
 
 # Cleanup settings
 cleanup = true

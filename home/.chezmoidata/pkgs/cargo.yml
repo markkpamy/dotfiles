@@ -5,11 +5,9 @@
 # Package configuration
 pkgs:
   cargo:
-    testing:
-      - 'pik' # Image picker utility - good for testing
-
     # Empty sections ready for future expansion
     cli_essentials: []
     development: []
-    system_tools: []
+    system_tools:
+      - 'pik' # Image picker utility - good for testing
     utilities: []

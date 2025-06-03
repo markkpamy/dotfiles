@@ -19,7 +19,7 @@
 {{ $terminalBlur := "1" }}
 {{ $theme := "dark" }}
 {{ $installScoopPackages := false }}
-{{ $installChocoPackages := false }}
+{{ $installChocoPackages := true }}
 {{ $installPythonPackages := true }}
 {{ $installCargoPackages := true }}
 {{ $isDesktop := false }}
@@ -46,8 +46,6 @@
   {{ $installChocoPackages = promptBool "Install Choco packages? This may take some time" $installChocoPackages }}
   {{/* Prompt for Python package installation if running interactively */}}
   {{ $installPythonPackages = promptBool "Install Python packages (pip and pipx)? This may take some time" $installPythonPackages }}
-  {{/* Prompt for Cargo package installation if running interactively */}}
-  {{ $installCargoPackages = promptBool "Install Cargo packages (Rust crates)? This may take some time" $installCargoPackages }}
   {{/* Prompt for Cargo package installation if running interactively */}}
   {{ $installCargoPackages = promptBool "Install Cargo packages (Rust crates)? This may take some time" $installCargoPackages }}
 {{ else if eq .chezmoi.os "linux" }}

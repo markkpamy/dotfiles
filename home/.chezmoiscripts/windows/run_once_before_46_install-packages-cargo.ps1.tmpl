@@ -60,10 +60,13 @@ $current = 0
 $current++
 Write-Host "[$current/$totalPackages] Installing: {{ $package }}" -ForegroundColor Yellow
 try {
-    cargo install {{ $package }}
-    Write-Host "✓ {{ $package }} installed successfully" -ForegroundColor Green
-} catch {
-    Write-Host "✗ Failed to install {{ $package }}" -ForegroundColor Red
+    $packageName = "{{ $package }}"
+    cargo install $packageName
+    Write-Host "✓ $packageName installed successfully" -ForegroundColor Green
+}
+catch {
+    $packageName = "{{ $package }}"
+    Write-Host "✗ Failed to install $packageName" -ForegroundColor Red
     Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
 }
 {{ end }}

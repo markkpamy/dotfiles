@@ -32,9 +32,7 @@ pre_commands = [
 {{- end }}
 
 # Post-hooks run after all upgrades
-post_commands = [
-    # "echo 'Topgrade completed!'"
-]
+# post_commands = [# "echo 'Topgrade completed!'"]
 
 [pre_commands]
 # Commands to run before specific steps
@@ -135,10 +133,6 @@ keep_going = false
 [remote]
 # Configuration for running topgrade on remote machines
 # max_concurrency = 4
-
-# Custom titles for different categories
-[misc]
-display_time = true
 
 # Set custom upgrade order (optional)
 # [step_order]

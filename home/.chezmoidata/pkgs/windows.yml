@@ -126,7 +126,6 @@ pkgs:
       - 'Gitleaks.Gitleaks'
       - 'lsd-rs.lsd'
       - 'DevToys-app.DevToys'
-      - 'Rustlang.Rustup'
       # Others
       - 'Microsoft.PowerToys'
       - 'WinSCP.WinSCP'

@@ -40,21 +40,6 @@ ignore_failures = [
 accept_all_updates = false
 open_remotes_in_new_terminal = true
 
-# Chocolatey
-[chocolatey]
-use_http = false
-
-# Scoop
-[scoop]
-# No specific configuration needed
-
-# WinGet
-[winget]
-# No specific configuration needed
-
-# PowerShell Gallery
-[powershell]
-# No specific configuration needed
 
 {{- else }}
 # Linux/Unix-specific configuration
@@ -62,15 +47,6 @@ use_http = false
 # Package managers
 [linux]
 # Use sudo for package managers that need it
-
-
-# APT (Ubuntu/Debian)
-[apt]
-enable_tlmgr = false
-
-# Snap packages
-[snap]
-use_sudo = true
 
 # Flatpak
 [flatpak]
@@ -82,45 +58,15 @@ use_sudo = false
 autoremove = true
 {{- end }}
 
-# Git repositories
-[git]
-
-# Python pip
-[pip3]
-# No specific configuration needed
 
 # Node.js npm
 [npm]
 use_sudo = false
 
-# Cargo (Rust)
-[cargo]
-# No specific configuration needed
-
 # Docker
 [containers]
 # Update Docker images
-use_sudo = false
-
-# Vim/Neovim
-#[vim]
-# Update Vim plugins
-
-# Cleanup settings
-cleanup = true
-keep_going = false
 
 # Step configuration
 [commands]
 # Custom commands to run during upgrade
-
-
-
-# Remote execution
-[remote]
-# Configuration for running topgrade on remote machines
-# max_concurrency = 4
-
-# Set custom upgrade order (optional)
-# [step_order]
-# Optional: Define custom order for upgrade steps

@@ -11,7 +11,6 @@ pkgs:
       # - 'neorocks-scoop' # https://github.com/nvim-neorocks/rocks-scoop.git
       pkgs:
         # Programming Languages
-        - 'rustup' # Rust toolchain installer
         # Completion (keep in Scoop as not available in Winget)
       #        - 'extras/dockercompletion'
       #        - 'extras/scoop-completion'

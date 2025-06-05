@@ -1,7 +1,8 @@
 # Environment variables and path settings
 
+{{ if and (eq .chezmoi.os "linux") .isDesktop -}}
 export SSH_AUTH_SOCK=/home/$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock
-
+{{ end }}
 # Add user binaries to path
 export PATH="$PATH:$HOME/.local/bin"
 

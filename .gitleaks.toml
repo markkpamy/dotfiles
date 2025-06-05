@@ -27,11 +27,11 @@ keywords = ["certificate-authority-data", "client-certificate-data", "client-key
 [allowlist]
 description = "Allow certain file types"
 files = [
-    '''(?i)\.md$''',           # Markdown files
-    '''(?i)\.txt$''',          # Text files
-    '''(?i)\.yaml$''',         # YAML files (be careful with this)
-    '''(?i)\.yml$''',          # YAML files (be careful with this)
-    '''(?i)\.json$''',         # JSON files (be careful with this)
+#    '''(?i)\.md$''',           # Markdown files
+#    '''(?i)\.txt$''',          # Text files
+#    '''(?i)\.yaml$''',         # YAML files (be careful with this)
+#    '''(?i)\.yml$''',          # YAML files (be careful with this)
+#    '''(?i)\.json$''',         # JSON files (be careful with this)
 ]
 
 # Paths to ignore

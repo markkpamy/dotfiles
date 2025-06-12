@@ -165,6 +165,7 @@ pkgs:
       - 'pug' # Pug is a CLI tool for managing terraform resources
       - 'rustscan' # Port scan tool
       - 'mise'
+      - 'x-cmd' # X command line tool
 
     dev_utils:
       - 'gh' # GitHub CLI

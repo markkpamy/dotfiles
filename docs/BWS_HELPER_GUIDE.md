@@ -204,6 +204,8 @@ bw-generate-env .env "Database:DB_URL" "Redis:REDIS_URL"
 ### 1. Development Workflow
 
 ```bash
+bw config server https://vault.bitwarden.eu
+
 # Daily workflow
 bw-unlock                              # Unlock vault once
 bws-run project list                   # See available projects

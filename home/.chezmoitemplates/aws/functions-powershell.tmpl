@@ -78,19 +78,10 @@ function Show-AWSProfiles {
 }
 
 # Aliases for PowerShell
-Set-Alias -Name aws-test -Value Test-AWSConfiguration
 Set-Alias -Name aws-profile -Value Set-AWSProfile
 Set-Alias -Name aws-assume -Value Invoke-AWSAssumeRole
 Set-Alias -Name aws-config-update -Value Update-AWSConfigFromBitwarden
 Set-Alias -Name aws-profiles -Value Show-AWSProfiles
-
-# Quick profile aliases
-function Set-AWSDevProfile { Set-AWSProfile "nx_training_advanced" }
-function Set-AWSStagingProfile { Set-AWSProfile "nx_datahub_advanced" }
-function Set-AWSProdProfile { Set-AWSProfile "nx_training_master" }
-function Set-AWSDatahubProfile { Set-AWSProfile "nx_datahub_master" }
-function Set-AWSRenovationProfile { Set-AWSProfile "nx_renovation_master" }
-function Set-AWSPresalesProfile { Set-AWSProfile "nx-presales-master" }
 
 Set-Alias -Name aws-dev -Value Set-AWSDevProfile
 Set-Alias -Name aws-staging -Value Set-AWSStagingProfile
@@ -149,23 +140,7 @@ Set-Alias -Name aws-presales -Value Set-AWSPresalesProfile
 }
 
 # Aliases for PowerShell
-Set-Alias -Name aws-test -Value Test-AWSConfiguration
 Set-Alias -Name aws-profile -Value Set-AWSProfile
 Set-Alias -Name aws-assume -Value Invoke-AWSAssumeRole
 Set-Alias -Name aws-config-update -Value Update-AWSConfigFromBitwarden
 Set-Alias -Name aws-profiles -Value Show-AWSProfiles
-
-# Quick profile aliases
-function Set-AWSDevProfile { Set-AWSProfile "nx_training_advanced" }
-function Set-AWSStagingProfile { Set-AWSProfile "nx_datahub_advanced" }
-function Set-AWSProdProfile { Set-AWSProfile "nx_training_master" }
-function Set-AWSDatahubProfile { Set-AWSProfile "nx_datahub_master" }
-function Set-AWSRenovationProfile { Set-AWSProfile "nx_renovation_master" }
-function Set-AWSPresalesProfile { Set-AWSProfile "nx-presales-master" }
-
-Set-Alias -Name aws-dev -Value Set-AWSDevProfile
-Set-Alias -Name aws-staging -Value Set-AWSStagingProfile
-Set-Alias -Name aws-prod -Value Set-AWSProdProfile
-Set-Alias -Name aws-datahub -Value Set-AWSDatahubProfile
-Set-Alias -Name aws-renovation -Value Set-AWSRenovationProfile
-Set-Alias -Name aws-presales -Value Set-AWSPresalesProfile

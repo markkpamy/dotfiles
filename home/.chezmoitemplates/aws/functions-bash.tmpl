@@ -1,14 +1,5 @@
 # AWS Helper Functions for Bash Shell (using existing BWS functions)
 
-# Test AWS configuration
-aws-test() {
-    echo "🧪 Testing AWS configuration..."
-    echo "📋 Default profile:"
-    aws sts get-caller-identity --profile default
-    echo "📋 Available profiles:"
-    aws configure list-profiles
-}
-
 # Quick AWS profile switch
 aws-profile() {
     if [ -z "$1" ]; then
@@ -114,11 +105,3 @@ aws-profiles() {
         echo "💡 Ensure BWS session is active: bwst"
     fi
 }
-
-# Quick aliases for common profiles
-alias aws-dev='aws-profile nx_training_advanced'
-alias aws-staging='aws-profile nx_datahub_advanced'
-alias aws-prod='aws-profile nx_training_master'
-alias aws-datahub='aws-profile nx_datahub_master'
-alias aws-renovation='aws-profile nx_renovation_master'
-alias aws-presales='aws-profile nx-presales-master'

@@ -1,14 +1,5 @@
 # AWS Helper Functions for Fish Shell
 
-# Test AWS configuration
-function aws-test
-    echo "🧪 Testing AWS configuration..."
-    echo "📋 Default profile:"
-    aws sts get-caller-identity --profile default
-    echo "📋 Available profiles:"
-    aws configure list-profiles
-end
-
 # Quick AWS profile switch
 function aws-profile
     if test (count $argv) -eq 0
@@ -105,29 +96,4 @@ function aws-profiles
         echo "❌ Not authenticated or session expired"
         echo "💡 Ensure BWS session is active: bwst"
     end
-end
-
-# Quick aliases for common profiles
-function aws-dev
-    aws-profile nx_training_advanced
-end
-
-function aws-staging
-    aws-profile nx_datahub_advanced
-end
-
-function aws-prod
-    aws-profile nx_training_master
-end
-
-function aws-datahub
-    aws-profile nx_datahub_master
-end
-
-function aws-renovation
-    aws-profile nx_renovation_master
-end
-
-function aws-presales
-    aws-profile nx-presales-master
 end

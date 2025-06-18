@@ -91,7 +91,6 @@ pkgs:
       - 'presenterm' # Terminal presentation tool
       - 'slides' # Terminal presentation tool
       - 'wtfutil' # Terminal dashboard
-      - 'Valkyrie00/homebrew-bbrew/bbrew' # A Homebrew TUI Manager.
 
     development:
       - 'httpie' # HTTP / API testing client

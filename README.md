@@ -393,7 +393,7 @@ theme = "dark"
 ## Documentation
 
 - [Chezmoi Usage Guide](docs/CHEZMOI.md) - Understanding file organization and templating
-- [UV/UVX Implementation](UV_UVX_README.md) - Modern Python package management setup
+- [UV/UVX Implementation](docs/UV_UVX_README.md) - Modern Python package management setup
 - [Pre-commit Setup](docs/pre-commit-setup.md) - Code quality and security automation  
 - [Windows Configuration](docs/windows.md) - Windows-specific notes and utilities
 - [Linux Configuration](docs/linux.md) - Linux-specific guides and troubleshooting

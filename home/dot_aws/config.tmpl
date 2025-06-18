@@ -1,82 +1,88 @@
-{{- /* AWS Config Template - Direct BWS Integration */ -}}
-{{- /* Only generate if AWS integration is enabled */ -}}
-{{- if .aws.enabled -}}
-
 [default]
-region = {{ .aws.default_region }}
-output = {{ .aws.default_output }}
+region = eu-west-3
+output = json
 {{- if eq .chezmoi.os "windows" }}
-credential_process = pwsh.exe -NoProfile -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
+    credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1" "AWS-Default"
 {{- else }}
-credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
+    credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials "AWS-Default"
 {{- end }}
 
 [profile default]
-region = {{ .aws.default_region }}
-output = {{ .aws.default_output }}
+region = eu-west-3
+output = json
 {{- if eq .chezmoi.os "windows" }}
-credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
+    credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1" "AWS-Default"
 {{- else }}
-credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
+    credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials "AWS-Default"
 {{- end }}
 
+# NX base profile - uses NX credentials
+[profile nx_base]
+region = eu-west-3
+{{- if eq .chezmoi.os "windows" }}
+    credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1" "AWS-NX"
+{{- else }}
+    credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials "AWS-NX"
+{{- end }}
+
+# NX role profiles - all use nx_base as source
 [profile nx_training_advanced]
 region = eu-west-3
 role_session_name = mark.kpamy
 role_arn = arn:aws:iam::766272829042:role/nx-training-advanced
-source_profile = default
+source_profile = nx_base
 
 [profile nx_datahub_advanced]
 region = eu-west-3
 role_session_name = mark.kpamy
 role_arn = arn:aws:iam::261001339617:role/nx-datahub-advanced
-source_profile = default
+source_profile = nx_base
 
 [profile nx_training_master]
 output = json
 region = eu-west-1
 role_session_name = mark.kpamy
 role_arn = arn:aws:iam::766272829042:role/nx-training-master
-source_profile = default
+source_profile = nx_base
 
 [profile nx_profile]
 region = eu-west-3
 role_session_name = mark.kpamy
 role_arn = arn:aws:iam::766272829042:role/nx-training-master
-source_profile = default
+source_profile = nx_base
 
 [profile nx-presales-advanced]
 region = ap-southeast-1
 role_arn = arn:aws:iam::666841086193:role/nx-presales-advanced
 role_session_name = nxsa-visage-apac
-source_profile = default
+source_profile = nx_base
 
 [profile nx-presales-master]
 region = ap-southeast-1
 role_arn = arn:aws:iam::666841086193:role/nx-presales-master
 role_session_name = nx-presales-master
-source_profile = default
+source_profile = nx_base
 
 [profile nx_datahub_master]
 output = json
 region = eu-west-3
 role_session_name = mark.kpamy
 role_arn = arn:aws:iam::261001339617:role/nx-datahub-master
-source_profile = default
+source_profile = nx_base
 
 [profile nx_renovation_master]
 output = json
 region = eu-west-3
 role_session_name = mark.kpamy
 role_arn = arn:aws:iam::248189924076:role/nx-renovation-master
-source_profile = default
+source_profile = nx_base
 
 [profile nx_renovation_advanced]
 output = json
 region = eu-west-3
 role_session_name = mark.kpamy
 role_arn = arn:aws:iam::248189924076:role/nx-renovation-advanced
-source_profile = default
+source_profile = nx_base
 
 [profile mk_root_admin]
 sso_session = sso
@@ -96,4 +102,3 @@ output = json
 sso_start_url = https://d-906785cef1.awsapps.com/start#
 sso_region = us-east-1
 sso_registration_scopes = sso:account:access
-{{- end }}

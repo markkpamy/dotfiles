@@ -1,166 +1,141 @@
-# AWS + Bitwarden Simple Security Setup Guide
+# AWS + Bitwarden CLI Setup Guide
 
-Clean and simple AWS authentication with **complete credential and metadata security** using existing Bitwarden configuration.
-
-## Security Features
-
-✅ **AWS credentials** stored in Bitwarden Secrets Manager  
-✅ **Account numbers** hidden in BWS (not in config files)  
-✅ **Role ARNs** dynamically generated from BWS metadata  
-✅ **Profile information** centrally managed in BWS  
-✅ **Integrated with existing** Bitwarden dotfiles configuration
-✅ **Direct template integration** - no separate generators needed
-✅ **Fallback support** - works even if BWS unavailable  
-
-## Configuration Structure
-
-Your existing Bitwarden config in `global.yml` has been enhanced:
-
-```yaml
-bitwarden:
-  enabled: true
-  # ... existing config ...
-
-  # AWS-specific settings (added)
-  aws:
-    enabled: true
-    item_name: 'AWS Default Profile'  # For BW CLI fallback
-  secrets:
-    enabled: true  # Using BWS
-    # Uses default_project from main bitwarden config
-```
-
-AWS-specific settings in `aws.yml`:
-```yaml
-aws:
-  enabled: true
-  default_region: 'eu-west-3'
-  default_output: 'json'
-```
+Simple AWS authentication using Bitwarden CLI with explicit BW item names for different credential sets.
 
 ## Setup Steps
 
-### 1. Update Your BWS Project ID
+### 1. Create Bitwarden Items
 
-Set your BWS project ID in the existing config:
-```bash
-# Edit global.yml and set your actual BWS project ID
-vim ~/.chezmoidata/global.yml
-# Update: default_project: 'your-actual-bws-project-id'
-```
-
-### 2. Store AWS Information in BWS
+Create 2 BW items for your AWS credentials:
 
 ```bash
-# Base AWS credentials
-bws secret create "aws-default-access-key-id" ""
-bws secret create "aws-default-secret-access-key" ""
+# For default/non-NX profiles
+bw create item '{
+  "object": "item",
+  "type": 1,
+  "name": "AWS-Default",
+  "login": {
+    "username": "XXXXXXXXXX",
+    "password": "XXXXXXXXXXXXXXXX"
+  },
+  "notes": "AWS credentials for default and non-NX profiles"
+}'
 
-# Profile metadata (see BWS_AWS_SECRETS_SETUP.md for complete JSON)
-bws secret create "aws-profiles-metadata" '{ ... }'
+# For NX profiles  
+bw create item '{
+  "object": "item",
+  "type": 1,
+  "name": "AWS-NX",
+  "login": {
+    "username": "XXXXXXXXXXXXXXXXXXX",
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  },
+  "notes": "AWS credentials for all NX-related profiles"
+}'
 ```
 
-### 3. Deploy Configuration
+### 2. Deploy Configuration
 
 ```bash
 cd ~/dotfiles
-
-# Set BWS session for template processing
-bwst
-
-# Deploy with secrets integration
 chezmoi apply
 ```
 
-### 4. Test Integration
+### 3. Set Up Bitwarden Session
 
 ```bash
-# Test complete setup
+# Unlock Bitwarden and set session
+export BW_SESSION=$(bw unlock --raw)
+
+# Or use your existing helper if available
+bw-unlock
+```
+
+### 4. Test the Integration
+
+```bash
+# Test default credentials
+aws sts get-caller-identity --profile default
+
+# Test NX credentials
+aws sts get-caller-identity --profile nx_training_advanced
+
+# Test all profiles
 aws-test
-
-# View profile information (without exposing account numbers)
-aws-profiles
-
-# Test profile switching
-aws-dev
-aws sts get-caller-identity
 ```
 
 ## How It Works
 
-### Template Integration
-The AWS config template leverages your existing Bitwarden configuration:
+### Credential Mapping
+- **Default profiles**: Use `credential_process = aws-bw-credentials "AWS-Default"`
+- **NX base profile**: Use `credential_process = aws-bw-credentials "AWS-NX"`
+- **All NX role profiles**: Use `source_profile = nx_base` (inherits NX credentials)
 
-```yaml
-# Uses existing bitwarden.secrets.enabled
-{{- if .bitwarden.secrets.enabled }}
-# Fetch from BWS using existing project configuration
-{{- $bwsResult := output "bws" "secret" "get" "aws-profiles-metadata" ... }}
+### Profile Structure
+```ini
+# Default profiles use AWS-Default item
+[default]
+credential_process = aws-bw-credentials "AWS-Default"
 
-# Uses aws.default_region from aws.yml
-region = {{ .aws.default_region }}
+# NX base profile uses AWS-NX item  
+[profile nx_base]
+credential_process = aws-bw-credentials "AWS-NX"
+
+# NX role profiles inherit from nx_base
+[profile nx_training_advanced]
+source_profile = nx_base  # Uses AWS-NX credentials
 ```
 
-### Fallback Safety
-- If BWS unavailable → Uses static fallback config
-- If BWS_ACCESS_TOKEN missing → Uses static fallback config  
-- If bws command not found → Uses static fallback config
-
 ## Available Commands
+
+All your existing AWS helper functions work:
 
 ### Profile Management
 - `aws-profile [name]` - Switch profiles or show current
 - `aws-test` - Test AWS configuration
+- `aws-profiles` - Show all profiles dynamically
 - `aws-dev`, `aws-prod`, etc. - Quick profile switching
 
 ### Configuration Management  
-- `aws-config-update` - Refresh config from Bitwarden (re-applies Chezmoi)
-- `aws-profiles` - Show profile information without exposing account numbers
+- `aws-config-update` - Refresh config (re-applies Chezmoi)
 
-## Updating Configuration
+## Usage Examples
 
-### Set BWS Project ID (One-time)
 ```bash
-# Edit global.yml
-chezmoi edit ~/.chezmoidata/global.yml
+# Default credentials (uses AWS-Default BW item)
+aws s3 ls --profile default
 
-# Set your actual BWS project ID:
-# default_project: 'your-actual-bws-project-id'
+# NX credentials (uses AWS-NX BW item via nx_base)
+aws s3 ls --profile nx_training_advanced
+aws ec2 describe-instances --profile nx_datahub_master
+aws sts get-caller-identity --profile nx-presales-advanced
+
+# Quick profile switching
+aws-dev     # nx_training_advanced
+aws-prod    # nx_training_master  
+aws-datahub # nx_datahub_master
 ```
 
-### Add New AWS Profile
-```bash
-# 1. Edit BWS metadata
-bws secret edit "aws-profiles-metadata"  # Add new profile to JSON
+## Troubleshooting
 
-# 2. Refresh config
-bwst && aws-config-update
-```
+### "BW_SESSION not set"
+Run: `export BW_SESSION=$(bw unlock --raw)`
 
-### Update Account Numbers
-```bash  
-# 1. Edit BWS metadata
-bws secret edit "aws-profiles-metadata"  # Update account_id
+### "Failed to retrieve credentials from item"
+- Verify BW item exists: `bw list items --search "AWS-Default"`
+- Check item name matches exactly: "AWS-Default" and "AWS-NX"
+- Test BW access: `bw get username "AWS-Default"`
 
-# 2. Refresh config  
-bwst && aws-config-update
-```
+### "credential_process failed"
+- Test script directly: `~/.local/bin/aws-bw-credentials "AWS-Default"`
+- Check script permissions: `chmod +x ~/.local/bin/aws-bw-credentials`
+- Verify BW session: `bw status`
 
-### Rotate Credentials
-```bash
-# 1. Update in BWS
-bws secret edit "aws-default-access-key-id"
-bws secret edit "aws-default-secret-access-key"
+## Security Benefits
 
-# 2. Test immediately (no config update needed)
-aws-test
-```
-
-## Benefits
-
-🎯 **Integrated** - Uses existing Bitwarden dotfiles configuration  
-🔒 **Security** - Account numbers and credentials hidden in BWS  
-⚡ **Simple** - Direct template processing, no external scripts  
-🛡️ **Reliable** - Automatic fallback if BWS unavailable  
-📦 **Maintainable** - Leverages existing Chezmoi infrastructure
-🔄 **Consistent** - Follows established dotfiles patterns
+✅ **Explicit credential mapping** - Clear which BW item each profile uses  
+✅ **Only 2 BW items** to manage (AWS-Default, AWS-NX)  
+✅ **No hardcoded credentials** anywhere in config files  
+✅ **Separate credential sets** for different AWS accounts  
+✅ **All existing profiles preserved** - just new credential sources  
+✅ **Cross-platform** - works on Windows, Linux, macOS

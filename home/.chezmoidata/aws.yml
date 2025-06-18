@@ -1,8 +1,8 @@
 # AWS Configuration for Dotfiles
 aws:
-  enabled: true # Single control for all AWS integration
+  enabled: true
   default_region: 'eu-west-3'
   default_output: 'json'
 
-  # Bitwarden integration method
-  use_bws: false # true = use BWS (recommended), false = use BW CLI
+  # Use traditional Bitwarden CLI instead of BWS
+  use_bws: false

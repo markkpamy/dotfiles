@@ -5,4 +5,4 @@ aws:
   default_output: 'json'
 
   # Bitwarden integration method
-  use_bws: true # true = use BWS (recommended), false = use BW CLI
+  use_bws: false # true = use BWS (recommended), false = use BW CLI

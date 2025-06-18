@@ -98,3 +98,74 @@ Set-Alias -Name aws-prod -Value Set-AWSProdProfile
 Set-Alias -Name aws-datahub -Value Set-AWSDatahubProfile
 Set-Alias -Name aws-renovation -Value Set-AWSRenovationProfile
 Set-Alias -Name aws-presales -Value Set-AWSPresalesProfile
+" -ForegroundColor Red
+        Write-Host "💡 Run 'Update-AWSConfigFromBitwarden' to generate from Bitwarden" -ForegroundColor Yellow
+        return
+    }
+
+    Write-Host "📋 Available Profiles:" -ForegroundColor Cyan
+    Write-Host "----------------------" -ForegroundColor Cyan
+
+    # Get all profiles using AWS CLI and add region information
+    $profiles = aws configure list-profiles
+    foreach ($profile in $profiles) {
+        try {
+            $region = aws configure get region --profile $profile 2>$null
+            if (-not $region) { $region = "(region not set)" }
+
+            # Show role info if it's a role-based profile
+            $roleArn = aws configure get role_arn --profile $profile 2>$null
+
+            if ($roleArn) {
+                # Extract account ID from role ARN for display
+                $accountId = $roleArn -replace '.*::(\d+):.*', '$1'
+                Write-Host ("{0,-25} {1,-15} (Role: {2})" -f $profile, $region, $accountId) -ForegroundColor White
+            } else {
+                Write-Host ("{0,-25} {1,-15} (Base credentials)" -f $profile, $region) -ForegroundColor White
+            }
+        }
+        catch {
+            Write-Host ("{0,-25} (Error reading config)" -f $profile) -ForegroundColor Yellow
+        }
+    }
+
+    Write-Host ""
+    Write-Host "💡 Use 'aws-profile <n>' to switch profiles" -ForegroundColor Yellow
+    Write-Host "💡 Use 'Update-AWSConfigFromBitwarden' to refresh from Bitwarden" -ForegroundColor Yellow
+    Write-Host "💡 Current profile: $($env:AWS_PROFILE ?? 'default')" -ForegroundColor Yellow
+
+    # Show current identity
+    Write-Host ""
+    Write-Host "🔑 Current Identity:" -ForegroundColor Cyan
+    Write-Host "-------------------" -ForegroundColor Cyan
+    try {
+        aws sts get-caller-identity --output table | Out-Host
+        Write-Host "✅ Successfully authenticated" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "❌ Not authenticated or session expired" -ForegroundColor Red
+        Write-Host "💡 Ensure BWS session is active: bwst" -ForegroundColor Yellow
+    }
+}
+
+# Aliases for PowerShell
+Set-Alias -Name aws-test -Value Test-AWSConfiguration
+Set-Alias -Name aws-profile -Value Set-AWSProfile
+Set-Alias -Name aws-assume -Value Invoke-AWSAssumeRole
+Set-Alias -Name aws-config-update -Value Update-AWSConfigFromBitwarden
+Set-Alias -Name aws-profiles -Value Show-AWSProfiles
+
+# Quick profile aliases
+function Set-AWSDevProfile { Set-AWSProfile "nx_training_advanced" }
+function Set-AWSStagingProfile { Set-AWSProfile "nx_datahub_advanced" }
+function Set-AWSProdProfile { Set-AWSProfile "nx_training_master" }
+function Set-AWSDatahubProfile { Set-AWSProfile "nx_datahub_master" }
+function Set-AWSRenovationProfile { Set-AWSProfile "nx_renovation_master" }
+function Set-AWSPresalesProfile { Set-AWSProfile "nx-presales-master" }
+
+Set-Alias -Name aws-dev -Value Set-AWSDevProfile
+Set-Alias -Name aws-staging -Value Set-AWSStagingProfile
+Set-Alias -Name aws-prod -Value Set-AWSProdProfile
+Set-Alias -Name aws-datahub -Value Set-AWSDatahubProfile
+Set-Alias -Name aws-renovation -Value Set-AWSRenovationProfile
+Set-Alias -Name aws-presales -Value Set-AWSPresalesProfile

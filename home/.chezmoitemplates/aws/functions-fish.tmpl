@@ -52,30 +52,59 @@ function aws-config-update
     aws configure list-profiles
 end
 
-# Show AWS profile information (without exposing account numbers)
+# Show AWS profile information (dynamically from config)
 function aws-profiles
     echo "🔍 AWS Profile Information:"
     echo "=========================="
 
-    set profiles \
-        "nx_training_advanced:Training Advanced (EU West 3)" \
-        "nx_datahub_advanced:DataHub Advanced (EU West 3)" \
-        "nx_training_master:Training Master (EU West 1)" \
-        "nx_profile:Training Profile (EU West 3)" \
-        "nx-presales-advanced:Presales Advanced (AP Southeast 1)" \
-        "nx-presales-master:Presales Master (AP Southeast 1)" \
-        "nx_datahub_master:DataHub Master (EU West 3)" \
-        "nx_renovation_master:Renovation Master (EU West 3)" \
-        "nx_renovation_advanced:Renovation Advanced (EU West 3)"
+    # Check if AWS CLI is available
+    if not command -v aws &> /dev/null
+        echo "❌ AWS CLI not found"
+        return 1
+    end
 
-    for profile_info in $profiles
-        set profile_parts (string split ":" $profile_info)
-        printf "%-25s %s\n" $profile_parts[1] $profile_parts[2]
+    # Check if config file exists
+    set config_file "$HOME/.aws/config"
+    if not test -f "$config_file"
+        echo "❌ AWS config file not found at $config_file"
+        echo "💡 Run 'aws-config-update' to generate from Bitwarden"
+        return 1
+    end
+
+    echo "📋 Available Profiles:"
+    echo "----------------------"
+
+    # Get all profiles using AWS CLI and add region information
+    aws configure list-profiles | while read -l profile
+        set region (aws configure get region --profile "$profile" 2>/dev/null; or echo "(region not set)")
+
+        # Show role info if it's a role-based profile
+        set role_arn (aws configure get role_arn --profile "$profile" 2>/dev/null)
+
+        if test -n "$role_arn"
+            # Extract account ID from role ARN for display
+            set account_id (echo "$role_arn" | sed 's/.*::\([0-9]*\):.*/\1/')
+            printf "%-25s %-15s (Role: %s)\n" "$profile" "$region" "$account_id"
+        else
+            printf "%-25s %-15s (Base credentials)\n" "$profile" "$region"
+        end
     end
 
     echo ""
-    echo "💡 Use 'aws-profile <name>' to switch profiles"
+    echo "💡 Use 'aws-profile <n>' to switch profiles"
     echo "💡 Use 'aws-config-update' to refresh from Bitwarden"
+    echo "💡 Current profile: "(set -q AWS_PROFILE; and echo $AWS_PROFILE; or echo "default")
+
+    # Show current identity
+    echo ""
+    echo "🔑 Current Identity:"
+    echo "-------------------"
+    if aws sts get-caller-identity --output table >/dev/null 2>&1
+        echo "✅ Successfully authenticated"
+    else
+        echo "❌ Not authenticated or session expired"
+        echo "💡 Ensure BWS session is active: bwst"
+    end
 end
 
 # Quick aliases for common profiles

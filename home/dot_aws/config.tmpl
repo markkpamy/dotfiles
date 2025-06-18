@@ -1,17 +1,6 @@
 {{- /* AWS Config Template - Direct BWS Integration */ -}}
 {{- /* Only generate if AWS integration is enabled */ -}}
 {{- if .aws.enabled -}}
-{{- /* Fetch profile metadata from BWS */ -}}
-{{- $profilesJson := "" -}}
-{{- if .aws.use_bws -}}
-{{- if lookPath "bws" -}}
-{{- if env "BWS_ACCESS_TOKEN" -}}
-{{- $bwsResult := output "bws" "secret" "get" "aws-profiles-metadata" "--access-token" (env "BWS_ACCESS_TOKEN") "--output" "json" -}}
-{{- $bwsData := $bwsResult | fromJson -}}
-{{- $profilesJson = $bwsData.value | fromJson -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
 
 [default]
 region = {{ .aws.default_region }}
@@ -30,22 +19,6 @@ credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws
 {{- else }}
 credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
 {{- end }}
-
-{{- /* Generate role-based profiles from BWS data */ -}}
-{{- if $profilesJson }}
-{{- range $profileName, $profileData := $profilesJson }}
-
-[profile {{ $profileName }}]
-region = {{ $profileData.region }}
-role_session_name = {{ $profileData.session_name }}
-role_arn = arn:aws:iam::{{ $profileData.account_id }}:role/{{ $profileData.role_name }}
-source_profile = default
-{{- if $profileData.output }}
-output = {{ $profileData.output }}
-{{- end }}
-{{- end }}
-{{- else }}
-{{- /* Fallback: Use static config if BWS not available */ -}}
 
 [profile nx_training_advanced]
 region = eu-west-3

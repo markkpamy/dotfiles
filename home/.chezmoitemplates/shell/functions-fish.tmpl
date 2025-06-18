@@ -34,12 +34,12 @@ function gama
   command gama $argv
 end
 
-# Include Bitwarden utilities if enabled
-{{- if .bitwarden.enabled }}
-{{ includeTemplate "bitwarden/functions-fish.tmpl" . }}
-{{- end }}
+{{/*# Include Bitwarden utilities if enabled*/}}
+{{/*{{- if .bitwarden.enabled }}*/}}
+{{/*{{ includeTemplate "bitwarden/functions-fish.tmpl" . }}*/}}
+{{/*{{- end }}*/}}
 
-# Include AWS utilities if enabled
-{{- if .aws.enabled }}
-{{ includeTemplate "aws/functions.tmpl" . }}
-{{- end }}
+{{/*# Include AWS utilities if enabled*/}}
+{{/*{{- if .aws.enabled }}*/}}
+{{/*{{ includeTemplate "aws/functions.tmpl" . }}*/}}
+{{/*{{- end }}*/}}

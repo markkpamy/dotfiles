@@ -1,13 +1,4 @@
 # AWS Helper Functions for PowerShell
-
-function Test-AWSConfiguration {
-    Write-Host "🧪 Testing AWS configuration..." -ForegroundColor Blue
-    Write-Host "📋 Default profile:" -ForegroundColor Cyan
-    aws sts get-caller-identity --profile default
-    Write-Host "📋 Available profiles:" -ForegroundColor Cyan
-    aws configure list-profiles
-}
-
 function Set-AWSProfile {
     param([string]$ProfileName)
 
@@ -22,25 +13,26 @@ function Set-AWSProfile {
     }
 }
 
-function Invoke-AWSAssumeRole {
+function Get-AWSIdentity {
     param([string]$ProfileName)
 
     if (-not $ProfileName) {
-        Write-Host "Usage: Invoke-AWSAssumeRole <profile-name>" -ForegroundColor Yellow
+        Write-Host "Usage: Get-AWSIdentity <profile-name>" -ForegroundColor Yellow
         return
     }
 
-    Write-Host "🔄 Assuming role for profile: $ProfileName" -ForegroundColor Blue
+    Write-Host "🔍 Checking identity for profile: $ProfileName" -ForegroundColor Blue
     aws sts get-caller-identity --profile $ProfileName
 }
 
 function Update-AWSConfigFromBitwarden {
     Write-Host "🔄 Updating AWS config from Bitwarden..." -ForegroundColor Blue
 
-    # Ensure BWS session is active
-    if (-not $env:BWS_ACCESS_TOKEN) {
-        Write-Host "🔐 Setting up BWS session..." -ForegroundColor Yellow
-        bwst
+    # Ensure BW session is active (not BWS)
+    if (-not $env:BW_SESSION) {
+        Write-Host "🔐 Setting up BW session..." -ForegroundColor Yellow
+        Write-Host "Please run: `$env:BW_SESSION = bw unlock --raw" -ForegroundColor Yellow
+        return
     }
 
     # Re-apply chezmoi templates
@@ -56,40 +48,16 @@ function Show-AWSProfiles {
     Write-Host "🔍 AWS Profile Information:" -ForegroundColor Blue
     Write-Host "==========================" -ForegroundColor Blue
 
-    $profiles = @(
-        @{Name="nx_training_advanced"; Description="Training Advanced (EU West 3)"},
-        @{Name="nx_datahub_advanced"; Description="DataHub Advanced (EU West 3)"},
-        @{Name="nx_training_master"; Description="Training Master (EU West 1)"},
-        @{Name="nx_profile"; Description="Training Profile (EU West 3)"},
-        @{Name="nx-presales-advanced"; Description="Presales Advanced (AP Southeast 1)"},
-        @{Name="nx-presales-master"; Description="Presales Master (AP Southeast 1)"},
-        @{Name="nx_datahub_master"; Description="DataHub Master (EU West 3)"},
-        @{Name="nx_renovation_master"; Description="Renovation Master (EU West 3)"},
-        @{Name="nx_renovation_advanced"; Description="Renovation Advanced (EU West 3)"}
-    )
-
-    foreach ($profile in $profiles) {
-        Write-Host ("{0,-25} {1}" -f $profile.Name, $profile.Description) -ForegroundColor White
+    # Check if AWS CLI is available
+    if (-not (Get-Command aws -ErrorAction SilentlyContinue)) {
+        Write-Host "❌ AWS CLI not found" -ForegroundColor Red
+        return
     }
 
-    Write-Host ""
-    Write-Host "💡 Use 'aws-profile <n>' to switch profiles" -ForegroundColor Yellow
-    Write-Host "💡 Use 'Update-AWSConfigFromBitwarden' to refresh from Bitwarden" -ForegroundColor Yellow
-}
-
-# Aliases for PowerShell
-Set-Alias -Name aws-profile -Value Set-AWSProfile
-Set-Alias -Name aws-assume -Value Invoke-AWSAssumeRole
-Set-Alias -Name aws-config-update -Value Update-AWSConfigFromBitwarden
-Set-Alias -Name aws-profiles -Value Show-AWSProfiles
-
-Set-Alias -Name aws-dev -Value Set-AWSDevProfile
-Set-Alias -Name aws-staging -Value Set-AWSStagingProfile
-Set-Alias -Name aws-prod -Value Set-AWSProdProfile
-Set-Alias -Name aws-datahub -Value Set-AWSDatahubProfile
-Set-Alias -Name aws-renovation -Value Set-AWSRenovationProfile
-Set-Alias -Name aws-presales -Value Set-AWSPresalesProfile
-" -ForegroundColor Red
+    # Check if config file exists
+    $configFile = "$env:USERPROFILE\.aws\config"
+    if (-not (Test-Path $configFile)) {
+        Write-Host "❌ AWS config file not found at $configFile" -ForegroundColor Red
         Write-Host "💡 Run 'Update-AWSConfigFromBitwarden' to generate from Bitwarden" -ForegroundColor Yellow
         return
     }
@@ -121,8 +89,8 @@ Set-Alias -Name aws-presales -Value Set-AWSPresalesProfile
     }
 
     Write-Host ""
-    Write-Host "💡 Use 'aws-profile <n>' to switch profiles" -ForegroundColor Yellow
-    Write-Host "💡 Use 'Update-AWSConfigFromBitwarden' to refresh from Bitwarden" -ForegroundColor Yellow
+    Write-Host "💡 Use 'aws-profile <name>' to switch profiles" -ForegroundColor Yellow
+    Write-Host "💡 Use 'aws-config-update' to refresh from Bitwarden" -ForegroundColor Yellow
     Write-Host "💡 Current profile: $($env:AWS_PROFILE ?? 'default')" -ForegroundColor Yellow
 
     # Show current identity
@@ -135,12 +103,12 @@ Set-Alias -Name aws-presales -Value Set-AWSPresalesProfile
     }
     catch {
         Write-Host "❌ Not authenticated or session expired" -ForegroundColor Red
-        Write-Host "💡 Ensure BWS session is active: bwst" -ForegroundColor Yellow
+        Write-Host "💡 Ensure BW session is active: `$env:BW_SESSION = bw unlock --raw" -ForegroundColor Yellow
     }
 }
 
 # Aliases for PowerShell
 Set-Alias -Name aws-profile -Value Set-AWSProfile
-Set-Alias -Name aws-assume -Value Invoke-AWSAssumeRole
+Set-Alias -Name aws-whoami -Value Get-AWSIdentity
 Set-Alias -Name aws-config-update -Value Update-AWSConfigFromBitwarden
 Set-Alias -Name aws-profiles -Value Show-AWSProfiles

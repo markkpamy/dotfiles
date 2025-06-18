@@ -13,15 +13,15 @@ aws-profile() {
     fi
 }
 
-# AWS role assumption helper
-aws-assume() {
+# AWS identity checker for a specific profile
+aws-whoami() {
     local profile="$1"
     if [ -z "$profile" ]; then
-        echo "Usage: aws-assume <profile-name>"
+        echo "Usage: aws-whoami <profile-name>"
         return 1
     fi
 
-    echo "🔄 Assuming role for profile: $profile"
+    echo "🔍 Checking identity for profile: $profile"
     aws sts get-caller-identity --profile "$profile"
 }
 

@@ -13,14 +13,14 @@ function aws-profile
     end
 end
 
-# AWS role assumption helper
-function aws-assume
+# AWS identity checker for a specific profile
+function aws-whoami
     if test (count $argv) -eq 0
-        echo "Usage: aws-assume <profile-name>"
+        echo "Usage: aws-whoami <profile-name>"
         return 1
     end
 
-    echo "🔄 Assuming role for profile: $argv[1]"
+    echo "🔍 Checking identity for profile: $argv[1]"
     aws sts get-caller-identity --profile $argv[1]
 end
 

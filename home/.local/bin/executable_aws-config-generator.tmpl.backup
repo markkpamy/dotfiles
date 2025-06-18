@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+# AWS Config Generator - Dynamically builds AWS config from Bitwarden Secrets
+# This script fetches profile metadata from BWS and generates the AWS config file
+
+set -euo pipefail
+
+# Check for BWS access token
+if [ -z "${BWS_ACCESS_TOKEN:-}" ]; then
+    echo "Error: BWS_ACCESS_TOKEN environment variable not set" >&2
+    echo "Please run: bwst" >&2
+    exit 1
+fi
+
+# Get profile metadata from BWS
+PROFILES_JSON=$(bws secret get "aws-profiles-metadata" --access-token "$BWS_ACCESS_TOKEN" --output json 2>/dev/null | jq -r '.value')
+
+if [ -z "$PROFILES_JSON" ] || [ "$PROFILES_JSON" = "null" ]; then
+    echo "Error: Failed to retrieve AWS profiles metadata from Bitwarden" >&2
+    exit 1
+fi
+
+# Generate AWS config
+cat << 'EOF'
+[default]
+region = eu-west-3
+output = json
+{{- if eq .chezmoi.os "windows" }}
+credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
+{{- else }}
+credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
+{{- end }}
+
+[profile default]
+region = eu-west-3
+output = json
+{{- if eq .chezmoi.os "windows" }}
+credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
+{{- else }}
+credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
+{{- end }}
+
+EOF
+
+# Generate role-based profiles dynamically
+echo "$PROFILES_JSON" | jq -r 'to_entries[] | @base64' | while read -r encoded_entry; do
+    entry=$(echo "$encoded_entry" | base64 --decode)
+    profile_name=$(echo "$entry" | jq -r '.key')
+    profile_data=$(echo "$entry" | jq -r '.value')
+
+    region=$(echo "$profile_data" | jq -r '.region')
+    account_id=$(echo "$profile_data" | jq -r '.account_id')
+    role_name=$(echo "$profile_data" | jq -r '.role_name')
+    session_name=$(echo "$profile_data" | jq -r '.session_name')
+    output=$(echo "$profile_data" | jq -r '.output // empty')
+
+    echo "[profile $profile_name]"
+    echo "region = $region"
+    echo "role_session_name = $session_name"
+    echo "role_arn = arn:aws:iam::$account_id:role/$role_name"
+    echo "source_profile = default"
+
+    if [ -n "$output" ] && [ "$output" != "null" ]; then
+        echo "output = $output"
+    fi
+
+    echo ""
+done

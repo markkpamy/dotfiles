@@ -642,3 +642,13 @@ if (Test-Path "$env:USERPROFILE\.cargo\bin") {
 
 # Include Bitwarden utilities if enabled
 {{- includeTemplate "bitwarden/functions-powershell.tmpl" . }}
+
+
+# =============================================================================
+# AWS HELPER FUNCTIONS
+# =============================================================================
+
+# Include AWS utilities if enabled
+{{- if .aws.enabled }}
+{{ includeTemplate "aws/functions-powershell.tmpl" . }}
+{{- end }}

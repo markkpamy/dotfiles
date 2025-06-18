@@ -1,0 +1,67 @@
+# AWS Config Generator for PowerShell
+# Dynamically builds AWS config from Bitwarden Secrets
+
+param()
+
+$ErrorActionPreference = "Stop"
+
+try {
+    # Check for BWS access token
+    if (-not $env:BWS_ACCESS_TOKEN) {
+        Write-Error "BWS_ACCESS_TOKEN environment variable not set. Please run: bwst"
+        exit 1
+    }
+
+    # Get profile metadata from BWS
+    $profilesResult = bws secret get "aws-profiles-metadata" --access-token $env:BWS_ACCESS_TOKEN --output json | ConvertFrom-Json
+    $profilesJson = $profilesResult.value | ConvertFrom-Json
+
+    if (-not $profilesJson) {
+        Write-Error "Failed to retrieve AWS profiles metadata from Bitwarden"
+        exit 1
+    }
+
+    # Generate base AWS config
+    @"
+[default]
+region = eu-west-3
+output = json
+{{- if eq .chezmoi.os "windows" }}
+credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
+{{- else }}
+credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
+{{- end }}
+
+[profile default]
+region = eu-west-3
+output = json
+{{- if eq .chezmoi.os "windows" }}
+credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
+{{- else }}
+credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
+{{- end }}
+
+"@
+
+    # Generate role-based profiles dynamically
+    foreach ($profile in $profilesJson.PSObject.Properties) {
+        $profileName = $profile.Name
+        $profileData = $profile.Value
+
+        "[profile $profileName]"
+        "region = $($profileData.region)"
+        "role_session_name = $($profileData.session_name)"
+        "role_arn = arn:aws:iam::$($profileData.account_id):role/$($profileData.role_name)"
+        "source_profile = default"
+
+        if ($profileData.output) {
+            "output = $($profileData.output)"
+        }
+
+        ""
+    }
+}
+catch {
+    Write-Error "Error generating AWS config: $($_.Exception.Message)"
+    exit 1
+}

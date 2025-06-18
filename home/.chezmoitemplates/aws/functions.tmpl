@@ -1,0 +1,89 @@
+# AWS Helper Functions (using existing BWS functions)
+
+# Test AWS configuration
+aws-test() {
+    echo "🧪 Testing AWS configuration..."
+    echo "📋 Default profile:"
+    aws sts get-caller-identity --profile default
+    echo "📋 Available profiles:"
+    aws configure list-profiles
+}
+
+# Quick AWS profile switch
+aws-profile() {
+    if [ -z "$1" ]; then
+        echo "Current AWS profile: ${AWS_PROFILE:-default}"
+        echo "Available profiles:"
+        aws configure list-profiles
+    else
+        export AWS_PROFILE="$1"
+        echo "✅ AWS profile set to: $1"
+        aws sts get-caller-identity
+    fi
+}
+
+# AWS role assumption helper
+aws-assume() {
+    local profile="$1"
+    if [ -z "$profile" ]; then
+        echo "Usage: aws-assume <profile-name>"
+        return 1
+    fi
+
+    echo "🔄 Assuming role for profile: $profile"
+    aws sts get-caller-identity --profile "$profile"
+}
+
+# Update AWS config (just re-apply chezmoi)
+aws-config-update() {
+    echo "🔄 Updating AWS config from Bitwarden..."
+
+    # Ensure BWS session is active
+    if [ -z "${BWS_ACCESS_TOKEN:-}" ]; then
+        echo "🔐 Setting up BWS session..."
+        bwst
+    fi
+
+    # Re-apply chezmoi templates
+    echo "📝 Re-applying Chezmoi templates..."
+    chezmoi apply ~/.aws/config
+
+    echo "✅ AWS config updated successfully"
+    echo "📋 Available profiles:"
+    aws configure list-profiles
+}
+
+# Show AWS profile information (without exposing account numbers)
+aws-profiles() {
+    echo "🔍 AWS Profile Information:"
+    echo "=========================="
+
+    local profiles=(
+        "nx_training_advanced:Training Advanced (EU West 3)"
+        "nx_datahub_advanced:DataHub Advanced (EU West 3)"
+        "nx_training_master:Training Master (EU West 1)"
+        "nx_profile:Training Profile (EU West 3)"
+        "nx-presales-advanced:Presales Advanced (AP Southeast 1)"
+        "nx-presales-master:Presales Master (AP Southeast 1)"
+        "nx_datahub_master:DataHub Master (EU West 3)"
+        "nx_renovation_master:Renovation Master (EU West 3)"
+        "nx_renovation_advanced:Renovation Advanced (EU West 3)"
+    )
+
+    for profile_info in "${profiles[@]}"; do
+        IFS=':' read -r profile_name description <<< "$profile_info"
+        printf "%-25s %s\n" "$profile_name" "$description"
+    done
+
+    echo ""
+    echo "💡 Use 'aws-profile <name>' to switch profiles"
+    echo "💡 Use 'aws-config-update' to refresh from Bitwarden"
+}
+
+# Quick aliases for common profiles
+alias aws-dev='aws-profile nx_training_advanced'
+alias aws-staging='aws-profile nx_datahub_advanced'
+alias aws-prod='aws-profile nx_training_master'
+alias aws-datahub='aws-profile nx_datahub_master'
+alias aws-renovation='aws-profile nx_renovation_master'
+alias aws-presales='aws-profile nx-presales-master'

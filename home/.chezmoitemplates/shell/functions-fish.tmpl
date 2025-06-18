@@ -38,3 +38,8 @@ end
 {{- if .bitwarden.enabled }}
 {{ includeTemplate "bitwarden/functions-fish.tmpl" . }}
 {{- end }}
+
+# Include AWS utilities if enabled
+{{- if .aws.enabled }}
+{{ includeTemplate "aws/functions.tmpl" . }}
+{{- end }}

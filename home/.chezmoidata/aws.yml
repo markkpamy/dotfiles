@@ -1,14 +1,8 @@
 # AWS Configuration for Dotfiles
 aws:
-  enabled: true
+  enabled: true # Single control for all AWS integration
   default_region: 'eu-west-3'
   default_output: 'json'
 
-# Bitwarden integration settings
-bitwarden:
-  aws:
-    enabled: true
-    item_name: 'AWS Default Profile' # For BW CLI (fallback)
-  secrets:
-    enabled: true # Using BWS (Bitwarden Secrets Manager)
-    project_id: 'your-bws-project-id' # Replace with your actual BWS project ID
+  # Bitwarden integration method
+  use_bws: true # true = use BWS (recommended), false = use BW CLI

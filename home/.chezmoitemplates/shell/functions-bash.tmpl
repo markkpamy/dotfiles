@@ -35,5 +35,5 @@ gama() {
 
 # Include AWS utilities if enabled
 {{- if .aws.enabled }}
-{{ includeTemplate "aws/functions.tmpl" . }}
+{{ includeTemplate "aws/functions-bash.tmpl" . }}
 {{- end }}

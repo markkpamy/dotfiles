@@ -1,7 +1,9 @@
 {{- /* AWS Config Template - Direct BWS Integration */ -}}
+{{- /* Only generate if AWS integration is enabled */ -}}
+{{- if .aws.enabled -}}
 {{- /* Fetch profile metadata from BWS */ -}}
 {{- $profilesJson := "" -}}
-{{- if .aws.enabled -}}
+{{- if .aws.use_bws -}}
 {{- if lookPath "bws" -}}
 {{- if env "BWS_ACCESS_TOKEN" -}}
 {{- $bwsResult := output "bws" "secret" "get" "aws-profiles-metadata" "--access-token" (env "BWS_ACCESS_TOKEN") "--output" "json" -}}
@@ -12,8 +14,8 @@
 {{- end -}}
 
 [default]
-region = eu-west-3
-output = json
+region = {{ .aws.default_region }}
+output = {{ .aws.default_output }}
 {{- if eq .chezmoi.os "windows" }}
 credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
 {{- else }}
@@ -21,8 +23,8 @@ credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials
 {{- end }}
 
 [profile default]
-region = eu-west-3
-output = json
+region = {{ .aws.default_region }}
+output = {{ .aws.default_output }}
 {{- if eq .chezmoi.os "windows" }}
 credential_process = powershell.exe -File "{{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.ps1"
 {{- else }}

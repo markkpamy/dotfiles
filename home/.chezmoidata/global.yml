@@ -12,6 +12,11 @@ bitwarden:
 
   aliases:
     docker_secure: true
+
+  # AWS-specific Bitwarden settings (only when AWS integration is enabled)
+  aws:
+    item_name: 'AWS Default Profile' # For BW CLI (fallback)
+
 #  item_mappings:
 #    database: 'Production Database'
 #    api_key: 'Main API Key'

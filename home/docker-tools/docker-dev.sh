@@ -180,6 +180,8 @@ if ! id "$USER_NAME" &>/dev/null; then
     echo "👤 Creating user $USER_NAME..."
     groupadd -g "$GROUP_ID" "$USER_NAME" 2>/dev/null || true
     useradd -u "$USER_ID" -g "$GROUP_ID" -m -s /bin/bash "$USER_NAME" 2>/dev/null || true
+    # Fix home directory ownership
+    chown -R "$USER_ID:$GROUP_ID" "/home/$USER_NAME"
     echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 fi
 

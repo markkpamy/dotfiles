@@ -113,21 +113,33 @@ DOCKER_CMD+=(
     "-e" "TERM=$TERM"
 )
 
+# Get current user info
+USER_ID=$(id -u)
+GROUP_ID=$(id -g)
+USER_NAME=$(id -un)
+
+# Add user info
+DOCKER_CMD+=(
+    "-u" "$USER_ID:$GROUP_ID"
+    "-e" "USER=$USER_NAME"
+    "-e" "HOME=/home/$USER_NAME"
+)
+
 # Mount configs (with error handling)
 if [[ -d "$HOME/.ssh" ]]; then
-    DOCKER_CMD+=("-v" "$HOME/.ssh:/root/.ssh:ro")
+    DOCKER_CMD+=("-v" "$HOME/.ssh:/home/$USER_NAME/.ssh:ro")
 fi
 
 if [[ -d "$HOME/.aws" ]]; then
-    DOCKER_CMD+=("-v" "$HOME/.aws:/root/.aws:ro")
+    DOCKER_CMD+=("-v" "$HOME/.aws:/home/$USER_NAME/.aws:ro")
 fi
 
 if [[ -d "$HOME/.kube" ]]; then
-    DOCKER_CMD+=("-v" "$HOME/.kube:/root/.kube:ro")
+    DOCKER_CMD+=("-v" "$HOME/.kube:/home/$USER_NAME/.kube:ro")
 fi
 
 if [[ -d "$HOME/.config/gcloud" ]]; then
-    DOCKER_CMD+=("-v" "$HOME/.config/gcloud:/root/.config/gcloud:ro")
+    DOCKER_CMD+=("-v" "$HOME/.config/gcloud:/home/$USER_NAME/.config/gcloud:ro")
 fi
 
 # Add Docker socket if requested
@@ -156,48 +168,46 @@ echo -e "${YELLOW}Dotfiles: $DOTFILES_DIR${NC}"
 echo -e "${YELLOW}Workspace: $PWD${NC}"
 
 # Create container startup script
-STARTUP_SCRIPT='#!/bin/bash
+STARTUP_SCRIPT="#!/bin/bash
 set -e
 
-echo "🚀 Setting up development environment..."
+echo '🚀 Setting up development environment...'
 
-# Update package list and install chezmoi
-apt-get update -qq
-apt-get install -y -qq curl
-
-# Install chezmoi
-echo "📦 Installing chezmoi..."
-curl -sfL https://git.io/chezmoi | sh -s -- -b /usr/local/bin
-
-# Apply dotfiles
-echo "⚙️  Applying dotfiles..."
-if chezmoi init --apply /dotfiles/home; then
-    echo "✅ Dotfiles applied successfully!"
-else
-    echo "⚠️  Some dotfiles installation steps may have failed, but continuing..."
+# Create user if it doesn't exist
+if ! id $USER_NAME &>/dev/null; then
+    echo '👤 Creating user...'
+    groupadd -g $GROUP_ID $USER_NAME 2>/dev/null || true
+    useradd -u $USER_ID -g $GROUP_ID -m -s /bin/bash $USER_NAME 2>/dev/null || true
+    echo '$USER_NAME ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 fi
 
-# Show welcome message
-echo ""
-echo "🎉 Development environment ready!"
-echo ""
-echo "Available tools:"
-if command -v bat >/dev/null 2>&1; then echo "  ✓ bat"; fi
-if command -v eza >/dev/null 2>&1; then echo "  ✓ eza"; fi
-if command -v fzf >/dev/null 2>&1; then echo "  ✓ fzf"; fi
-if command -v rg >/dev/null 2>&1; then echo "  ✓ ripgrep"; fi
-if command -v aws >/dev/null 2>&1; then echo "  ✓ aws-cli"; fi
-if command -v kubectl >/dev/null 2>&1; then echo "  ✓ kubectl"; fi
-if command -v docker >/dev/null 2>&1; then echo "  ✓ docker"; fi
+# Update package list and install chezmoi
+echo '📦 Installing chezmoi...'
+apt-get update -qq
+apt-get install -y -qq curl sudo
 
-echo ""
-echo "📁 Workspace: /workspace"
-echo "🏠 Dotfiles: /dotfiles"
-echo ""
+# Switch to user and install chezmoi
+su - $USER_NAME -c '
+    curl -sfL https://git.io/chezmoi | sh
+    export PATH=\$PATH:\$HOME/bin
 
-# Start interactive shell
-exec bash
+    # Apply dotfiles
+    echo \"⚙️  Applying dotfiles...\"
+    if ~/bin/chezmoi init --apply /dotfiles/home; then
+        echo \"✅ Dotfiles applied successfully!\"
+    else
+        echo \"⚠️  Some dotfiles installation steps may have failed, but continuing...\"
+    fi
 '
+
+# Show welcome message and start shell as user
+echo ''
+echo '🎉 Development environment ready!'
+echo ''
+
+# Switch to user for interactive shell
+exec su - $USER_NAME -c 'cd /workspace && exec bash'
+"
 
 # Execute the container
 "${DOCKER_CMD[@]}" bash -c "$STARTUP_SCRIPT"

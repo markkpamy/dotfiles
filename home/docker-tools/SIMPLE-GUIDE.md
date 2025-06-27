@@ -13,11 +13,12 @@ docker pull ubuntu:24.04
 # Run interactive container with dotfiles mounted
 docker run -it --name dotfiles-dev \
   -v "$(pwd):/dotfiles" \
-  -v "$HOME/.ssh:/root/.ssh:ro" \
-  -v "$HOME/.aws:/root/.aws:ro" \
-  -v "$HOME/.kube:/root/.kube:ro" \
+  -v "$HOME/.ssh:/home/dev/.ssh:ro" \
+  -v "$HOME/.aws:/home/dev/.aws:ro" \
+  -v "$HOME/.kube:/home/dev/.kube:ro" \
   -v "$PWD:/workspace" \
   -w /workspace \
+  -u "$(id -u):$(id -g)" \
   ubuntu:24.04 bash
 ```
 
@@ -25,7 +26,9 @@ docker run -it --name dotfiles-dev \
 
 Inside the container:
 ```bash
-# Install chezmoi
+# Create user and install chezmoi
+sudo useradd -m -s /bin/bash dev
+sudo apt-get update && sudo apt-get install -y curl
 curl -sfL https://git.io/chezmoi | sh
 
 # Initialize and apply your dotfiles
@@ -47,27 +50,34 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "Starting development container: $CONTAINER_NAME"
 
+USER_NAME=$(id -un)
+
 docker run -it --rm \
   --name "$CONTAINER_NAME" \
   -v "$DOTFILES_DIR:/dotfiles" \
-  -v "$HOME/.ssh:/root/.ssh:ro" \
-  -v "$HOME/.aws:/root/.aws:ro" \
-  -v "$HOME/.kube:/root/.kube:ro" \
-  -v "$HOME/.config/gcloud:/root/.config/gcloud:ro" \
+  -v "$HOME/.ssh:/home/$USER_NAME/.ssh:ro" \
+  -v "$HOME/.aws:/home/$USER_NAME/.aws:ro" \
+  -v "$HOME/.kube:/home/$USER_NAME/.kube:ro" \
+  -v "$HOME/.config/gcloud:/home/$USER_NAME/.config/gcloud:ro" \
   -v "$PWD:/workspace" \
   -w /workspace \
+  -u "$(id -u):$(id -g)" \
   -e TERM="$TERM" \
   ubuntu:24.04 bash -c '
-    # Install chezmoi
-    curl -sfL https://git.io/chezmoi | sh
+    # Create user
+    groupadd -g $(id -g) $USER_NAME
+    useradd -u $(id -u) -g $(id -g) -m -s /bin/bash $USER_NAME
+    echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+    # Install chezmoi as user
+    su - $USER_NAME -c "curl -sfL https://git.io/chezmoi | sh"
 
     # Apply dotfiles
-    echo "Applying dotfiles..."
-    ./bin/chezmoi init --apply /dotfiles/home
+    su - $USER_NAME -c "~/bin/chezmoi init --apply /dotfiles/home"
 
-    # Start shell
+    # Start shell as user
     echo "Development environment ready! 🚀"
-    exec bash
+    exec su - $USER_NAME -c "cd /workspace && exec bash"
   '
 ```
 
@@ -87,9 +97,10 @@ If you want to keep your container between sessions:
 # Create and start container
 docker run -it --name my-persistent-dev \
   -v "$(pwd):/dotfiles" \
-  -v "$HOME/.ssh:/root/.ssh:ro" \
-  -v "$HOME/.aws:/root/.aws:ro" \
+  -v "$HOME/.ssh:/home/$(id -un)/.ssh:ro" \
+  -v "$HOME/.aws:/home/$(id -un)/.aws:ro" \
   -v "$PWD:/workspace" \
+  -u "$(id -u):$(id -g)" \
   ubuntu:24.04 bash
 
 # Later, restart the same container
@@ -104,9 +115,10 @@ docker exec -it my-persistent-dev bash
 ```bash
 docker run -it --name dotfiles-dev \
   -v "$(pwd):/dotfiles" \
-  -v "$HOME/.ssh:/root/.ssh:ro" \
+  -v "$HOME/.ssh:/home/$(id -un)/.ssh:ro" \
   -v "/var/run/docker.sock:/var/run/docker.sock" \
   -v "$PWD:/workspace" \
+  -u "$(id -u):$(id -g)" \
   ubuntu:24.04 bash
 ```
 
@@ -161,9 +173,9 @@ docker build -f Dockerfile.dev -t my-dotfiles-env .
 docker run -it --rm \
   -v "$(pwd):/dotfiles" \
   -v "$PWD:/workspace" \
-  my-dotfiles-env bash -c '
-    chezmoi init --apply /dotfiles/home && exec bash
-  '
+  -u "$(id -u):$(id -g)" \
+  -e USER_ID=$(id -u) -e GROUP_ID=$(id -g) -e USER_NAME=$(id -un) \
+  my-dotfiles-env
 ```
 
 ## Comparison: Simple vs Complex Approach

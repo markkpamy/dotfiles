@@ -1,0 +1,54 @@
+# Optional pre-built image for faster startup
+FROM ubuntu:24.04
+
+# Set environment to avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+# Install chezmoi and basic tools
+RUN apt-get update && \
+    apt-get install -y \
+        curl \
+        ca-certificates \
+        locales \
+        sudo && \
+    # Generate locales
+    locale-gen en_US.UTF-8 && \
+    # Install chezmoi globally
+    curl -sfL https://git.io/chezmoi | sh -s -- -b /usr/local/bin && \
+    # Cleanup
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+# Create user matching host user\n\
+USER_ID=${USER_ID:-1000}\n\
+GROUP_ID=${GROUP_ID:-1000}\n\
+USER_NAME=${USER_NAME:-dev}\n\
+\n\
+groupadd -g $GROUP_ID $USER_NAME 2>/dev/null || true\n\
+useradd -u $USER_ID -g $GROUP_ID -m -s /bin/bash $USER_NAME 2>/dev/null || true\n\
+echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\n\
+\n\
+# Apply dotfiles if mounted\n\
+if [ -d "/dotfiles" ]; then\n\
+    su - $USER_NAME -c "chezmoi init --apply /dotfiles/home"\n\
+fi\n\
+\n\
+# Switch to user and exec command\n\
+cd /workspace\n\
+exec su - $USER_NAME -c "cd /workspace && exec $*"\n\
+' > /entrypoint.sh && chmod +x /entrypoint.sh
+
+# Set working directory
+WORKDIR /workspace
+
+# Use entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash"]
+
+# Build with: docker build -f Dockerfile.dev -t my-dotfiles-env .
+# Use with: docker run -it --rm -e USER_ID=$(id -u) -e GROUP_ID=$(id -g) -e USER_NAME=$(id -un) -v "$(pwd):/dotfiles" -v "$PWD:/workspace" my-dotfiles-env

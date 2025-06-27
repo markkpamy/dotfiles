@@ -1,0 +1,218 @@
+# Simple Docker Development Environment
+
+A straightforward approach to running your dotfiles in a clean Ubuntu Docker container - perfect for compatibility issues or testing your setup.
+
+## Quick Start
+
+### 1. Basic Container Setup
+
+```bash
+# Pull Ubuntu 24.04
+docker pull ubuntu:24.04
+
+# Run interactive container with dotfiles mounted
+docker run -it --name dotfiles-dev \
+  -v "$(pwd):/dotfiles" \
+  -v "$HOME/.ssh:/root/.ssh:ro" \
+  -v "$HOME/.aws:/root/.aws:ro" \
+  -v "$HOME/.kube:/root/.kube:ro" \
+  -v "$PWD:/workspace" \
+  -w /workspace \
+  ubuntu:24.04 bash
+```
+
+### 2. Install Chezmoi and Apply Dotfiles
+
+Inside the container:
+```bash
+# Install chezmoi
+curl -sfL https://git.io/chezmoi | sh
+
+# Initialize and apply your dotfiles
+./bin/chezmoi init --apply /dotfiles/home
+```
+
+That's it! Your full development environment is now available in the container.
+
+## Convenience Script
+
+Create this script to automate the process:
+
+```bash
+#!/bin/bash
+# docker-dev.sh - Quick development container
+
+CONTAINER_NAME="dotfiles-dev-$(date +%s)"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+echo "Starting development container: $CONTAINER_NAME"
+
+docker run -it --rm \
+  --name "$CONTAINER_NAME" \
+  -v "$DOTFILES_DIR:/dotfiles" \
+  -v "$HOME/.ssh:/root/.ssh:ro" \
+  -v "$HOME/.aws:/root/.aws:ro" \
+  -v "$HOME/.kube:/root/.kube:ro" \
+  -v "$HOME/.config/gcloud:/root/.config/gcloud:ro" \
+  -v "$PWD:/workspace" \
+  -w /workspace \
+  -e TERM="$TERM" \
+  ubuntu:24.04 bash -c '
+    # Install chezmoi
+    curl -sfL https://git.io/chezmoi | sh
+
+    # Apply dotfiles
+    echo "Applying dotfiles..."
+    ./bin/chezmoi init --apply /dotfiles/home
+
+    # Start shell
+    echo "Development environment ready! 🚀"
+    exec bash
+  '
+```
+
+Save as `docker-dev.sh`, make executable, and run:
+```bash
+chmod +x docker-dev.sh
+./docker-dev.sh
+```
+
+## Advanced Usage
+
+### Persistent Container
+
+If you want to keep your container between sessions:
+
+```bash
+# Create and start container
+docker run -it --name my-persistent-dev \
+  -v "$(pwd):/dotfiles" \
+  -v "$HOME/.ssh:/root/.ssh:ro" \
+  -v "$HOME/.aws:/root/.aws:ro" \
+  -v "$PWD:/workspace" \
+  ubuntu:24.04 bash
+
+# Later, restart the same container
+docker start -i my-persistent-dev
+
+# Or attach to running container
+docker exec -it my-persistent-dev bash
+```
+
+### With Docker Socket (for Docker-in-Docker)
+
+```bash
+docker run -it --name dotfiles-dev \
+  -v "$(pwd):/dotfiles" \
+  -v "$HOME/.ssh:/root/.ssh:ro" \
+  -v "/var/run/docker.sock:/var/run/docker.sock" \
+  -v "$PWD:/workspace" \
+  ubuntu:24.04 bash
+```
+
+### With Network Access to Host Services
+
+```bash
+docker run -it --name dotfiles-dev \
+  --network host \
+  -v "$(pwd):/dotfiles" \
+  -v "$PWD:/workspace" \
+  ubuntu:24.04 bash
+```
+
+## Environment Variables
+
+Pass environment variables to maintain your configuration:
+
+```bash
+docker run -it --name dotfiles-dev \
+  -v "$(pwd):/dotfiles" \
+  -v "$PWD:/workspace" \
+  -e AWS_PROFILE="$AWS_PROFILE" \
+  -e AWS_REGION="$AWS_REGION" \
+  -e GIT_AUTHOR_NAME="$GIT_AUTHOR_NAME" \
+  -e GIT_AUTHOR_EMAIL="$GIT_AUTHOR_EMAIL" \
+  ubuntu:24.04 bash
+```
+
+## Pre-built Image (Optional)
+
+If you use this frequently, create a pre-built image:
+
+```dockerfile
+# Dockerfile.dev
+FROM ubuntu:24.04
+
+# Install chezmoi
+RUN apt-get update && apt-get install -y curl && \
+    curl -sfL https://git.io/chezmoi | sh && \
+    mv ./bin/chezmoi /usr/local/bin/ && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+CMD ["bash"]
+```
+
+Build and use:
+```bash
+# Build once
+docker build -f Dockerfile.dev -t my-dotfiles-env .
+
+# Use anytime
+docker run -it --rm \
+  -v "$(pwd):/dotfiles" \
+  -v "$PWD:/workspace" \
+  my-dotfiles-env bash -c '
+    chezmoi init --apply /dotfiles/home && exec bash
+  '
+```
+
+## Comparison: Simple vs Complex Approach
+
+| Aspect | Simple Ubuntu Container | Custom Docker Images |
+|--------|------------------------|----------------------|
+| **Setup Time** | 30 seconds | 10+ minutes |
+| **Flexibility** | Full chezmoi config | Limited to pre-built tools |
+| **Maintenance** | None | Rebuild when tools change |
+| **Disk Usage** | ~200MB base | ~1GB+ for all images |
+| **Customization** | Complete dotfiles support | Fixed tool selection |
+| **Learning Curve** | Minimal | Moderate |
+
+## Why This Approach Works Better
+
+1. **Uses Your Actual Config**: Your chezmoi templates and configurations work exactly as designed
+2. **No Duplication**: No need to recreate your tool selection in Dockerfiles
+3. **Easy Updates**: Just `chezmoi update` inside the container
+4. **Familiar Workflow**: Same commands and aliases you already use
+5. **Testing Friendly**: Perfect for testing dotfiles changes
+6. **Zero Lock-in**: Standard Ubuntu + your dotfiles
+
+## Common Use Cases
+
+### Testing Dotfiles Changes
+```bash
+# Test your dotfiles on fresh Ubuntu
+./docker-dev.sh
+# Make changes, test, exit when done
+```
+
+### Clean Development Environment
+```bash
+# Start fresh environment for each project
+docker run -it --rm -v "$PWD:/workspace" -w /workspace my-dotfiles-env
+```
+
+### Compatibility Testing
+```bash
+# Test your setup on different Ubuntu versions
+docker run -it -v "$(pwd):/dotfiles" ubuntu:22.04 bash
+docker run -it -v "$(pwd):/dotfiles" ubuntu:20.04 bash
+```
+
+### Isolated Experiments
+```bash
+# Try new tools without affecting host system
+docker run -it --rm -v "$(pwd):/dotfiles" ubuntu:24.04 bash
+# Install experimental packages, test, container disappears when done
+```
+
+This simple approach gives you all the benefits of containerized development with none of the complexity!

@@ -118,9 +118,11 @@ USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 USER_NAME=$(id -un)
 
-# Add user info
+# Add user info as environment variables (don't use -u flag yet)
 DOCKER_CMD+=(
-    "-u" "$USER_ID:$GROUP_ID"
+    "-e" "USER_ID=$USER_ID"
+    "-e" "GROUP_ID=$GROUP_ID"
+    "-e" "USER_NAME=$USER_NAME"
     "-e" "USER=$USER_NAME"
     "-e" "HOME=/home/$USER_NAME"
 )
@@ -168,26 +170,26 @@ echo -e "${YELLOW}Dotfiles: $DOTFILES_DIR${NC}"
 echo -e "${YELLOW}Workspace: $PWD${NC}"
 
 # Create container startup script
-STARTUP_SCRIPT="#!/bin/bash
+STARTUP_SCRIPT='#!/bin/bash
 set -e
 
-echo '🚀 Setting up development environment...'
+echo "🚀 Setting up development environment..."
 
-# Create user if it doesn't exist
-if ! id $USER_NAME &>/dev/null; then
-    echo '👤 Creating user...'
-    groupadd -g $GROUP_ID $USER_NAME 2>/dev/null || true
-    useradd -u $USER_ID -g $GROUP_ID -m -s /bin/bash $USER_NAME 2>/dev/null || true
-    echo '$USER_NAME ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+# Create user if it doesn'\''t exist
+if ! id "$USER_NAME" &>/dev/null; then
+    echo "👤 Creating user $USER_NAME..."
+    groupadd -g "$GROUP_ID" "$USER_NAME" 2>/dev/null || true
+    useradd -u "$USER_ID" -g "$GROUP_ID" -m -s /bin/bash "$USER_NAME" 2>/dev/null || true
+    echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 fi
 
 # Update package list and install chezmoi
-echo '📦 Installing chezmoi...'
+echo "📦 Installing chezmoi..."
 apt-get update -qq
 apt-get install -y -qq curl sudo
 
 # Switch to user and install chezmoi
-su - $USER_NAME -c '
+su - "$USER_NAME" -c "
     curl -sfL https://git.io/chezmoi | sh
     export PATH=\$PATH:\$HOME/bin
 
@@ -198,16 +200,16 @@ su - $USER_NAME -c '
     else
         echo \"⚠️  Some dotfiles installation steps may have failed, but continuing...\"
     fi
-'
+"
 
 # Show welcome message and start shell as user
-echo ''
-echo '🎉 Development environment ready!'
-echo ''
+echo ""
+echo "🎉 Development environment ready!"
+echo ""
 
 # Switch to user for interactive shell
-exec su - $USER_NAME -c 'cd /workspace && exec bash'
-"
+exec su - "$USER_NAME" -c "cd /workspace && exec bash"
+'
 
 # Execute the container
 "${DOCKER_CMD[@]}" bash -c "$STARTUP_SCRIPT"

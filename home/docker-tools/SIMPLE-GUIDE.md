@@ -9,15 +9,13 @@ A straightforward approach to running your dotfiles in a clean Ubuntu Docker con
 Download and run the docker-dev script directly:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/yourusername/dotfiles/main/home/docker-tools/docker-dev.sh | bash
+curl -sSL https://raw.githubusercontent.com/markkpamy/dotfiles/main/home/docker-tools/docker-dev.sh | bash
 ```
 
 Or save it first:
 ```bash
-curl -sSL https://raw.githubusercontent.com/yourusername/dotfiles/main/home/docker-tools/docker-dev.sh -o docker-dev.sh && chmod +x docker-dev.sh && ./docker-dev.sh
+curl -sSL https://raw.githubusercontent.com/markkpamy/dotfiles/main/home/docker-tools/docker-dev.sh -o docker-dev.sh && chmod +x docker-dev.sh && ./docker-dev.sh
 ```
-
-**Note:** Replace `yourusername` with your actual GitHub username.
 
 ### Manual Setup
 

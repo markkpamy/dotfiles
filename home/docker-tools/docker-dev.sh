@@ -190,12 +190,13 @@ apt-get install -y -qq curl sudo
 
 # Switch to user and install chezmoi
 su - "$USER_NAME" -c "
+    mkdir -p \$HOME/bin
     curl -sfL https://git.io/chezmoi | sh
     export PATH=\$PATH:\$HOME/bin
 
     # Apply dotfiles
     echo \"⚙️  Applying dotfiles...\"
-    if ~/bin/chezmoi init --apply /dotfiles/home; then
+    if \$HOME/bin/chezmoi init --apply /dotfiles/home; then
         echo \"✅ Dotfiles applied successfully!\"
     else
         echo \"⚠️  Some dotfiles installation steps may have failed, but continuing...\"

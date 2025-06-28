@@ -10,7 +10,9 @@ print_header "Homebrew Package Installation" "Installing packages via Homebrew" 
 # Set total steps for progress tracking
 set_total_steps 3
 
+{{ if .chezmoi.isDockerInstallMode }}
 alias brew="/home/linuxbrew/.linuxbrew/bin/brew"
+{{ end}}
 
 # Step 1: Check availability
 print_step 1 "Homebrew Availability Check"

@@ -19,12 +19,14 @@
 {{ $terminalBlur := "1" }}
 {{ $theme := "dark" }}
 {{ $installScoopPackages := false }}
+{{ $isDockerInstallMode := false }}
 {{ $installChocoPackages := true }}
 {{ $installPythonPackages := true }}
 {{ $installCargoPackages := true }}
 {{ $isDesktop := false }}
 {{ $desktopEnv := "none" }}
 
+{{ $isDockerInstallMode = promptBool "Are you installing inside Docker ? " $isDockerInstallMode}}
 {{/* Access token handling */}}
 {{ $accessToken := env "BWS_ACCESS_TOKEN" }}
 {{ if not $accessToken }}

@@ -13,7 +13,7 @@ NC='\033[0m'
 # Configuration
 CONTAINER_NAME="dotfiles-dev-$(date +%s)"
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-IMAGE_NAME="homebrew/brew:latest"
+IMAGE_NAME="my-brew-env"
 
 show_help() {
     cat << EOF
@@ -24,7 +24,7 @@ Quick development container with your dotfiles applied.
 OPTIONS:
     -p, --persistent    Create persistent container (not removed on exit)
     -n, --name NAME     Custom container name
-    -i, --image IMAGE   Docker image (default: homebrew/brew:latest)
+    -i, --image IMAGE   Docker image (default: my-brew-env)
     -d, --docker        Mount Docker socket for Docker-in-Docker
     --network-host      Use host networking
     -h, --help          Show this help
@@ -88,11 +88,17 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-# Pull Docker image if not present
+# Pull Docker image if not present (skip for local images)
 echo -e "${BLUE}Checking Docker image $IMAGE_NAME...${NC}"
 if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
-    echo -e "${YELLOW}Pulling $IMAGE_NAME...${NC}"
-    docker pull "$IMAGE_NAME"
+    if [[ "$IMAGE_NAME" == "my-brew-env" ]]; then
+        echo -e "${RED}Error: Local image $IMAGE_NAME not found. Please build it first:${NC}"
+        echo -e "${YELLOW}  docker build -f home/docker-tools/Dockerfile.simple -t my-brew-env .${NC}"
+        exit 1
+    else
+        echo -e "${YELLOW}Pulling $IMAGE_NAME...${NC}"
+        docker pull "$IMAGE_NAME"
+    fi
 fi
 
 # Build docker run command
@@ -126,6 +132,7 @@ DOCKER_CMD+=(
     "-e" "USER_NAME=$USER_NAME"
     "-e" "USER=$USER_NAME"
     "-e" "HOME=/home/$USER_NAME"
+    "-e" "CHEZMOI_DOCKER_MODE=1"
 )
 
 # Mount configs (with error handling)

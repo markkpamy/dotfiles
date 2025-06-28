@@ -1,0 +1,45 @@
+# Simple Homebrew Docker image with your packages pre-installed
+FROM homebrew/brew:latest
+
+# Install essential packages as the linuxbrew user
+RUN brew install \
+    bat \
+    eza \
+    fd \
+    ripgrep \
+    fzf \
+    delta \
+    httpie \
+    lazydocker \
+    lazygit \
+    neovim \
+    tmux \
+    mise
+
+# Switch to root for entrypoint setup
+USER root
+
+# Create entrypoint script for user setup
+RUN echo '#!/bin/bash\n\
+USER_ID=${USER_ID:-1000}\n\
+GROUP_ID=${GROUP_ID:-1000}\n\
+USER_NAME=${USER_NAME:-dev}\n\
+\n\
+# Create user\n\
+if ! id $USER_NAME >/dev/null 2>&1; then\n\
+    groupadd -g $GROUP_ID $USER_NAME 2>/dev/null || true\n\
+    useradd --non-unique -u $USER_ID -g $GROUP_ID -m -s /bin/bash $USER_NAME\n\
+    echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\n\
+fi\n\
+\n\
+# Switch to user and exec command\n\
+cd /workspace\n\
+exec su - $USER_NAME -c "cd /workspace && exec $*"\n\
+' > /entrypoint.sh && chmod +x /entrypoint.sh
+
+WORKDIR /workspace
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash"]
+
+# Build with: docker build -f Dockerfile.simple -t my-brew-env .
+# Use with: docker run -it --rm -e USER_ID=$(id -u) -e GROUP_ID=$(id -g) -e USER_NAME=$(id -un) -v "$PWD:/workspace" my-brew-env

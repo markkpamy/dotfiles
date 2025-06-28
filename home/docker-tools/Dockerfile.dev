@@ -38,6 +38,9 @@ USER_ID=${USER_ID:-1000}\n\
 GROUP_ID=${GROUP_ID:-1000}\n\
 USER_NAME=${USER_NAME:-dev}\n\
 \n\
+# Ensure brew is in PATH\n\
+export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"\n\
+\n\
 echo "Creating user $USER_NAME with UID $USER_ID and GID $GROUP_ID"\n\
 \n\
 # Create group if it doesnt exist\n\
@@ -65,7 +68,7 @@ fi\n\
 # Apply dotfiles if mounted\n\
 if [ -d "/dotfiles" ]; then\n\
     echo "Applying dotfiles..."\n\
-    su - $USER_NAME -c "chezmoi init --apply https://github.com/markkpamy/dotfiles.git" || true\n\
+    su - $USER_NAME -c "export PATH=\"/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH\" && chezmoi init --apply https://github.com/markkpamy/dotfiles.git" || true\n\
 fi\n\
 \n\
 # Switch to user and exec command\n\

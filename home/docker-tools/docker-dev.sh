@@ -13,7 +13,7 @@ NC='\033[0m'
 # Configuration
 CONTAINER_NAME="dotfiles-dev-$(date +%s)"
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-UBUNTU_VERSION="24.04"
+IMAGE_NAME="homebrew/brew:latest"
 
 show_help() {
     cat << EOF
@@ -24,7 +24,7 @@ Quick development container with your dotfiles applied.
 OPTIONS:
     -p, --persistent    Create persistent container (not removed on exit)
     -n, --name NAME     Custom container name
-    -u, --ubuntu VER    Ubuntu version (default: 24.04)
+    -i, --image IMAGE   Docker image (default: homebrew/brew:latest)
     -d, --docker        Mount Docker socket for Docker-in-Docker
     --network-host      Use host networking
     -h, --help          Show this help
@@ -33,7 +33,7 @@ EXAMPLES:
     $0                  # Quick throwaway container
     $0 -p -n my-dev     # Persistent container named 'my-dev'
     $0 -d               # With Docker access
-    $0 -u 22.04         # Use Ubuntu 22.04
+    $0 -i ubuntu:22.04  # Use Ubuntu 22.04 instead
 
 The container will have:
     - Your dotfiles applied via chezmoi
@@ -58,8 +58,8 @@ while [[ $# -gt 0 ]]; do
             CONTAINER_NAME="$2"
             shift 2
             ;;
-        -u|--ubuntu)
-            UBUNTU_VERSION="$2"
+        -i|--image)
+            IMAGE_NAME="$2"
             shift 2
             ;;
         -d|--docker)
@@ -88,11 +88,11 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-# Pull Ubuntu image if not present
-echo -e "${BLUE}Checking Ubuntu $UBUNTU_VERSION image...${NC}"
-if ! docker image inspect "ubuntu:$UBUNTU_VERSION" >/dev/null 2>&1; then
-    echo -e "${YELLOW}Pulling ubuntu:$UBUNTU_VERSION...${NC}"
-    docker pull "ubuntu:$UBUNTU_VERSION"
+# Pull Docker image if not present
+echo -e "${BLUE}Checking Docker image $IMAGE_NAME...${NC}"
+if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
+    echo -e "${YELLOW}Pulling $IMAGE_NAME...${NC}"
+    docker pull "$IMAGE_NAME"
 fi
 
 # Build docker run command
@@ -107,6 +107,7 @@ fi
 
 DOCKER_CMD+=(
     "--name" "$CONTAINER_NAME"
+    "--user" "root"
     "-v" "$DOTFILES_DIR:/dotfiles"
     "-v" "$PWD:/workspace"
     "-w" "/workspace"
@@ -163,7 +164,7 @@ DOCKER_CMD+=(
 )
 
 # Add image and command
-DOCKER_CMD+=("ubuntu:$UBUNTU_VERSION")
+DOCKER_CMD+=("$IMAGE_NAME")
 
 echo -e "${BLUE}Starting development container: $CONTAINER_NAME${NC}"
 echo -e "${YELLOW}Dotfiles: $DOTFILES_DIR${NC}"
@@ -178,27 +179,57 @@ echo "🚀 Setting up development environment..."
 # Create user if it doesn'\''t exist
 if ! id "$USER_NAME" &>/dev/null; then
     echo "👤 Creating user $USER_NAME..."
-    groupadd -g "$GROUP_ID" "$USER_NAME" 2>/dev/null || true
-    useradd -u "$USER_ID" -g "$GROUP_ID" -m -s /bin/bash "$USER_NAME" 2>/dev/null || true
-    # Fix home directory ownership
-    chown -R "$USER_ID:$GROUP_ID" "/home/$USER_NAME"
+
+    # Check if UID/GID is already taken and handle it
+    if id "$USER_ID" &>/dev/null; then
+        echo "🔧 UID $USER_ID already exists, finding existing user..."
+        EXISTING_USER=$(id -nu "$USER_ID")
+        echo "🔧 Renaming existing user $EXISTING_USER to ${EXISTING_USER}_old..."
+        usermod -l "${EXISTING_USER}_old" "$EXISTING_USER" || true
+    fi
+
+    echo "🔧 Creating group $USER_NAME with GID $GROUP_ID..."
+    groupadd -g "$GROUP_ID" "$USER_NAME" 2>/dev/null || {
+        echo "🔧 Group with GID $GROUP_ID exists, using it..."
+        EXISTING_GROUP=$(getent group "$GROUP_ID" | cut -d: -f1)
+        echo "🔧 Adding user to existing group $EXISTING_GROUP..."
+    }
+
+    echo "🔧 Creating user $USER_NAME with UID $USER_ID..."
+    useradd -u "$USER_ID" -g "$GROUP_ID" -m -s /bin/bash "$USER_NAME" || {
+        echo "❌ User creation failed, trying alternative approach..."
+        # Use --non-unique flag to force creation
+        useradd --non-unique -u "$USER_ID" -g "$GROUP_ID" -m -s /bin/bash "$USER_NAME"
+    }
+
+    # Fix home directory ownership (ignore read-only mounted volumes)
+    echo "🔧 Fixing home directory ownership..."
+    chown -R "$USER_ID:$GROUP_ID" "/home/$USER_NAME" 2>/dev/null || true
+    echo "🔧 Adding user to sudoers..."
     echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    # Also add to sudo group
+    usermod -aG sudo "$USER_NAME" 2>/dev/null || true
+    echo "✅ User creation completed"
+else
+    echo "✅ User $USER_NAME already exists"
 fi
 
-# Update package list and install chezmoi
-echo "📦 Installing chezmoi..."
+# Update package list and install dependencies
+echo "📦 Installing dependencies..."
+export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y -qq curl sudo
+apt-get install -y -qq curl sudo git unzip wget ca-certificates gnupg lsb-release build-essential
 
-# Switch to user and install chezmoi
+# Install chezmoi globally
+echo "📦 Installing chezmoi globally..."
+curl -sfL https://git.io/chezmoi | sh -s -- -b /usr/local/bin
+
+# Switch to user and apply dotfiles
+echo "🔄 Switching to user $USER_NAME..."
 su - "$USER_NAME" -c "
-    mkdir -p \$HOME/bin
-    curl -sfL https://git.io/chezmoi | sh
-    export PATH=\$PATH:\$HOME/bin
-
     # Apply dotfiles
     echo \"⚙️  Applying dotfiles...\"
-    if \$HOME/bin/chezmoi init --apply /dotfiles/home; then
+    if chezmoi init --apply https://github.com/markkpamy/dotfiles.git; then
         echo \"✅ Dotfiles applied successfully!\"
     else
         echo \"⚠️  Some dotfiles installation steps may have failed, but continuing...\"

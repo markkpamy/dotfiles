@@ -1,5 +1,5 @@
-# Optional pre-built image for faster startup
-FROM ubuntu:24.04
+# Use official Homebrew Docker image as base
+FROM homebrew/brew:latest
 
 # Set environment to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
@@ -7,13 +7,20 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
-# Install chezmoi and basic tools
+# Switch to root to install additional tools
+USER root
+
+# Install chezmoi and additional tools
 RUN apt-get update && \
     apt-get install -y \
         curl \
         ca-certificates \
         locales \
-        sudo && \
+        sudo \
+        git \
+        unzip \
+        wget \
+        build-essential && \
     # Generate locales
     locale-gen en_US.UTF-8 && \
     # Install chezmoi globally
@@ -35,7 +42,7 @@ echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\n\
 \n\
 # Apply dotfiles if mounted\n\
 if [ -d "/dotfiles" ]; then\n\
-    su - $USER_NAME -c "chezmoi init --apply /dotfiles/home"\n\
+    su - $USER_NAME -c "chezmoi init --apply https://github.com/markkpamy/dotfiles.git"\n\
 fi\n\
 \n\
 # Switch to user and exec command\n\

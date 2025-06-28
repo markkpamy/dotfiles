@@ -42,10 +42,10 @@ sudo apt install -y git
 # Step 4: Homebrew Installation
 print_step 4 "Homebrew Installation"
 
-# Check if running in Docker container with homebrew/brew image
-if [ -f /.dockerenv ] && command -v brew >/dev/null 2>&1; then
-    print_action "Skipping" "Homebrew installation (using homebrew/brew Docker image)" "$ICON_CONFIG"
-    print_success "Use homebrew/brew Docker image for pre-installed Homebrew environment"
+# Check if brew is already available (e.g., in homebrew/brew Docker image)
+if command -v brew >/dev/null 2>&1; then
+    print_action "Skipping" "Homebrew installation (already available)" "$ICON_CONFIG"
+    print_success "Homebrew is already installed and available"
 else
     print_action "Installing" "Homebrew" "$ICON_INSTALL"
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

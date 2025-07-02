@@ -137,6 +137,9 @@ alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
 alias cpuinfo='lscpu'
 alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
 
+# Network utilities
+alias myip='curl ifconfig.me'
+
 # Include Bitwarden aliases if enabled
 {{- if .bitwarden.enabled }}
 {{ includeTemplate "bitwarden/aliases.tmpl" . }}

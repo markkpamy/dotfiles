@@ -534,6 +534,10 @@ function flushdns {
   Write-Host "DNS has been flushed"
 }
 
+function myip {
+  curl ifconfig.me
+}
+
 # Clipboard Utilities
 function cpy { Set-Clipboard $args[0] }
 function pst { Get-Clipboard }

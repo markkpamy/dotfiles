@@ -5,11 +5,37 @@ function Set-AWSProfile {
     if (-not $ProfileName) {
         Write-Host "Current AWS profile: $($env:AWS_PROFILE ?? 'default')" -ForegroundColor Cyan
         Write-Host "Available profiles:" -ForegroundColor Cyan
-        aws configure list-profiles
+        try {
+            aws configure list-profiles
+        }
+        catch {
+            Write-Host "❌ Error listing profiles: $($_.Exception.Message)" -ForegroundColor Red
+        }
     } else {
-        $env:AWS_PROFILE = $ProfileName
-        Write-Host "✅ AWS profile set to: $ProfileName" -ForegroundColor Green
-        aws sts get-caller-identity
+        try {
+            # Set the environment variable for the current session
+            $env:AWS_PROFILE = $ProfileName
+
+            # Also set it at the process level to avoid access issues
+            [Environment]::SetEnvironmentVariable("AWS_PROFILE", $ProfileName, [EnvironmentVariableTarget]::Process)
+
+            Write-Host "✅ AWS profile set to: $ProfileName" -ForegroundColor Green
+
+            # Test the profile with error handling
+            $identity = aws sts get-caller-identity --output json 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                $identityObj = $identity | ConvertFrom-Json
+                Write-Host "📋 Account: $($identityObj.Account)" -ForegroundColor Cyan
+                Write-Host "👤 User: $($identityObj.Arn -replace '.*/', '')" -ForegroundColor Cyan
+            } else {
+                Write-Host "⚠️  Profile set but authentication may be required" -ForegroundColor Yellow
+                Write-Host "💡 Error: $identity" -ForegroundColor Yellow
+            }
+        }
+        catch {
+            Write-Host "❌ Error setting AWS profile: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "💡 Try running PowerShell as Administrator or check AWS CLI installation" -ForegroundColor Yellow
+        }
     }
 }
 

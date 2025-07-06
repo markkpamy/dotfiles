@@ -54,6 +54,8 @@ pkgs:
       - 'Neovim.Neovim'
       - 'Bitwarden.CLI'
       - 'Bitwarden.Bitwarden'
+      - 'AgileBits.1Password'
+      - 'AgileBits.1Password.CLI'
       - 'FilesCommunity.Files'
       # CLI Tools
       - 'alexpasmantier.television'

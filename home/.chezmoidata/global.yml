@@ -1,5 +1,6 @@
 githubUsername: markkpamy
 externalGitArgs: "clone.args = ['--depth', '1']\npull.args = ['--depth', '1']"
+isDockerInstallMode: false
 
 # Bitwarden utilities configuration
 bitwarden:

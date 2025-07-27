@@ -247,6 +247,112 @@ Set-Alias -Name fxe -Value Get-FluxEvents
 Set-Alias -Name fxsusp -Value Get-FluxSuspend
 Set-Alias -Name fxres -Value Get-FluxResume
 
+# Terraform functions
+function Invoke-Terraform { terraform $args }
+function Invoke-TerraformInit { terraform init $args }
+function Invoke-TerraformPlan { terraform plan $args }
+function Invoke-TerraformApply { terraform apply $args }
+function Invoke-TerraformDestroy { terraform destroy $args }
+function Invoke-TerraformValidate { terraform validate $args }
+function Invoke-TerraformFormat { terraform fmt $args }
+function Invoke-TerraformShow { terraform show $args }
+function Invoke-TerraformOutput { terraform output $args }
+function Invoke-TerraformRefresh { terraform refresh $args }
+function Invoke-TerraformWorkspace { terraform workspace $args }
+function Invoke-TerraformWorkspaceList { terraform workspace list $args }
+function Invoke-TerraformWorkspaceSelect { terraform workspace select $args }
+function Invoke-TerraformWorkspaceNew { terraform workspace new $args }
+function Invoke-TerraformConsole { terraform console $args }
+function Invoke-TerraformGraph { terraform graph $args }
+function Invoke-TerraformState { terraform state $args }
+function Invoke-TerraformStateList { terraform state list $args }
+function Invoke-TerraformStateShow { terraform state show $args }
+function Invoke-TerraformImport { terraform import $args }
+
+# Terraform with common options
+function Invoke-TerraformPlanOut { terraform plan -out=tfplan $args }
+function Invoke-TerraformApplyPlan { terraform apply tfplan $args }
+function Invoke-TerraformApplyAutoApprove { terraform apply -auto-approve $args }
+function Invoke-TerraformDestroyAutoApprove { terraform destroy -auto-approve $args }
+
+# OpenTofu functions
+function Invoke-OpenTofu { tofu $args }
+function Invoke-OpenTofuInit { tofu init $args }
+function Invoke-OpenTofuPlan { tofu plan $args }
+function Invoke-OpenTofuApply { tofu apply $args }
+function Invoke-OpenTofuDestroy { tofu destroy $args }
+function Invoke-OpenTofuValidate { tofu validate $args }
+function Invoke-OpenTofuFormat { tofu fmt $args }
+function Invoke-OpenTofuShow { tofu show $args }
+function Invoke-OpenTofuOutput { tofu output $args }
+
+# Terragrunt functions
+function Invoke-Terragrunt { terragrunt $args }
+function Invoke-TerragruntInit { terragrunt init $args }
+function Invoke-TerragruntPlan { terragrunt plan $args }
+function Invoke-TerragruntApply { terragrunt apply $args }
+function Invoke-TerragruntDestroy { terragrunt destroy $args }
+function Invoke-TerragruntValidate { terragrunt validate $args }
+function Invoke-TerragruntFormat { terragrunt fmt $args }
+function Invoke-TerragruntOutput { terragrunt output $args }
+function Invoke-TerragruntApplyAll { terragrunt apply-all $args }
+function Invoke-TerragruntDestroyAll { terragrunt destroy-all $args }
+function Invoke-TerragruntPlanAll { terragrunt plan-all $args }
+function Invoke-TerragruntRunAll { terragrunt run-all $args }
+function Invoke-TerragruntInitAll { terragrunt init-all $args }
+
+# Set Terraform aliases
+Set-Alias -Name tf -Value Invoke-Terraform
+Set-Alias -Name tfi -Value Invoke-TerraformInit
+Set-Alias -Name tfp -Value Invoke-TerraformPlan
+Set-Alias -Name tfa -Value Invoke-TerraformApply
+Set-Alias -Name tfd -Value Invoke-TerraformDestroy
+Set-Alias -Name tfv -Value Invoke-TerraformValidate
+Set-Alias -Name tff -Value Invoke-TerraformFormat
+Set-Alias -Name tfs -Value Invoke-TerraformShow
+Set-Alias -Name tfo -Value Invoke-TerraformOutput
+Set-Alias -Name tfr -Value Invoke-TerraformRefresh
+Set-Alias -Name tfw -Value Invoke-TerraformWorkspace
+Set-Alias -Name tfwl -Value Invoke-TerraformWorkspaceList
+Set-Alias -Name tfws -Value Invoke-TerraformWorkspaceSelect
+Set-Alias -Name tfwn -Value Invoke-TerraformWorkspaceNew
+Set-Alias -Name tfc -Value Invoke-TerraformConsole
+Set-Alias -Name tfg -Value Invoke-TerraformGraph
+Set-Alias -Name tfst -Value Invoke-TerraformState
+Set-Alias -Name tfsl -Value Invoke-TerraformStateList
+Set-Alias -Name tfss -Value Invoke-TerraformStateShow
+Set-Alias -Name tfim -Value Invoke-TerraformImport
+Set-Alias -Name tfpl -Value Invoke-TerraformPlanOut
+Set-Alias -Name tfap -Value Invoke-TerraformApplyPlan
+Set-Alias -Name tfaa -Value Invoke-TerraformApplyAutoApprove
+Set-Alias -Name tfda -Value Invoke-TerraformDestroyAutoApprove
+
+# Set OpenTofu aliases
+Set-Alias -Name tofu -Value Invoke-OpenTofu
+Set-Alias -Name tofui -Value Invoke-OpenTofuInit
+Set-Alias -Name tofup -Value Invoke-OpenTofuPlan
+Set-Alias -Name tofua -Value Invoke-OpenTofuApply
+Set-Alias -Name tofud -Value Invoke-OpenTofuDestroy
+Set-Alias -Name tofuv -Value Invoke-OpenTofuValidate
+Set-Alias -Name tofuf -Value Invoke-OpenTofuFormat
+Set-Alias -Name tofus -Value Invoke-OpenTofuShow
+Set-Alias -Name tofuo -Value Invoke-OpenTofuOutput
+
+# Set Terragrunt aliases
+Set-Alias -Name tg -Value Invoke-Terragrunt
+Set-Alias -Name tgi -Value Invoke-TerragruntInit
+Set-Alias -Name tgp -Value Invoke-TerragruntPlan
+Set-Alias -Name tga -Value Invoke-TerragruntApply
+Set-Alias -Name tgd -Value Invoke-TerragruntDestroy
+Set-Alias -Name tgv -Value Invoke-TerragruntValidate
+Set-Alias -Name tgf -Value Invoke-TerragruntFormat
+Set-Alias -Name tgo -Value Invoke-TerragruntOutput
+Set-Alias -Name tgaa -Value Invoke-TerragruntApplyAll
+Set-Alias -Name tgda -Value Invoke-TerragruntDestroyAll
+Set-Alias -Name tgpa -Value Invoke-TerragruntPlanAll
+Set-Alias -Name tgra -Value Invoke-TerragruntRunAll
+Set-Alias -Name tgiac -Value Invoke-TerragruntInitAll
+
 # Docker aliases (similar to your bash/fish setup)
 function Invoke-DockerComposeUp { docker compose up -d $args }
 function Invoke-DockerComposeUpBuild { docker compose up -d --build $args }

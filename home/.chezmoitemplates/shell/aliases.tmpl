@@ -87,6 +87,81 @@ alias fxgtk='flux get kustomization'
 alias fxgth='flux get helmrelease'
 # Get helmrelease details
 
+# Terraform aliases
+alias tf='terraform'
+alias tfi='terraform init'
+alias tfp='terraform plan'
+alias tfa='terraform apply'
+alias tfd='terraform destroy'
+alias tfv='terraform validate'
+alias tff='terraform fmt'
+alias tfs='terraform show'
+alias tfo='terraform output'
+alias tfr='terraform refresh'
+alias tfw='terraform workspace'
+alias tfwl='terraform workspace list'
+alias tfws='terraform workspace select'
+alias tfwn='terraform workspace new'
+alias tfc='terraform console'
+alias tfg='terraform graph'
+alias tft='terraform taint'
+alias tfu='terraform untaint'
+alias tfim='terraform import'
+alias tfst='terraform state'
+alias tfsl='terraform state list'
+alias tfss='terraform state show'
+alias tfrm='terraform state rm'
+alias tfmv='terraform state mv'
+
+# Terraform with common options
+alias tfpl='terraform plan -out=tfplan'
+# Plan and save to file
+alias tfap='terraform apply tfplan'
+# Apply from plan file
+alias tfaa='terraform apply -auto-approve'
+# Apply without confirmation
+alias tfda='terraform destroy -auto-approve'
+# Destroy without confirmation
+alias tfpar='terraform plan -refresh-only'
+# Plan refresh only
+alias tfar='terraform apply -refresh-only'
+# Apply refresh only
+
+# OpenTofu aliases (drop-in Terraform replacement)
+alias tofu='tofu'
+alias tofui='tofu init'
+alias tofup='tofu plan'
+alias tofua='tofu apply'
+alias tofud='tofu destroy'
+alias tofuv='tofu validate'
+alias tofuf='tofu fmt'
+alias tofus='tofu show'
+alias tofuo='tofu output'
+alias tofur='tofu refresh'
+alias tofuw='tofu workspace'
+alias tofuwl='tofu workspace list'
+alias tofuws='tofu workspace select'
+alias tofuwn='tofu workspace new'
+alias tofuc='tofu console'
+alias tofug='tofu graph'
+alias tofut='tofu taint'
+alias tofuun='tofu untaint'
+
+# Terragrunt aliases
+alias tg='terragrunt'
+alias tgi='terragrunt init'
+alias tgp='terragrunt plan'
+alias tga='terragrunt apply'
+alias tgd='terragrunt destroy'
+alias tgv='terragrunt validate'
+alias tgf='terragrunt fmt'
+alias tgo='terragrunt output'
+alias tgaa='terragrunt apply-all'
+alias tgda='terragrunt destroy-all'
+alias tgpa='terragrunt plan-all'
+alias tgra='terragrunt run-all'
+alias tgiac='terragrunt init-all'
+
 # Kubernetes aliases
 alias k='kubectl'
 alias ka='kubectl apply -f'

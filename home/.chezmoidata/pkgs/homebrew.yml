@@ -64,7 +64,7 @@ pkgs:
       - 'halp'
       - 'felinks' # Browser in Terminal
       - 'macchina' #
-      - 'braindrop' # Raindrop TUI
+      - 'braid' # Raindrop TUI
       - 'sampler'
       - 'lsd' # Better ls
 

@@ -8,6 +8,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Suppress all output except the final JSON to stderr
+$ProgressPreference = 'SilentlyContinue'
+$VerbosePreference = 'SilentlyContinue'
+$WarningPreference = 'SilentlyContinue'
+$InformationPreference = 'SilentlyContinue'
+
 try {
     # Check for Bitwarden session - try environment variable first, then session file
     $session = $env:BW_SESSION
@@ -20,16 +26,16 @@ try {
     }
 
     if (-not $session) {
-        Write-Error "No Bitwarden session found. Please run: bwu"
+        Write-Host "No Bitwarden session found. Please run: bwu" -ForegroundColor Red | Out-Host
         exit 1
     }
 
     # Fetch credentials using BW CLI
-    $accessKey = bw get username "$BWItemName" --session $session
-    $secretKey = bw get password "$BWItemName" --session $session
+    $accessKey = bw get username "$BWItemName" --session $session 2>$null
+    $secretKey = bw get password "$BWItemName" --session $session 2>$null
 
     if (-not $accessKey -or -not $secretKey) {
-        Write-Error "Failed to retrieve AWS credentials from Bitwarden item: $BWItemName"
+        Write-Host "Failed to retrieve AWS credentials from Bitwarden item: $BWItemName" -ForegroundColor Red | Out-Host
         exit 1
     }
 

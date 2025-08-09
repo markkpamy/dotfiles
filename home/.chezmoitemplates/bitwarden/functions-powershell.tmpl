@@ -64,15 +64,7 @@ function Invoke-BitwardenEnsureUnlocked {
                 $session | Out-File -FilePath $env:BW_UTILS_SESSION_FILE -Encoding utf8
 
                 # Set restrictive permissions (Windows equivalent of chmod 600)
-                $acl = Get-Acl $env:BW_UTILS_SESSION_FILE
-                $acl.SetAccessRuleProtection($true, $false)
-                $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-                    [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
-                    "FullControl",
-                    "Allow"
-                )
-                $acl.SetAccessRule($accessRule)
-                Set-Acl $env:BW_UTILS_SESSION_FILE $acl
+                & icacls $env:BW_UTILS_SESSION_FILE /inheritance:r /grant:r "$env:USERNAME:(F)" | Out-Null
 
                 $env:BW_SESSION = $session
                 Write-Host "$($BWColors.Green)✅ Vault unlocked$($BWColors.Reset)"

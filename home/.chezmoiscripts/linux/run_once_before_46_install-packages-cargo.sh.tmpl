@@ -9,7 +9,7 @@ print_header "Cargo Package Installation" "Installing Rust crates via Cargo" "$I
 
 # Set total steps for progress tracking
 set_total_steps 3
-
+{{- if .installCargoPackages }}
 # Step 1: Check cargo availability
 print_step 1 "Cargo Availability Check"
 if ! command -v cargo &>/dev/null; then
@@ -33,8 +33,9 @@ if ! command -v cargo &>/dev/null; then
   exit 1
 fi
 
-print_success "Cargo is available: $(cargo --version)"
 
+print_success "Cargo is available: $(cargo --version)"
+{{- end }}
 # Step 2: Check installation preference
 print_step 2 "Configuration Check"
 {{- if not .installCargoPackages }}

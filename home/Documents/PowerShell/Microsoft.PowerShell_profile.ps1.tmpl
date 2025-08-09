@@ -1,2 +1,7 @@
 {{ includeTemplate "powershell/profile.ps1.tmpl" . }}
 {{ includeTemplate "powershell/mise.ps1.tmpl" . }}
+
+# Initialize zoxide for fast directory navigation
+if (Get-Command zoxide -ErrorAction SilentlyContinue) {
+    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+}

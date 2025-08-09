@@ -9,15 +9,24 @@ param(
 $ErrorActionPreference = "Stop"
 
 try {
-    # Check for Bitwarden session
-    if (-not $env:BW_SESSION) {
-        Write-Error "BW_SESSION environment variable not set. Please run: `$env:BW_SESSION = bw unlock --raw"
+    # Check for Bitwarden session - try environment variable first, then session file
+    $session = $env:BW_SESSION
+    if (-not $session) {
+        $sessionFile = "$env:USERPROFILE\.config\bitwarden-utils\session"
+        if (Test-Path $sessionFile) {
+            $session = Get-Content $sessionFile -Raw
+            $session = $session.Trim()
+        }
+    }
+
+    if (-not $session) {
+        Write-Error "No Bitwarden session found. Please run: bwu"
         exit 1
     }
 
     # Fetch credentials using BW CLI
-    $accessKey = bw get username "$BWItemName" --session $env:BW_SESSION
-    $secretKey = bw get password "$BWItemName" --session $env:BW_SESSION
+    $accessKey = bw get username "$BWItemName" --session $session
+    $secretKey = bw get password "$BWItemName" --session $session
 
     if (-not $accessKey -or -not $secretKey) {
         Write-Error "Failed to retrieve AWS credentials from Bitwarden item: $BWItemName"

@@ -18,6 +18,16 @@ else
 fi
 {{ end -}}
 
+# Install each script defined in onScriptInstall
+{{ range .pkgs.linuxDesktop.onScriptInstallSudo -}}
+echo "Executing script with sudo: {{ . }}"
+if curl -fsSL "{{ . }}" | sudo bash; then
+    echo "✓ Script executed successfully: {{ . }}"
+else
+    echo "✗ Failed to execute script: {{ . }}"
+fi
+{{ end -}}
+
 echo "Script-based desktop applications installation complete!"
 
 {{ else -}}

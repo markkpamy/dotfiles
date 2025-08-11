@@ -22,4 +22,6 @@ pkgs:
     oneScriptInstall:
       #- 'https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh'
       - 'https://raw.githubusercontent.com/rgwood/systemctl-tui/master/install.sh'
-      - 'https://aka.ms/InstallAzureCLIDeb' #Azure CLI
+
+    oneScriptInstallSudo:
+      - 'https://aka.ms/InstallAzureCLIDeb'

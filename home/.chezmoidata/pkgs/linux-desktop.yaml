@@ -14,6 +14,8 @@ pkgs:
     onScriptInstall:
       - 'https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh' # Ghostty
 
+    onScriptInstallSudo:
+
     gnome: # GNOME-specific packages
     #      - gnome-tweaks
     #      - gnome-shell-extensions

@@ -56,7 +56,6 @@ pkgs:
       - 'micro' # Micro editor
       - 'kakoune' # Kakoune editor
       - 'jump' # Jump between folders
-      - 'pet' # Pet snippet manager
       - 'topgrade' # Update manager
       - 'eget'
       - 'g-ls'
@@ -96,8 +95,6 @@ pkgs:
       - 'httpie' # HTTP / API testing client
       - 'lazydocker' # Full Docker management app
       - 'lazygit' # Full Git management app
-      - 'kdash' # Kubernetes management
-      - 'kube-prompt' # Kubernetes management
       - 'pgcli' # CLI for Postgres with auto-completion and syntax highlighting
       - 'mycli' # CLI for MySQL with auto-completion and syntax highlighting
       - 'helix'

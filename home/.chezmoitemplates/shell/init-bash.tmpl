@@ -6,6 +6,11 @@ fi
 
 ulimit -n 4096
 
+# Initialize ble.sh (Bash Line Editor) if available
+if [ -f ~/.local/share/blesh/ble.sh ]; then
+    source ~/.local/share/blesh/ble.sh
+fi
+
 # Initialize prompt
 if command -v oh-my-posh &> /dev/null; then
     eval "$(oh-my-posh init bash --config $HOME/.oh-my-posh.json)"

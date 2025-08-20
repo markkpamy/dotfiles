@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+# Import formatting library
+source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
+
+set -eufo pipefail
+
+print_header "ble.sh Installation" "Installing Bash Line Editor for enhanced bash experience" "$ICON_DOWNLOAD"
+
+# Check if ble.sh is already installed
+if [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
+    print_success "ble.sh is already installed"
+    print_footer "ble.sh Installation" "skipped"
+    exit 0
+fi
+
+# Set total steps for progress tracking
+set_total_steps 4
+
+# Step 1: Prerequisites Check
+print_step 1 "Prerequisites Check"
+print_action "Checking" "required tools (git, make)" "$ICON_CHECK"
+
+if ! command -v git &> /dev/null; then
+    print_error "git is not installed. Please install git first."
+    exit 1
+fi
+
+if ! command -v make &> /dev/null; then
+    print_error "make is not installed. Please install build-essential or make."
+    exit 1
+fi
+
+print_success "Prerequisites satisfied"
+
+# Step 2: Clone ble.sh Repository
+print_step 2 "Repository Download"
+print_action "Cloning" "ble.sh repository" "$ICON_DOWNLOAD"
+
+TEMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TEMP_DIR"' EXIT
+
+cd "$TEMP_DIR"
+git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git
+
+print_success "Repository cloned successfully"
+
+# Step 3: Build and Install
+print_step 3 "Build and Install"
+print_action "Building" "ble.sh with PREFIX=~/.local" "$ICON_BUILD"
+
+cd ble.sh
+make install PREFIX="$HOME/.local"
+
+print_success "ble.sh built and installed successfully"
+
+# Step 4: Verification
+print_step 4 "Installation Verification"
+print_action "Verifying" "ble.sh installation" "$ICON_CHECK"
+
+if [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
+    print_success "ble.sh installation verified"
+    print_info "Installation path: $HOME/.local/share/blesh/ble.sh"
+else
+    print_error "ble.sh installation failed - file not found"
+    exit 1
+fi
+
+print_success "ble.sh installation completed successfully!"
+print_info "ble.sh will be automatically loaded in new bash sessions"
+print_footer "ble.sh Installation" "completed"
+
+# Ensure script exits with success code
+ensure_success_exit

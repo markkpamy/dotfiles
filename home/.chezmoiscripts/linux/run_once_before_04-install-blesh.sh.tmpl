@@ -47,7 +47,7 @@ print_success "Repository cloned successfully"
 
 # Step 3: Build and Install
 print_step 3 "Build and Install"
-print_action "Building" "ble.sh with PREFIX=~/.local" "$ICON_BUILD"
+print_action "Building" "ble.sh with PREFIX=~/.local" "$ICON_INSTALL"
 
 cd ble.sh
 make install PREFIX="$HOME/.local"

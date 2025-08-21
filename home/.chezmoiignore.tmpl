@@ -1,6 +1,14 @@
 # vim:ft=gitignore.chezmoitmpl
 
 ##########################################
+# Conditional exclusions
+
+{{- if not .accessToken }}
+# Ignore Kubernetes/Talos config when Bitwarden access token is not available
+.kube/talosconfig
+{{- end }}
+
+##########################################
 # Platform-specific scripts and binaries
 
 {{- if ne .chezmoi.os "linux" }}

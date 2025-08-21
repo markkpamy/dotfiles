@@ -151,7 +151,7 @@ pkgs:
       - 'arkade' # Kubernetes marketplace
       - 'talhelper' # Helper for Talos Linux
       - 'fluxcd/tap/flux' # GitOps for Kubernetes
-      - 'siderolabs/tap/talosctl' # Talos Linux management
+      - 'talosctl' # Talos Linux management
       - 'dive' # Explore container layers
       - 'kubectx' # Kubernetes context switcher
       #      - 'asdf' # Version manager

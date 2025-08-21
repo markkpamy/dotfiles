@@ -5,7 +5,7 @@ source "{{ .chezmoi.sourceDir }}/utils-linux/formatting.sh"
 
 set -eufo pipefail
 
-DISTRO=$(lsb_release -i | awk '{print $NF}')
+DISTRO=$(grep '^ID=' /etc/os-release | cut -d'=' -f2 | tr -d '"')
 
 print_header "Arch-based Package Installation" "Installing packages via pacman/yay" "$ICON_PACKAGE"
 

@@ -12,7 +12,7 @@ if [ -f ~/.local/share/blesh/ble.sh ]; then
 fi
 
 if command -v atuin &>/dev/null; then
-    echo 'eval "$(atuin init bash)"' >> ~/.bashrc
+    eval "$(atuin init bash)"
 fi
 
 # Initialize prompt

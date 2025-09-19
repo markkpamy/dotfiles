@@ -140,7 +140,7 @@ pkgs:
       - 'ingress2gateway' # Convert Ingress to Gateway API
       - 'kubeshark' # API traffic viewer for Kubernetes
       - 'kubie' # Context switching for kubectl
-      - 'terraform' # Infrastructure as code
+      #      - 'terraform' # Infrastructure as code # upstream disabled
       #- 'idoavrah/homebrew/tftui' # Infrastructure as code
       - 'terraformer' # Generate terraform files from existing resources
       - 'helmify' # Convert Kubernetes YAML to Helm chart

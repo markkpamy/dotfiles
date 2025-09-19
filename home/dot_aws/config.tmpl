@@ -84,6 +84,12 @@ role_session_name = mark.kpamy
 role_arn = arn:aws:iam::148792395952:role/nx-compliance-advanced
 source_profile = nx_base
 
+[profile nx_delivery_master]
+region = eu-west-3
+role_session_name = mark.kpamy
+role_arn = arn:aws:iam::193293424588:role/nx-delivery-master
+source_profile = nx_base
+
 [profile mk_root_admin]
 sso_session = sso
 sso_account_id = 409348746500

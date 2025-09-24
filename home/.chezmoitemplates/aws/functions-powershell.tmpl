@@ -133,8 +133,62 @@ function Show-AWSProfiles {
     }
 }
 
+function Export-AWSCredentials {
+    param(
+        [string]$ProfileName,
+        [string]$Region = "eu-west-3"
+    )
+
+    if (-not $ProfileName) {
+        $ProfileName = $env:AWS_PROFILE ?? "default"
+    }
+
+    Write-Host "🔑 Exporting credentials for profile: $ProfileName" -ForegroundColor Blue
+
+    try {
+        $creds = aws configure export-credentials --profile $ProfileName --format json 2>&1
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "❌ Failed to get credentials for profile: $ProfileName" -ForegroundColor Red
+            Write-Host "💡 Make sure the profile exists and you're authenticated" -ForegroundColor Yellow
+            return
+        }
+
+        $credsObj = $creds | ConvertFrom-Json
+
+        $env:AWS_ACCESS_KEY_ID = $credsObj.AccessKeyId
+        $env:AWS_SECRET_ACCESS_KEY = $credsObj.SecretAccessKey
+        if ($credsObj.SessionToken) {
+            $env:AWS_SESSION_TOKEN = $credsObj.SessionToken
+        }
+        $env:AWS_DEFAULT_REGION = $Region
+
+        Write-Host "✅ AWS credentials exported to environment variables:" -ForegroundColor Green
+        Write-Host "   AWS_ACCESS_KEY_ID: $($env:AWS_ACCESS_KEY_ID.Substring(0, [Math]::Min(20, $env:AWS_ACCESS_KEY_ID.Length)))..." -ForegroundColor Cyan
+        Write-Host "   AWS_SECRET_ACCESS_KEY: ***" -ForegroundColor Cyan
+        if ($env:AWS_SESSION_TOKEN) {
+            Write-Host "   AWS_SESSION_TOKEN: $($env:AWS_SESSION_TOKEN.Substring(0, [Math]::Min(20, $env:AWS_SESSION_TOKEN.Length)))..." -ForegroundColor Cyan
+        }
+        Write-Host "   AWS_DEFAULT_REGION: $Region" -ForegroundColor Cyan
+    }
+    catch {
+        Write-Host "❌ Error exporting credentials: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
+function Clear-AWSCredentials {
+    Remove-Item Env:\AWS_ACCESS_KEY_ID -ErrorAction SilentlyContinue
+    Remove-Item Env:\AWS_SECRET_ACCESS_KEY -ErrorAction SilentlyContinue
+    Remove-Item Env:\AWS_SESSION_TOKEN -ErrorAction SilentlyContinue
+    Remove-Item Env:\AWS_DEFAULT_REGION -ErrorAction SilentlyContinue
+
+    Write-Host "✅ AWS credentials cleared from environment variables" -ForegroundColor Green
+}
+
 # Aliases for PowerShell
 Set-Alias -Name aws-profile -Value Set-AWSProfile
 Set-Alias -Name aws-whoami -Value Get-AWSIdentity
 Set-Alias -Name aws-config-update -Value Update-AWSConfigFromBitwarden
 Set-Alias -Name aws-profiles -Value Show-AWSProfiles
+Set-Alias -Name awsenv -Value Export-AWSCredentials
+Set-Alias -Name awsclear -Value Clear-AWSCredentials

@@ -97,3 +97,58 @@ function aws-profiles
         echo "💡 Ensure BW session is active: bwu"
     end
 end
+
+# Export AWS credentials to environment variables
+function awsenv
+    set profile $argv[1]
+    set region $argv[2]
+
+    if test -z "$profile"
+        if set -q AWS_PROFILE
+            set profile $AWS_PROFILE
+        else
+            set profile default
+        end
+    end
+
+    if test -z "$region"
+        set region eu-west-3
+    end
+
+    echo "🔑 Exporting credentials for profile: $profile"
+
+    set creds (aws configure export-credentials --profile "$profile" --format env 2>/dev/null)
+
+    if test $status -ne 0
+        echo "❌ Failed to get credentials for profile: $profile"
+        echo "💡 Make sure the profile exists and you're authenticated"
+        return 1
+    end
+
+    # Parse and export the credentials
+    for line in (echo "$creds" | string split \n)
+        if test -n "$line"
+            set -gx (echo "$line" | string split =)
+        end
+    end
+
+    set -gx AWS_DEFAULT_REGION "$region"
+
+    echo "✅ AWS credentials exported to environment variables:"
+    echo "   AWS_ACCESS_KEY_ID: "(string sub -s 1 -l 20 $AWS_ACCESS_KEY_ID)"..."
+    echo "   AWS_SECRET_ACCESS_KEY: ***"
+    if set -q AWS_SESSION_TOKEN
+        echo "   AWS_SESSION_TOKEN: "(string sub -s 1 -l 20 $AWS_SESSION_TOKEN)"..."
+    end
+    echo "   AWS_DEFAULT_REGION: $region"
+end
+
+# Clear AWS credentials from environment variables
+function awsclear
+    set -e AWS_ACCESS_KEY_ID
+    set -e AWS_SECRET_ACCESS_KEY
+    set -e AWS_SESSION_TOKEN
+    set -e AWS_DEFAULT_REGION
+
+    echo "✅ AWS credentials cleared from environment variables"
+end

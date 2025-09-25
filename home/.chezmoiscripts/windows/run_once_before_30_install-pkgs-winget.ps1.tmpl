@@ -1,3 +1,14 @@
+{{ if not (hasKey . "installWingetPackages") }}
+$installWingetPackages = $true
+{{ else }}
+$installWingetPackages = [System.Convert]::ToBoolean("{{ .installWingetPackages }}")
+{{ end }}
+
+if (-not $installWingetPackages) {
+  Write-Host "Skipping WinGet packages installation (disabled by user)"
+  exit 0
+}
+
 {{ if .pkgs.windows.winget }}
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")

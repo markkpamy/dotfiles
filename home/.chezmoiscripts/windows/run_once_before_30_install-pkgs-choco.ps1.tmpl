@@ -1,3 +1,14 @@
+{{ if not (hasKey . "installChocoPackages") }}
+$installChocoPackages = $true
+{{ else }}
+$installChocoPackages = [System.Convert]::ToBoolean("{{ .installChocoPackages }}")
+{{ end }}
+
+if (-not $installChocoPackages) {
+  Write-Host "Skipping Choco packages installation (disabled by user)"
+  exit 0
+}
+
 {{ if .pkgs.windows.choco }}
 
 # Self-elevate the script if required

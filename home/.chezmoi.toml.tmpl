@@ -20,6 +20,7 @@
 {{ $theme := "dark" }}
 {{ $installScoopPackages := false }}
 {{ $isDockerInstallMode := false }}
+{{ $installWingetPackages := true }}
 {{ $installChocoPackages := true }}
 {{ $installPythonPackages := true }}
 {{ $installCargoPackages := true }}
@@ -44,6 +45,8 @@
   {{ $shell = "pwsh" }}
   {{/* Prompt for Scoop package installation if running interactively */}}
   {{ $installScoopPackages = promptBool "Install Scoop packages? This may take some time" $installScoopPackages }}
+  {{/* Prompt for WinGet package installation if running interactively */}}
+  {{ $installWingetPackages = promptBool "Install WinGet packages? This may take some time" $installWingetPackages }}
   {{/* Prompt for Choco package installation if running interactively */}}
   {{ $installChocoPackages = promptBool "Install Choco packages? This may take some time" $installChocoPackages }}
   {{/* Prompt for Python package installation if running interactively */}}
@@ -182,6 +185,7 @@ name = "Mark Kpamy"
 email = "markkpamy@gmail.com"
 shell = {{ $shell | quote }}
 installScoopPackages = {{ $installScoopPackages }}
+installWingetPackages = {{ $installWingetPackages }}
 installChocoPackages = {{ $installChocoPackages }}
 installPythonPackages = {{ $installPythonPackages }}
 isDockerInstallMode = {{ $isDockerInstallMode }}

@@ -1,4 +1,15 @@
-{{- if and .pkgs.python.windows.uvx .installPythonPackages }}
+{{ if not (hasKey . "installUvxPackages") }}
+$installUvxPackages = $false
+{{ else }}
+$installUvxPackages = [System.Convert]::ToBoolean("{{ .installUvxPackages }}")
+{{ end }}
+
+if (-not $installUvxPackages) {
+  Write-Host "Skipping UVX packages installation (disabled by user)"
+  exit 0
+}
+
+{{- if and .pkgs.python.windows.uvx .installUvxPackages }}
 
 # Refresh environment variables to ensure uv is in PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")

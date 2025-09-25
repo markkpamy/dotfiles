@@ -1,4 +1,15 @@
-{{- if and .pkgs.python.windows.uv .installPythonPackages }}
+{{ if not (hasKey . "installUvPackages") }}
+$installUvPackages = $false
+{{ else }}
+$installUvPackages = [System.Convert]::ToBoolean("{{ .installUvPackages }}")
+{{ end }}
+
+if (-not $installUvPackages) {
+  Write-Host "Skipping UV packages installation (disabled by user)"
+  exit 0
+}
+
+{{- if and .pkgs.python.windows.uv .installUvPackages }}
 
 # Refresh environment variables to ensure Python is in PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")

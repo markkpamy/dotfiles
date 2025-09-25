@@ -23,6 +23,8 @@
 {{ $installWingetPackages := true }}
 {{ $installChocoPackages := true }}
 {{ $installPythonPackages := true }}
+{{ $installUvPackages := true }}
+{{ $installUvxPackages := true }}
 {{ $installCargoPackages := true }}
 {{ $isDesktop := false }}
 {{ $desktopEnv := "none" }}
@@ -51,6 +53,10 @@
   {{ $installChocoPackages = promptBool "Install Choco packages? This may take some time" $installChocoPackages }}
   {{/* Prompt for Python package installation if running interactively */}}
   {{ $installPythonPackages = promptBool "Install Python packages (pip and pipx)? This may take some time" $installPythonPackages }}
+  {{/* Prompt for UV package installation if running interactively */}}
+  {{ $installUvPackages = promptBool "Install UV packages (modern Python package manager)? This may take some time" $installUvPackages }}
+  {{/* Prompt for UVX package installation if running interactively */}}
+  {{ $installUvxPackages = promptBool "Install UVX packages (isolated Python CLI tools)? This may take some time" $installUvxPackages }}
   {{/* Prompt for Cargo package installation if running interactively */}}
   {{ $installCargoPackages = promptBool "Install Cargo packages (Rust crates)? This may take some time" $installCargoPackages }}
 {{ else if eq .chezmoi.os "linux" }}
@@ -73,6 +79,10 @@
   {{ end }}
   {{/* Prompt for Python package installation if running interactively */}}
   {{ $installPythonPackages = promptBool "Install Python packages (pip and pipx)? This may take some time" $installPythonPackages }}
+  {{/* Prompt for UV package installation if running interactively */}}
+  {{ $installUvPackages = promptBool "Install UV packages (modern Python package manager)? This may take some time" $installUvPackages }}
+  {{/* Prompt for UVX package installation if running interactively */}}
+  {{ $installUvxPackages = promptBool "Install UVX packages (isolated Python CLI tools)? This may take some time" $installUvxPackages }}
   {{/* Prompt for Cargo package installation if running interactively */}}
   {{ $installCargoPackages = promptBool "Install Cargo packages (Rust crates)? This may take some time" $installCargoPackages }}
   {{/* Check XDG_CURRENT_DESKTOP (primary method) */}}
@@ -188,6 +198,8 @@ installScoopPackages = {{ $installScoopPackages }}
 installWingetPackages = {{ $installWingetPackages }}
 installChocoPackages = {{ $installChocoPackages }}
 installPythonPackages = {{ $installPythonPackages }}
+installUvPackages = {{ $installUvPackages }}
+installUvxPackages = {{ $installUvxPackages }}
 isDockerInstallMode = {{ $isDockerInstallMode }}
 installCargoPackages = {{ $installCargoPackages }}
 accessToken = {{ $accessToken | quote }}

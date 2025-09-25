@@ -1,5 +1,5 @@
 {{ if not (hasKey . "installChocoPackages") }}
-$installChocoPackages = $true
+$installChocoPackages = $false
 {{ else }}
 $installChocoPackages = [System.Convert]::ToBoolean("{{ .installChocoPackages }}")
 {{ end }}
@@ -9,6 +9,7 @@ if (-not $installChocoPackages) {
   exit 0
 }
 
+{{- if .installChocoPackages }}
 {{ if .pkgs.windows.choco }}
 
 # Self-elevate the script if required
@@ -36,3 +37,4 @@ choco install '{{ $pkg }}' -y
 {{ end }}
 
 {{ end }}
+{{- end }}

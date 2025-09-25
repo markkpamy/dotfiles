@@ -8,7 +8,7 @@ if (-not (Get-Command "scoop" -ErrorAction SilentlyContinue))
 
 # Check if scoop package installation is enabled
 {{ if not (hasKey . "installScoopPackages") }}
-$installScoopPackages = $true
+$installScoopPackages = $false
 {{ else }}
 $installScoopPackages = [System.Convert]::ToBoolean("{{ .installScoopPackages }}")
 {{ end }}
@@ -17,6 +17,8 @@ if (-not $installScoopPackages) {
   Write-Host 'SKIPPING SCOOP PACKAGE INSTALLATION (disabled by config)'
   exit
 }
+
+{{- if .installScoopPackages }}
 
 {{ if .pkgs.windows.scoop.buckets }}
 Write-Host 'ADDING SCOOP BUCKETS...'
@@ -41,3 +43,5 @@ if (Test-Path -Path "{{ $reg }}" -PathType Leaf)
 }
 {{ end }}
 {{ end }}
+
+{{- end }}

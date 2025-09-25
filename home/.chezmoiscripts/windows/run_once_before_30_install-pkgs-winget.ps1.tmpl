@@ -1,5 +1,5 @@
 {{ if not (hasKey . "installWingetPackages") }}
-$installWingetPackages = $true
+$installWingetPackages = $false
 {{ else }}
 $installWingetPackages = [System.Convert]::ToBoolean("{{ .installWingetPackages }}")
 {{ end }}
@@ -9,6 +9,7 @@ if (-not $installWingetPackages) {
   exit 0
 }
 
+{{- if .installWingetPackages }}
 {{ if .pkgs.windows.winget }}
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
@@ -36,3 +37,4 @@ winget install '{{ $pkg }}' --accept-source-agreements --accept-package-agreemen
   {{ end }}
 
 {{ end }}
+{{- end }}

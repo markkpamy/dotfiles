@@ -1,4 +1,4 @@
-if (-not (Get-Command "git" -ErrorAction SilentlyContinue))
+if (-not (Get-Command "git"))
 {
     # Self-elevate the script if required
     if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator'))

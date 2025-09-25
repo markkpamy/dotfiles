@@ -9,7 +9,6 @@ pkgs:
         - 'pre-commit'
         - 'commitizen'
         - 'poetry'
-        - 'elia-chat'
         - 'ggshield' #GitGuardian CLI
       uv:
         # Fast pip replacement - project dependencies

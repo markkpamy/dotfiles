@@ -118,7 +118,7 @@ pkgs:
       - 'go' # Compiler for Go Lang
       - 'nvm' # Switching node versions
       - 'uv' # pyhton fast package manager
-      - 'openjdk' # Java development kit
+      #      - 'openjdk' # Java development kit
       - 'python' # Python interpreter
       - 'virtualenv' # Python virtualenv
       - 'virtualfish' # Virtualenv for Fish shell

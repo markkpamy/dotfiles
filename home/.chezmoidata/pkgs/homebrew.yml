@@ -5,7 +5,7 @@ pkgs:
       - 'fisher' # Fish shell plugin manager
       - 'oh-my-posh' # Oh My Posh Shell prompt
       - 'neovim' # Text editor
-      - 'ranger' # Directory browser
+      #      - 'ranger' # Directory browser
       - 'tmux' # Term multiplexer
       - 'zellij' # Zellij multiplexer
 
@@ -14,8 +14,8 @@ pkgs:
       - 'cmatrix' # rain in the terminal
 
     cli_basics:
-      - 'lf' # Terminal file manager
-      - 'walk' # Terminal file manager
+      #      - 'lf' # Terminal file manager
+      #      - 'walk' # Terminal file manager
       - 'bit-git' # Git cli alternative
       - 'television' # Fzf tui
       - 'glow' # Mardown viewer
@@ -29,15 +29,15 @@ pkgs:
       - 'difftastic' # Readable file compares (better diff)
       - 'duf' # Get info on mounted disks (better df)
       - 'dust' # Get info on disk usage (better du)
-      - 'entr' # Run command whenever file changes
+      #      - 'entr' # Run command whenever file changes
       - 'eza' # Listing files with info (better ls)
-      - 'exiftool' # Read, write and modify exif data
+      #      - 'exiftool' # Read, write and modify exif data
       - 'fzf' # Fuzzy file finder and filtering
       - 'sk' # Skim rust Fzf
       - 'fd' # https://github.com/sharkdp/fd#installation
-      - 'hyperfine' # Benchmarking for arbitrary commands
-      - 'jdupes' # Duplicate file finder
-      - 'just' # Powerful command runner (better make)
+      #      - 'hyperfine' # Benchmarking for arbitrary commands
+      #      - 'jdupes' # Duplicate file finder
+      #      - 'just' # Powerful command runner (better make)
       - 'jq' # JSON parser, output and query files
       - 'most' # Multi-window scroll pager (better less)
       - 'procs' # Advanced process viewer (better ps)
@@ -45,7 +45,7 @@ pkgs:
       - 'rsync' # Fast incremental file transfer
       - 'sd' # RegEx find and replace (better sed)
       - 'tldr' # Community-maintained docs (better man)
-      - 'tokei' # Count lines of code (better cloc)
+      #      - 'tokei' # Count lines of code (better cloc)
       - 'tree' # Directory listings as tree structure
       - 'tre-command' # Directory listings as tree structure
       - 'trash-cli' # Record and restore removed files
@@ -53,18 +53,18 @@ pkgs:
       - 'xsel' # Copy paste access to the X clipboard
       - 'zoxide' # Auto-learning navigation (better cd)
       - 'nnn' # File manager
-      - 'micro' # Micro editor
-      - 'kakoune' # Kakoune editor
+      #      - 'micro' # Micro editor
+      #      - 'kakoune' # Kakoune editor
       - 'jump' # Jump between folders
       - 'topgrade' # Update manager
-      - 'eget'
-      - 'g-ls'
-      - 'gama' # Giithub actions viewer
-      - 'halp'
-      - 'felinks' # Browser in Terminal
-      - 'macchina' #
-      - 'braid' # Raindrop TUI
-      - 'sampler'
+      #      - 'eget'
+      #      - 'g-ls'
+      #      - 'gama' # Giithub actions viewer
+      #      - 'halp'
+      #      - 'felinks' # Browser in Terminal
+      #      - 'macchina' #
+      #      - 'braid' # Raindrop TUI
+      #      - 'sampler'
       - 'lsd' # Better ls
 
     secrets_mgmt:
@@ -86,18 +86,18 @@ pkgs:
       - 'pandoc' # Pandoc multi format converter
       - 'termscp' # Terminal file transfer client
       - 'harlequin' # Database client for SQLite, Postgres, MySQL, and more
-      - 'sttr' # String manipulation tool
-      - 'presenterm' # Terminal presentation tool
-      - 'slides' # Terminal presentation tool
-      - 'wtfutil' # Terminal dashboard
+    #      - 'sttr' # String manipulation tool
+    #      - 'presenterm' # Terminal presentation tool
+    #      - 'slides' # Terminal presentation tool
+    #      - 'wtfutil' # Terminal dashboard
 
     development:
-      - 'httpie' # HTTP / API testing client
+      #      - 'httpie' # HTTP / API testing client
       - 'lazydocker' # Full Docker management app
       - 'lazygit' # Full Git management app
       - 'pgcli' # CLI for Postgres with auto-completion and syntax highlighting
-      - 'mycli' # CLI for MySQL with auto-completion and syntax highlighting
-      - 'helix'
+      #      - 'mycli' # CLI for MySQL with auto-completion and syntax highlighting
+      #      - 'helix'
       - 'lazysql'
       - 'pre-commit' # Pre-commit framework
       - 'commitizen'
@@ -111,7 +111,7 @@ pkgs:
       - 'figlet' # Output text as big ASCII art text
       - 'lolcat' # Make console output rainbow colored
       - 'neofetch' # Show system data and distro info
-      - 'nbsdgames' # Terminal bsd games
+    #      - 'nbsdgames' # Terminal bsd games
 
     programming_languages:
       - 'gcc' # GNU C++ compilers
@@ -126,26 +126,26 @@ pkgs:
 
     devops:
       - 'ansible' # Automation
-      - 'atop' # Monitoring
+      #      - 'atop' # Monitoring
       - 'docker' # Containers
       - 'docker-completion' # Docker shell utilities
-      - 'awsume' # Assume role in AWS
-      - 'aws-shell'
+      #      - 'awsume' # Assume role in AWS
+      #      - 'aws-shell'
       - 'aws-vault' # AWS credential manager
       - 'helm' # Kubernetes package manager
       - 'stern' # Multi-pod log tailing for Kubernetes
       - 'k9s' # Kubernetes CLI UI
-      - 'kubetui' # Kubernetes TUI
+      #      - 'kubetui' # Kubernetes TUI
       - 'kubecolor' # Colorized kubectl output
       - 'ingress2gateway' # Convert Ingress to Gateway API
       - 'kubeshark' # API traffic viewer for Kubernetes
-      - 'kubie' # Context switching for kubectl
+      #      - 'kubie' # Context switching for kubectl
       #      - 'terraform' # Infrastructure as code # upstream disabled
-      #- 'idoavrah/homebrew/tftui' # Infrastructure as code
-      - 'terraformer' # Generate terraform files from existing resources
-      - 'helmify' # Convert Kubernetes YAML to Helm chart
-      - 'kubespy' # Observe Kubernetes resources in real-time
-      - 'kwok' # Kubernetes WithOut Kubelet
+      #      - 'idoavrah/homebrew/tftui' # Infrastructure as code
+      #      - 'terraformer' # Generate terraform files from existing resources
+      #      - 'helmify' # Convert Kubernetes YAML to Helm chart
+      #      - 'kubespy' # Observe Kubernetes resources in real-time
+      #      - 'kwok' # Kubernetes WithOut Kubelet
       - 'kubectl' # Kubernetes CLI
       - 'krew' # kubectl plugin manager
       - 'arkade' # Kubernetes marketplace
@@ -157,12 +157,12 @@ pkgs:
       #      - 'asdf' # Version manager
       - 'direnv' # Environment variable manager
       - 'cidr'
-      - 'mayowa-ojo/tap/chmod-cli'
-      - 'superfile' # Beautiful file manager
+      #      - 'mayowa-ojo/tap/chmod-cli'
+      #      - 'superfile' # Beautiful file manager
       - 'gitleaks' # Secret scanning
       - 'ggshield'
-      - 'pug' # Pug is a CLI tool for managing terraform resources
-      - 'rustscan' # Port scan tool
+      #      - 'pug' # Pug is a CLI tool for managing terraform resources
+      #      - 'rustscan' # Port scan tool
       - 'mise'
       - 'x-cmd' # X command line tool
 

@@ -9,7 +9,7 @@ if (-not $installUvPackages) {
   exit 0
 }
 
-{{- if and .pkgs.python.windows.uv .installUvPackages }}
+{{- if and .pkgs.python.windows.uv (and (hasKey . "installUvPackages") .installUvPackages) }}
 
 # Refresh environment variables to ensure Python is in PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")

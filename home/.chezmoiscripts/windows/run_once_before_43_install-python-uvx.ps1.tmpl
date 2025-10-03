@@ -9,7 +9,7 @@ if (-not $installUvxPackages) {
   exit 0
 }
 
-{{- if and .pkgs.python.windows.uvx .installUvxPackages }}
+{{- if and .pkgs.python.windows.uvx (and (hasKey . "installUvxPackages") .installUvxPackages) }}
 
 # Refresh environment variables to ensure uv is in PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")

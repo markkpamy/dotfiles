@@ -9,7 +9,7 @@ if (-not $installChocoPackages) {
   exit 0
 }
 
-{{- if .installChocoPackages }}
+{{- if and (hasKey . "installChocoPackages") .installChocoPackages }}
 {{ if .pkgs.windows.choco }}
 
 # Self-elevate the script if required

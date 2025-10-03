@@ -10,7 +10,7 @@ if (-not $installScoopPackages) {
   exit
 }
 
-{{- if .installScoopPackages }}
+{{- if and (hasKey . "installScoopPackages") .installScoopPackages }}
 if (Get-Command 'scoop')
 {
   exit

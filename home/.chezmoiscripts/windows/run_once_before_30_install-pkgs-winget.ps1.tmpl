@@ -9,7 +9,7 @@ if (-not $installWingetPackages) {
   exit 0
 }
 
-{{- if .installWingetPackages }}
+{{- if and (hasKey . "installWingetPackages") .installWingetPackages }}
 {{ if .pkgs.windows.winget }}
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")

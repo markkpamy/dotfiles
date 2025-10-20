@@ -183,37 +183,6 @@ widgets:
         border_color: '#7aa2f7'
         alignment: 'center'
         offset_top: 0
-  weather:
-    type: 'yasb.weather.WeatherWidget'
-    options:
-      label: '<span>{icon}</span> {temp}'
-      label_alt: '{location}: {conditions}, Min {min_temp}, Max {max_temp}, Humidity {humidity}'
-      api_key: '24b6c2cda6d84066b0304531241908' # gitleaks:allow
-      update_interval: 600
-      hide_decimal: true
-      location: 'Hungary, Eger'
-      units: 'metric'
-      callbacks:
-        on_left: 'toggle_card'
-      icons:
-        sunnyDay: "\U000F0599"
-        clearNight: "\ue3c2"
-        cloudyDay: "\ue21d"
-        cloudyNight: "\ue226"
-        rainyDay: "\ue371"
-        rainyNight: "\ue371"
-        snowyIcyDay: "\U000F0717"
-        snowyIcyNight: "\U000F0717"
-        default: "\U000F0599"
-      weather_card:
-        blur: true
-        round_corners: true
-        round_corners_type: 'small'
-        border_color: '#7aa2f7'
-        alignment: 'center'
-        direction: 'down'
-        offset_top: 0
-        icon_size: 48
   wifi:
     type: 'yasb.wifi.WifiWidget'
     options:

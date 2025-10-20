@@ -32,12 +32,12 @@ repos:
       - id: gitleaks
 
   # GitGuardian Secret Scan
-  - repo: https://github.com/gitguardian/ggshield
-    rev: v1.39.0
-    hooks:
-      - id: ggshield
-        language_version: python3
-        stages: [pre-commit]
+  #  - repo: https://github.com/gitguardian/ggshield
+  #    rev: v1.39.0
+  #    hooks:
+  #      - id: ggshield
+  #        language_version: python3
+  #        stages: [pre-commit]
 
   # YAML formatting and linting
   - repo: https://github.com/pre-commit/mirrors-prettier

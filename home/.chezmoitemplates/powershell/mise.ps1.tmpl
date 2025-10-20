@@ -8,7 +8,7 @@ function mise {
     $command, [array]$arguments = Invoke-Expression ('Write-Output -- ' + $myLine)
 
     if ($null -eq $arguments) {
-        & "C:\Program Files\WinGet\Links\mise.exe"
+        & mise
         return
     }
 
@@ -16,20 +16,20 @@ function mise {
     $arguments = $arguments[1..$arguments.Length]
 
     if ($arguments -contains '--help') {
-        return & "C:\Program Files\WinGet\Links\mise.exe" $command $arguments
+        return & mise $command $arguments
     }
 
     switch ($command) {
         { $_ -in 'deactivate', 'shell', 'sh' } {
             if ($arguments -contains '-h' -or $arguments -contains '--help') {
-                & "C:\Program Files\WinGet\Links\mise.exe" $command $arguments
+                & mise $command $arguments
             }
             else {
-                & "C:\Program Files\WinGet\Links\mise.exe" $command $arguments | Out-String | Invoke-Expression -ErrorAction SilentlyContinue
+                & mise $command $arguments | Out-String | Invoke-Expression -ErrorAction SilentlyContinue
             }
         }
         default {
-            & "C:\Program Files\WinGet\Links\mise.exe" $command $arguments
+            & mise $command $arguments
             $status = $LASTEXITCODE
             if ($(Test-Path -Path Function:\_mise_hook)){
                 _mise_hook
@@ -42,7 +42,7 @@ function mise {
 
 function Global:_mise_hook {
     if ($env:MISE_SHELL -eq "pwsh"){
-        & "C:\Program Files\WinGet\Links\mise.exe" hook-env $args -s pwsh | Out-String | Invoke-Expression -ErrorAction SilentlyContinue
+        & mise hook-env $args -s pwsh | Out-String | Invoke-Expression -ErrorAction SilentlyContinue
     }
 }
 
@@ -90,7 +90,7 @@ if (-not $__mise_pwsh_command_not_found){
             param([object] $Name, [System.Management.Automation.CommandLookupEventArgs] $eventArgs)
             end {
                 if ([Microsoft.PowerShell.PSConsoleReadLine]::GetHistoryItems()[-1].CommandLine -match ([regex]::Escape($Name))) {
-                    if (& "C:\Program Files\WinGet\Links\mise.exe" hook-not-found -s pwsh -- $Name){
+                    if (& mise hook-not-found -s pwsh -- $Name){
                         _mise_hook
                         if (Get-Command $Name -ErrorAction SilentlyContinue){
                             $EventArgs.Command = Get-Command $Name

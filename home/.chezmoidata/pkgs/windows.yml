@@ -68,7 +68,7 @@ pkgs:
       - 'PasteBar.PasteBar'
       - 'GNU.Wget2'
       #- 'Clement.bottom'
-      - 'jesseduffield.lazygit'
+      #- 'jesseduffield.lazygit'
       #- 'LGUG2Z.whkd'
       - 'AmN.yasb' # YASB
       - 'sharkdp.bat'

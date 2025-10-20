@@ -33,7 +33,7 @@ bars:
     widgets:
       left: ['home', 'komorebi_workspaces', 'komorebi_active_layout', 'active_window']
       center: ['clock']
-      right: ['memory', 'disk', 'weather', 'wifi', 'volume', 'battery', 'power_menu']
+      right: ['memory', 'disk', 'wifi', 'volume', 'battery', 'power_menu']
 widgets:
   home:
     type: 'yasb.home.HomeWidget'

@@ -22,119 +22,178 @@ pkgs:
     #        - '$env:USERPROFILE\scoop\apps\pwsh\current\install-file-context.reg'
     #        - '$env:USERPROFILE\scoop\apps\7zip\current\install-context.reg'
     choco:
+      # Core Tools
+      - 'git'
+      - 'chezmoi'
+      - 'powershell-core'
+      # Languages and Development
+      - 'python312'
+      #- 'uv' # Not available in Chocolatey
+      #- 'mise' # Not available in Chocolatey
+      - 'fnm'
+      - 'notepadplusplus'
       - 'mingw'
       - 'luarocks'
-    winget:
-      # Core Tools
-      - 'Git.Git'
-      - 'twpayne.chezmoi'
-      - 'Microsoft.PowerShell'
-      # Languages and Development
-      - 'Python.Python.3.12'
-      - 'astral-sh.uv'
-      - 'jdx.mise'
-      - 'Schniz.fnm'
-      - 'Notepad++.Notepad++'
       # Fonts
-      - 'DEVCOM.JetBrainsMonoNerdFont'
+      - 'jetbrainsmononf'
       # Shells and Terminal
-      - 'Eugeny.Tabby'
-      - 'Microsoft.OpenSSH.Preview'
-      - 'Microsoft.PowerShell.Preview'
-      - 'Microsoft.WindowsTerminal'
-      - 'JanDeDobbeleer.OhMyPosh'
-      - 'Obsidian.Obsidian'
-      - 'Amazon.AWSCLI'
-      - 'Microsoft.AzureCLI'
+      #- 'tabby' # Not available in Chocolatey
+      - 'openssh'
+      #- 'powershell-preview' # Not available in Chocolatey
+      - 'microsoft-windows-terminal'
+      - 'oh-my-posh'
+      - 'obsidian'
+      - 'awscli'
+      - 'azure-cli'
+      #- 'starship'
+      #- 'nushell'
+      # Essentials
+      - '7zip'
+      #- 'aria2'
+      #- 'neovim'
+      - 'bitwarden-cli'
+      - 'bitwarden'
+      #- '1password'
+      #- '1password-cli'
+      #- 'files' # Not available in Chocolatey
+      # CLI Tools
+      #- 'television' # Not available in Chocolatey
+      #- 'windhawk' # Not available in Chocolatey
+      #- 'autohotkey'
+      #- 'keyviz' # Not available in Chocolatey
+      #- 'komorebi' # Not available in Chocolatey
+      #- 'zebar' # Not available in Chocolatey
+      #- 'glazewm' # Not available in Chocolatey
+      #- 'pastebar' # Not available in Chocolatey
+      - 'wget'
+      #- 'bottom'
+      #- 'lazygit'
+      #- 'whkd' # Not available in Chocolatey
+      #- 'yasb' # Not available in Chocolatey
+      - 'bat'
+      - 'delta'
+      - 'eza'
+      #- 'fastfetch'
+      - 'fd'
+      #- 'ffmpeg'
+      - 'fzf'
+      - 'gh'
+      #- 'glow'
+      - 'gzip'
+      - 'jq'
+      - 'lazydocker'
+      #- 'ripgrep'
+      #- 'sd'
+      #- 'gsudo'
+      - 'tldr'
+      #- 'wakatime' # Desktop version not in Chocolatey
+      #- 'xh'
+      - 'yazi'
+      - 'yq'
+      - 'zoxide'
+      #- 'topgrade' # Not available in Chocolatey
+      - 'sysinternals'
+      #- 'httrack'
+      - 'pandoc'
+      #- 'pandocgui' # Not available in Chocolatey
+      #- 'tealdeer'
+      #- 'ugrep'
+      #- 'gum'
+      #- 'mods'
+      #- 'agg' # Not available in Chocolatey
+      #- 'ascii-image-converter'
+      #- 'neohtop' # Not available in Chocolatey
+      #- 'btop4win' # Not available in Chocolatey
+      - 'listary'
+      #- 'powersession' # Not available in Chocolatey
+      - 'direnv'
+      - 'git-lfs'
+      #- 'sttr' # Not available in Chocolatey
+      # DevOps Tools
+      #- 'kwokctl' # Not available in Chocolatey
+      - 'krew'
+      - 'kubernetes-cli'
+      - 'kubernetes-kompose'
+      #- 'kubecolor' # Not available in Chocolatey
+      - 'kubernetes-helm'
+      #- 'kubetui' # Not available in Chocolatey
+      #- 'ingress2gateway' # Not available in Chocolatey
+      - 'k9s'
+      #- 'docker-desktop'
+      - 'terraform'
+      - 'fluxctl'
+      #- 'xpipe' # Not available in Chocolatey
+      - 'gitleaks'
+      - 'lsd'
+      - 'devtoys'
+      # Others
+      - 'powertoys'
+      - 'winscp'
+      - 'openssl'
+      #- 'localsend' # Not available in Chocolatey
+      #- 'onecommander' # Not available in Chocolatey
+      - 'windirstat'
+      #- 'gpgfrontend' # Not available in Chocolatey
+    winget:
+      # Languages and Development (WinGet-only)
+      - 'astral-sh.uv' # Not available in Chocolatey
+      - 'jdx.mise' # Not available in Chocolatey
+      # Shells and Terminal (WinGet-only)
+      - 'Eugeny.Tabby' # Not available in Chocolatey
+      - 'Microsoft.PowerShell.Preview' # Not available in Chocolatey
       #- 'Starship.Starship'
       #- 'Nushell.Nushell'
-      # Essentials
-      - '7zip.7zip'
+      # Essentials (WinGet-only)
       #- 'aria2.aria2'
       #- 'Neovim.Neovim'
-      - 'Bitwarden.CLI'
-      - 'Bitwarden.Bitwarden'
-      #      - 'AgileBits.1Password'
-      #      - 'AgileBits.1Password.CLI'
-      - 'FilesCommunity.Files'
-      # CLI Tools
-      #- 'alexpasmantier.television'
-      #- 'RamenSoftware.Windhawk'
+      #- 'AgileBits.1Password'
+      #- 'AgileBits.1Password.CLI'
+      - 'FilesCommunity.Files' # Not available in Chocolatey
+      # CLI Tools (WinGet-only)
+      #- 'alexpasmantier.television' # Not available in Chocolatey
+      #- 'RamenSoftware.Windhawk' # Not available in Chocolatey
       #- 'AutoHotkey.AutoHotkey'
-      - 'mulaRahul.keyviz'
-      #- 'LGUG2Z.komorebi'
-      #- 'glzr-io.zebar'
-      #- 'glzr-io.glazewm'
-      - 'PasteBar.PasteBar'
-      - 'GNU.Wget2'
+      - 'mulaRahul.keyviz' # Not available in Chocolatey
+      #- 'LGUG2Z.komorebi' # Not available in Chocolatey
+      #- 'glzr-io.zebar' # Not available in Chocolatey
+      #- 'glzr-io.glazewm' # Not available in Chocolatey
+      - 'PasteBar.PasteBar' # Not available in Chocolatey
       #- 'Clement.bottom'
       #- 'jesseduffield.lazygit'
-      #- 'LGUG2Z.whkd'
-      - 'AmN.yasb' # YASB
-      - 'sharkdp.bat'
-      - 'dandavison.delta'
-      - 'eza-community.eza'
+      #- 'LGUG2Z.whkd' # Not available in Chocolatey
+      - 'AmN.yasb' # Not available in Chocolatey
       #- 'fastfetch-cli.fastfetch'
-      - 'sharkdp.fd'
       #- 'Gyan.FFmpeg'
-      - 'junegunn.fzf'
-      - 'GitHub.cli'
       #- 'charmbracelet.glow'
-      - 'GnuWin32.Gzip'
-      - 'jqlang.jq'
-      - 'jesseduffield.lazydocker'
       #- 'BurntSushi.ripgrep.MSVC'
       #- 'chmln.sd'
       #- 'gerardog.gsudo'
-      - 'tldr-pages.tlrc'
-      #- 'Wakatime.DesktopWakatime'
+      #- 'Wakatime.DesktopWakatime' # Desktop version not in Chocolatey
       #- 'ducaale.xh'
-      - 'sxyazi.yazi'
-      - 'mikefarah.yq'
-      - 'ajeetdsouza.zoxide'
-      #- 'topgrade-rs.topgrade'
-      - 'Microsoft.Sysinternals'
+      #- 'topgrade-rs.topgrade' # Not available in Chocolatey
       #- 'XavierRoche.HTTrack'
-      - 'JohnMacFarlane.Pandoc'
-      - 'Ombrelin.PandocGui'
+      - 'Ombrelin.PandocGui' # Not available in Chocolatey
       #- 'dbrgn.tealdeer' # tldr alternative
       #- 'Genivia.ugrep'
       #- 'charmbracelet.gum'
       #- 'charmbracelet.mods'
-      - 'asciinema.agg'
+      - 'asciinema.agg' # Not available in Chocolatey
       #- 'TheZoraiz.ascii-image-converter'
-      #- 'abdenasser.NeoHtop'
-      #- 'aristocratos.btop4win'
-      - 'Bopsoft.Listary'
-      - 'Watfaq.PowerSession'
-      - 'direnv.direnv'
-      - 'GitHub.GitLFS'
-      - 'abhimanyu003.sttr'
-      # DevOps Tools
-      #- 'Kubernetes.kwokctl'
-      - 'Kubernetes.krew'
-      - 'Kubernetes.kubectl'
-      - 'Kubernetes.kompose'
-      #- 'Kubecolor.kubecolor'
-      - 'Helm.Helm'
-      #- 'kosay.kubetui'
-      #- 'Kubernetes.ingress2gateway'
-      - 'Derailed.k9s'
+      #- 'abdenasser.NeoHtop' # Not available in Chocolatey
+      #- 'aristocratos.btop4win' # Not available in Chocolatey
+      - 'Watfaq.PowerSession' # Not available in Chocolatey
+      - 'abhimanyu003.sttr' # Not available in Chocolatey
+      # DevOps Tools (WinGet-only)
+      #- 'Kubernetes.kwokctl' # Not available in Chocolatey
+      #- 'Kubecolor.kubecolor' # Not available in Chocolatey
+      #- 'kosay.kubetui' # Not available in Chocolatey
+      #- 'Kubernetes.ingress2gateway' # Not available in Chocolatey
       #- 'Docker.DockerDesktop'
-      - 'Hashicorp.Terraform'
-      - 'fluxcd.flux'
-      #- 'xpipe-io.xpipe'
-      - 'Gitleaks.Gitleaks'
-      - 'lsd-rs.lsd'
-      - 'DevToys-app.DevToys'
-      # Others
-      - 'Microsoft.PowerToys'
-      - 'WinSCP.WinSCP'
-      - 'ShiningLight.OpenSSL.Dev'
-      - 'localsend'
-      - 'MilosParipovic.OneCommander'
-      - 'WinDirStat.WinDirStat.Beta'
-      - 'Saturneric.GpgFrontend'
+      #- 'xpipe-io.xpipe' # Not available in Chocolatey
+      # Others (WinGet-only)
+      - 'localsend' # Not available in Chocolatey
+      - 'MilosParipovic.OneCommander' # Not available in Chocolatey
+      - 'Saturneric.GpgFrontend' # Not available in Chocolatey
     psGallery:
       - 'DockerCompletion'
       - 'PsReadLine'

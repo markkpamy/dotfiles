@@ -1,0 +1,7 @@
+contexts:
+    default:
+        url: https://omni.toolsera.fr
+        auth:
+            siderov1:
+                identity: markkpamy@gmail.com
+context: default

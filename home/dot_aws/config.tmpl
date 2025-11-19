@@ -1,110 +1,115 @@
 [default]
 region = eu-west-3
 output = json
-{{- if eq .chezmoi.os "windows" }}
-credential_process = {{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.cmd 685da43d-b023-4598-b5e0-b3000108f754
-{{- else }}
-credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials "685da43d-b023-4598-b5e0-b3000108f754"
-{{- end }}
 cli_pager=
 
-# NX base profile - uses NX credentials
-[profile nx_base]
-region = eu-west-3
-{{- if eq .chezmoi.os "windows" }}
-credential_process = {{ .chezmoi.homeDir }}\.local\bin\aws-bw-credentials.cmd 685da43d-b023-4598-b5e0-b3000108f754
-{{- else }}
-credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-credentials "685da43d-b023-4598-b5e0-b3000108f754"
-{{- end }}
-
-[profile nx_profile]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::148792395952:role/nx-compliance-master
-source_profile = nx_base
-
-# NX role profiles - all use nx_base as source
-[profile nx_training_advanced]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::766272829042:role/nx-training-advanced
-source_profile = nx_base
-
-[profile nx_datahub_advanced]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::261001339617:role/nx-datahub-advanced
-source_profile = nx_base
-
-[profile nx_datahub_master]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::261001339617:role/nx-datahub-master
-source_profile = nx_base
-
-[profile nx_training_master]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::766272829042:role/nx-training-master
-source_profile = nx_base
-
-[profile nx-presales-advanced]
-region = eu-west-3
-role_arn = arn:aws:iam::666841086193:role/nx-presales-advanced
-role_session_name = mark.kpamy
-source_profile = nx_base
-
-[profile nx-presales-master]
-region = eu-west-3
-role_arn = arn:aws:iam::666841086193:role/nx-presales-master
-role_session_name = mark.kpamy
-source_profile = nx_base
-
-[profile nx_renovation_master]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::248189924076:role/nx-renovation-master
-source_profile = nx_base
-
-[profile nx_renovation_advanced]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::248189924076:role/nx-renovation-advanced
-source_profile = nx_base
-
-[profile nx_compliance_master]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::148792395952:role/nx-compliance-master
-source_profile = nx_base
-
-[profile nx_compliance_advanced]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::148792395952:role/nx-compliance-advanced
-source_profile = nx_base
-
-[profile nx_delivery_master]
-region = eu-west-3
-role_session_name = mark.kpamy
-role_arn = arn:aws:iam::193293424588:role/nx-delivery-master
-source_profile = nx_base
-
+# Personal AWS SSO profiles
 [profile mk_root_admin]
-sso_session = sso
+sso_session = mk-personal
 sso_account_id = 409348746500
 sso_role_name = AdministratorAccess
 region = eu-west-3
 output = json
 
 [profile mk_sandbox_admin]
-sso_session = sso
+sso_session = mk-personal
 sso_account_id = 347264101318
 sso_role_name = AdministratorAccess
 region = eu-west-3
 output = json
 
-[sso-session sso]
+# NX Organization SSO profiles
+[profile nx_compliance_master]
+sso_session = nx-org
+sso_account_id = 148792395952
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_compliance_advanced]
+sso_session = nx-org
+sso_account_id = 148792395952
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_profile]
+sso_session = nx-org
+sso_account_id = 148792395952
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_training_master]
+sso_session = nx-org
+sso_account_id = 766272829042
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_training_advanced]
+sso_session = nx-org
+sso_account_id = 766272829042
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_datahub_master]
+sso_session = nx-org
+sso_account_id = 261001339617
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_datahub_advanced]
+sso_session = nx-org
+sso_account_id = 261001339617
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_presales_master]
+sso_session = nx-org
+sso_account_id = 666841086193
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_presales_advanced]
+sso_session = nx-org
+sso_account_id = 666841086193
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_renovation_master]
+sso_session = nx-org
+sso_account_id = 248189924076
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_renovation_advanced]
+sso_session = nx-org
+sso_account_id = 248189924076
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+[profile nx_delivery_master]
+sso_session = nx-org
+sso_account_id = 193293424588
+sso_role_name = AdministratorAccess
+region = eu-west-3
+output = json
+
+# SSO Session Configurations
+[sso-session mk-personal]
 sso_start_url = https://d-906785cef1.awsapps.com/start#
+sso_region = us-east-1
+sso_registration_scopes = sso:account:access
+
+[sso-session nx-org]
+sso_start_url = https://d-9067d7434a.awsapps.com/start/#
 sso_region = us-east-1
 sso_registration_scopes = sso:account:access

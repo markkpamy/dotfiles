@@ -21,9 +21,44 @@ function Set-AWSProfile {
 
             Write-Host "✅ AWS profile set to: $ProfileName" -ForegroundColor Green
 
+            # Check if profile uses SSO
+            $ssoSession = aws configure get sso_session --profile $ProfileName 2>$null
+
             # Test the profile with error handling
             $identity = aws sts get-caller-identity --output json 2>&1
-            if ($LASTEXITCODE -eq 0) {
+            $exitCode = $LASTEXITCODE
+
+            # If failed and profile uses SSO, attempt automatic login
+            if ($exitCode -ne 0 -and $ssoSession) {
+                $identityStr = $identity | Out-String
+                if ($identityStr -match "(?i)sso.*(token|session|expired)") {
+                    Write-Host "🔐 SSO session '$ssoSession' requires authentication" -ForegroundColor Yellow
+                    Write-Host "🌐 Opening browser for SSO login..." -ForegroundColor Cyan
+
+                    $null = aws sso login --sso-session $ssoSession
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-Host "✅ Successfully logged in to SSO session: $ssoSession" -ForegroundColor Green
+                        Write-Host ""
+
+                        # Retry identity check
+                        $identity = aws sts get-caller-identity --output json 2>&1
+                        if ($LASTEXITCODE -eq 0) {
+                            $identityObj = $identity | ConvertFrom-Json
+                            Write-Host "📋 Account: $($identityObj.Account)" -ForegroundColor Cyan
+                            Write-Host "👤 User: $($identityObj.Arn -replace '.*/', '')" -ForegroundColor Cyan
+                        } else {
+                            Write-Host "⚠️  Authentication succeeded but identity check failed" -ForegroundColor Yellow
+                            Write-Host "💡 Error: $identity" -ForegroundColor Yellow
+                        }
+                    } else {
+                        Write-Host "❌ SSO login failed" -ForegroundColor Red
+                        return
+                    }
+                } else {
+                    Write-Host "⚠️  Profile set but authentication may be required" -ForegroundColor Yellow
+                    Write-Host "💡 Error: $identity" -ForegroundColor Yellow
+                }
+            } elseif ($exitCode -eq 0) {
                 $identityObj = $identity | ConvertFrom-Json
                 Write-Host "📋 Account: $($identityObj.Account)" -ForegroundColor Cyan
                 Write-Host "👤 User: $($identityObj.Arn -replace '.*/', '')" -ForegroundColor Cyan

@@ -1,6 +1,6 @@
 # AWS Helper Functions for Fish Shell
 
-# Quick AWS profile switch
+# Quick AWS profile switch with automatic SSO login
 function aws-profile
     if test (count $argv) -eq 0
         echo "Current AWS profile: "(set -q AWS_PROFILE; and echo $AWS_PROFILE; or echo "default")
@@ -9,7 +9,39 @@ function aws-profile
     else
         set -gx AWS_PROFILE $argv[1]
         echo "✅ AWS profile set to: $argv[1]"
-        aws sts get-caller-identity
+
+        # Check if profile uses SSO
+        set sso_session (aws configure get sso_session --profile "$argv[1]" 2>/dev/null)
+
+        # Try to get caller identity
+        set identity_output (aws sts get-caller-identity 2>&1)
+        set exit_code $status
+
+        # If failed and profile uses SSO, attempt automatic login
+        if test $exit_code -ne 0 -a -n "$sso_session"
+            if echo "$identity_output" | grep -qi "sso.*token\|sso.*session\|sso.*expired"
+                echo "🔐 SSO session '$sso_session' requires authentication"
+                echo "🌐 Opening browser for SSO login..."
+
+                if aws sso login --sso-session "$sso_session"
+                    echo "✅ Successfully logged in to SSO session: $sso_session"
+                    echo ""
+                    # Retry identity check
+                    aws sts get-caller-identity
+                else
+                    echo "❌ SSO login failed"
+                    return 1
+                end
+            else
+                echo "$identity_output"
+                return $exit_code
+            end
+        else if test $exit_code -eq 0
+            echo "$identity_output"
+        else
+            echo "$identity_output"
+            return $exit_code
+        end
     end
 end
 

@@ -1,6 +1,6 @@
 # AWS Helper Functions for Bash Shell (using existing BWS functions)
 
-# Quick AWS profile switch
+# Quick AWS profile switch with automatic SSO login
 aws-profile() {
     if [ -z "$1" ]; then
         echo "Current AWS profile: ${AWS_PROFILE:-default}"
@@ -9,7 +9,41 @@ aws-profile() {
     else
         export AWS_PROFILE="$1"
         echo "✅ AWS profile set to: $1"
-        aws sts get-caller-identity
+
+        # Check if profile uses SSO
+        local sso_session
+        sso_session=$(aws configure get sso_session --profile "$1" 2>/dev/null)
+
+        # Try to get caller identity
+        local identity_output
+        identity_output=$(aws sts get-caller-identity 2>&1)
+        local exit_code=$?
+
+        # If failed and profile uses SSO, attempt automatic login
+        if [ $exit_code -ne 0 ] && [ -n "$sso_session" ]; then
+            if echo "$identity_output" | grep -qi "sso.*token\|sso.*session\|sso.*expired"; then
+                echo "🔐 SSO session '$sso_session' requires authentication"
+                echo "🌐 Opening browser for SSO login..."
+
+                if aws sso login --sso-session "$sso_session"; then
+                    echo "✅ Successfully logged in to SSO session: $sso_session"
+                    echo ""
+                    # Retry identity check
+                    aws sts get-caller-identity
+                else
+                    echo "❌ SSO login failed"
+                    return 1
+                fi
+            else
+                echo "$identity_output"
+                return $exit_code
+            fi
+        elif [ $exit_code -eq 0 ]; then
+            echo "$identity_output"
+        else
+            echo "$identity_output"
+            return $exit_code
+        fi
     fi
 }
 

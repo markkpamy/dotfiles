@@ -137,7 +137,7 @@ pkgs:
     winget:
       # Languages and Development (WinGet-only)
       - 'astral-sh.uv' # Not available in Chocolatey
-      - 'jdx.mise' # Not available in Chocolatey
+      #- 'jdx.mise' # Not available in Chocolatey
       # Shells and Terminal (WinGet-only)
       - 'Eugeny.Tabby' # Not available in Chocolatey
       - 'Microsoft.PowerShell.Preview' # Not available in Chocolatey

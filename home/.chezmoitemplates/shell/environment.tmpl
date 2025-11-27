@@ -3,8 +3,10 @@
 {{ if and (eq .chezmoi.os "linux") .isDesktop -}}
 export SSH_AUTH_SOCK=/home/$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock
 {{ end }}
-# Add user binaries to path
+# Add user binaries to PATH
+export PATH="$PATH:/home/linuxbrew/.linuxbrew/bin/ruby"
 export PATH="$PATH:$HOME/.local/bin"
+
 
 # Kubernetes configuration
 export KUBECONFIG="$HOME/.kube/config:$HOME/.kube/talosconfig"

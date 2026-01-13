@@ -86,6 +86,8 @@ pkgs:
       - 'pandoc' # Pandoc multi format converter
       - 'termscp' # Terminal file transfer client
       - 'harlequin' # Database client for SQLite, Postgres, MySQL, and more
+      - 'rainfrog'
+      - 'posting'
     #      - 'sttr' # String manipulation tool
     #      - 'presenterm' # Terminal presentation tool
     #      - 'slides' # Terminal presentation tool

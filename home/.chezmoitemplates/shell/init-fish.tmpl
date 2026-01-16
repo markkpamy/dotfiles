@@ -71,5 +71,11 @@ if test -d "$HOME/.cargo/bin"
     fish_add_path "$HOME/.cargo/bin"
 end
 
+if test -x /home/linuxbrew/.linuxbrew/bin/mise
+    /home/linuxbrew/.linuxbrew/bin/mise activate fish | source
+else if command -v mise
+    mise activate fish | source
+end
+
 # Fish-specific settings
 export ENHANCD_ENABLE_DOUBLE_DOT=false

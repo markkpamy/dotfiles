@@ -1,0 +1,166 @@
+wtf:
+  colors:
+    border:
+      focusable: '#bd93f9'
+      focused: '#50fa7b'
+      normal: '#6272a4'
+    text: '#f8f8f2'
+    title: '#bd93f9'
+  grid:
+    columns: [32, 32, 32]
+    rows: [10, 12, 16]
+  refreshInterval: 1
+  mods:
+    digitalclock:
+      color: '#bd93f9'
+      enabled: true
+      font: digitalfont
+      hourFormat: '24'
+      position:
+        top: 0
+        left: 0
+        height: 1
+        width: 1
+      refreshInterval: 1
+      title: '🕐 Clock'
+      type: 'digitalclock'
+
+    prettyweather:
+      enabled: true
+      city: 'Paris'
+      position:
+        top: 0
+        left: 1
+        height: 1
+        width: 1
+      refreshInterval: 900
+      title: '☁ Weather'
+      type: 'prettyweather'
+      unit: 'm'
+      view: 0
+      language: 'en'
+
+    feedreader:
+      enabled: true
+      position:
+        top: 0
+        left: 2
+        height: 1
+        width: 1
+      refreshInterval: 900
+      title: '📰 Feeds'
+      type: 'feedreader'
+      feedLimit: 10
+      feeds:
+        - https://blog.kubernetes.io/feed.xml
+        - https://www.cncf.io/blog/feed/
+        - https://engineering.hashicorp.com/feed
+        - https://github.blog/engineering.atom
+        - https://selfh.st/rss/
+        - https://noted.lol/rss/
+        - https://www.reddit.com/r/selfhosted/.rss
+
+    resourceusage:
+      enabled: true
+      position:
+        top: 1
+        left: 0
+        height: 1
+        width: 1
+      refreshInterval: 5
+      title: '📊 Resources'
+      type: 'resourceusage'
+      cpuCombined: false
+      showSwap: true
+
+    ipaddress:
+      enabled: true
+      position:
+        top: 1
+        left: 1
+        height: 1
+        width: 1
+      refreshInterval: 300
+      title: '🌐 IP Address'
+      type: 'ipaddress'
+      colors:
+        name: '#8be9fd'
+        value: '#f8f8f2'
+
+    subreddit:
+      enabled: true
+      position:
+        top: 1
+        left: 2
+        height: 1
+        width: 1
+      refreshInterval: 900
+      subreddit: 'selfhosted'
+      numberOfPosts: 10
+      sortOrder: 'hot'
+      showScore: true
+      title: '📡 r/selfhosted'
+      type: 'subreddit'
+
+    jira:
+      enabled: true
+      position:
+        top: 2
+        left: 0
+        height: 1
+        width: 1
+      refreshInterval: 900
+      title: '🎫 Jira'
+      type: 'jira'
+      colors:
+        rows:
+          even: '#8be9fd'
+          odd: '#f8f8f2'
+      domain: '${WTF_JIRA_DOMAIN}'
+      email: '${WTF_JIRA_EMAIL}'
+      jql: 'assignee = currentUser() AND resolution = Unresolved ORDER BY priority DESC'
+      project: '${WTF_JIRA_PROJECT}'
+      username: '${WTF_JIRA_USERNAME}'
+      verifyServerCertificate: true
+
+    quick_cmds:
+      enabled: true
+      position:
+        top: 2
+        left: 1
+        height: 1
+        width: 2
+      refreshInterval: 3600
+      title: '⚡ Quick Commands & Aliases'
+      type: 'cmdrunner'
+      cmd: 'echo'
+      args:
+        - |
+          ━━━ Productivity ━━━━━━━━━━━━━━━━━━━━━━━━
+           lzg     → lazygit
+           lzd     → lazydocker
+           zj      → zellij
+           z       → zoxide
+           cr      → clear
+           myip    → curl ifconfig.me
+
+          ━━━ Better Defaults ━━━━━━━━━━━━━━━━━━━━━
+           cat     → bat
+           ls      → lsd
+           du      → dust
+           df      → duf
+
+          ━━━ Docker ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           dcu     → docker compose up -d
+           dcub    → docker compose up -d --build
+           dcd     → docker compose down
+           dcr     → docker compose restart
+           dcl     → docker compose logs
+           dps     → docker ps
+           dsa     → stop all containers
+           dsp     → docker system prune
+           dex     → docker exec -it
+
+          ━━━ Run Directly (no alias) ━━━━━━━━━━━━━
+           k9s · btop · fzf · tldr · navi
+           topgrade · television · nnn

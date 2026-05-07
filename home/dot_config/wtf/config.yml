@@ -94,7 +94,6 @@ wtf:
         height: 1
         width: 1
       refreshInterval: 300
-      type: 'ipaddress'
       colors:
         name: '#8be9fd'
         value: '#f8f8f2'

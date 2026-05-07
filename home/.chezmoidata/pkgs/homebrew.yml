@@ -3,7 +3,7 @@ pkgs:
     cli_essentials:
       - 'fish' # Fish shell
       - 'fisher' # Fish shell plugin manager
-      - 'oh-my-posh' # Oh My Posh Shell prompt
+      #      - 'oh-my-posh' # Oh My Posh Shell prompt
       - 'neovim' # Text editor
       #      - 'ranger' # Directory browser
       - 'tmux' # Term multiplexer

@@ -136,31 +136,18 @@ wtf:
       cmd: 'echo'
       args:
         - |
-          ━━━ Productivity ━━━━━━━━━━━━━━━━━━━━━━━━
-           lzg     → lazygit
-           lzd     → lazydocker
-           zj      → zellij
-           z       → zoxide
-           cr      → clear
-           myip    → curl ifconfig.me
-
-          ━━━ Better Defaults ━━━━━━━━━━━━━━━━━━━━━
-           cat     → bat
-           ls      → lsd
-           du      → dust
-           df      → duf
-
-          ━━━ Docker ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           dcu     → docker compose up -d
-           dcub    → docker compose up -d --build
-           dcd     → docker compose down
-           dcr     → docker compose restart
-           dcl     → docker compose logs
-           dps     → docker ps
-           dsa     → stop all containers
-           dsp     → docker system prune
-           dex     → docker exec -it
-
-          ━━━ Run Directly (no alias) ━━━━━━━━━━━━━
-           k9s · btop · fzf · tldr · navi
-           topgrade · television · nnn
+          Productivity                     Docker
+          ─────────────────────────────    ─────────────────────────────────────
+          lzg   → lazygit                  dcu   → docker compose up -d
+          lzd   → lazydocker               dcd   → docker compose down
+          zj    → zellij                   dcr   → docker compose restart
+          z     → zoxide                   dcl   → docker compose logs
+          cr    → clear                    dps   → docker ps
+          myip  → curl ifconfig.me         dsa   → stop all containers
+                                           dsp   → docker system prune
+          Better Defaults                  dex   → docker exec -it
+          ─────────────────────────────
+          cat   → bat                      Run Directly
+          ls    → lsd                      ─────────────────────────────────────
+          du    → dust                     k9s · lfk · btop · fzf · tldr · navi
+          df    → duf                      topgrade · television

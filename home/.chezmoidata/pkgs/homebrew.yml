@@ -88,10 +88,11 @@ pkgs:
       - 'harlequin' # Database client for SQLite, Postgres, MySQL, and more
       - 'rainfrog'
       - 'posting'
-    #      - 'sttr' # String manipulation tool
-    #      - 'presenterm' # Terminal presentation tool
-    #      - 'slides' # Terminal presentation tool
-    #      - 'wtfutil' # Terminal dashboard
+      #      - 'sttr' # String manipulation tool
+      #      - 'presenterm' # Terminal presentation tool
+      #      - 'slides' # Terminal presentation tool
+      - 'wtfutil' # Terminal dashboard
+      - 'try-rs' # A lightning-fast TUI to manage temporary projects. Create, explore, and clone repositories instantly without cluttering your system
 
     development:
       #      - 'httpie' # HTTP / API testing client
@@ -167,6 +168,7 @@ pkgs:
       #      - 'rustscan' # Port scan tool
       - 'mise'
       - 'x-cmd' # X command line tool
+      - 'janosmiko/tap/lfk' # LFK is a CLI tool for managing Kubernetes resources and contexts, with a focus on simplicity and ease of use.
 
     dev_utils:
       - 'gh' # GitHub CLI

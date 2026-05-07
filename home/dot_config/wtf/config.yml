@@ -90,7 +90,7 @@ wtf:
       enabled: true
       position:
         top: 1
-        left: 2
+        left: 1
         height: 1
         width: 1
       refreshInterval: 300
@@ -98,6 +98,7 @@ wtf:
         name: '#8be9fd'
         value: '#f8f8f2'
       title: '🌐 IP Address'
+      type: 'ipapi'
 
     subreddit:
       enabled: true

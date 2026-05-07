@@ -73,19 +73,32 @@ wtf:
       cpuCombined: false
       showSwap: true
 
-    ipaddress:
+    ipapi:
+      # Optional
+      args:
+        - 'ip'
+        - 'isp'
+        - 'as'
+        - 'city'
+        - 'regionName'
+        - 'country'
+        - 'continent'
+        - 'coordinates'
+        - 'organization'
+        - 'timezone'
+        - 'reverseDNS'
       enabled: true
       position:
         top: 1
-        left: 1
+        left: 2
         height: 1
         width: 1
       refreshInterval: 300
-      title: '🌐 IP Address'
       type: 'ipaddress'
       colors:
         name: '#8be9fd'
         value: '#f8f8f2'
+      title: '🌐 IP Address'
 
     subreddit:
       enabled: true

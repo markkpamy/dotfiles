@@ -7,7 +7,7 @@ wtf:
     text: '#f8f8f2'
     title: '#bd93f9'
   grid:
-    columns: [45, 45, 45]
+    columns: [50, 50, 50]
     rows: [13, 13, 24]
   refreshInterval: 1
   mods:

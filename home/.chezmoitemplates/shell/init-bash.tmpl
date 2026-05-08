@@ -74,3 +74,8 @@ fi
 if [ -d "$HOME/.cargo/bin" ]; then
     export PATH="$HOME/.cargo/bin:$PATH"
 fi
+
+# Auto-attach to zellij session
+if [[ -z "$ZELLIJ" ]] && command -v zellij &>/dev/null && [[ $- == *i* ]]; then
+    zellij attach --create main
+fi

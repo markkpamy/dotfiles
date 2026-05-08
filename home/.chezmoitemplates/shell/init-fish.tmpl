@@ -1,5 +1,5 @@
 # Fish initialization
-fish_config theme choose "Catppuccin Mocha"
+fish_config theme choose "catppuccin-mocha"
 if status is-interactive
 # Initialize tools
     if command -v atuin &>/dev/null
@@ -79,3 +79,10 @@ end
 
 # Fish-specific settings
 export ENHANCD_ENABLE_DOUBLE_DOT=false
+
+# Auto-attach to zellij session
+if status is-interactive; and not set -q ZELLIJ
+    if command -v zellij &>/dev/null
+        zellij attach --create main
+    end
+end

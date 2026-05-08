@@ -80,6 +80,7 @@ pkgs:
       - 'glances' # Resource monitor + web and API
       - 'goaccess' # Web log analyzer and viewer
       - 'gping' # Interactive ping tool, with graph
+      - 'matthart1983/tap/netwatch' # Network traffic monitor
 
     productivity:
       - 'khal' # Calendar client

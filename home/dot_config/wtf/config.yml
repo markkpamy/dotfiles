@@ -144,23 +144,20 @@ wtf:
         height: 1
         width: 2
       refreshInterval: 3600
-      title: '⚡ Quick Commands & Aliases'
+      title: '⚡ Useful Commands'
       type: 'cmdrunner'
       cmd: 'echo'
       args:
         - |
-          Productivity                     Docker
-          ─────────────────────────────    ─────────────────────────────────────
-          lzg   → lazygit                  dcu   → docker compose up -d
-          lzd   → lazydocker               dcd   → docker compose down
-          zj    → zellij                   dcr   → docker compose restart
-          z     → zoxide                   dcl   → docker compose logs
-          cr    → clear                    dps   → docker ps
-          myip  → curl ifconfig.me         dsa   → stop all containers
-                                           dsp   → docker system prune
-          Better Defaults                  dex   → docker exec -it
-          ─────────────────────────────
-          cat   → bat                      Run Directly
-          ls    → lsd                      ─────────────────────────────────────
-          du    → dust                     k9s · lfk · btop · fzf · tldr · navi
-          df    → duf                      topgrade · television
+          lzg    →  lazygit                          mise
+          lzd    →  lazydocker                       btop
+          zj     →  zellij                           fzf
+          z      →  zoxide                           tldr
+          cr     →  clear                            navi
+          myip   →  curl ifconfig.me                 k9s
+          cat    →  bat                              lfk
+          ls     →  lsd                              topgrade
+          du     →  dust
+          df     →  duf
+          nw     →  netwatch
+          tv     →  television

@@ -150,6 +150,7 @@ pkgs:
       #- 'AgileBits.1Password.CLI'
       - 'FilesCommunity.Files' # Not available in Chocolatey
       # CLI Tools (WinGet-only)
+      - 'Atuinsh.Atuin' # Better shell history
       #- 'alexpasmantier.television' # Not available in Chocolatey
       #- 'RamenSoftware.Windhawk' # Not available in Chocolatey
       #- 'AutoHotkey.AutoHotkey'

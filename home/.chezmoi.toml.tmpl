@@ -2,7 +2,7 @@
 {{- writeToStdout "==== SETTING CHEZMOI CONFIG ====\n" -}}
 {{ $gpgId := "80F43975A84EAC1F" }}
 {{/*TODO*/}}
-{{ $agePubKey := "age14xt22jc4d8p4t5sc7k0fnsy7fuxcgy464rrgkfzt2z2mmmzy835qpkckhd" }}
+{{ $agePubKey := "age1q2qz090pzgfaf3flm2v058apewrv3dudq7hsuhxq5rencnvda3dsswpe5f" }}
 {{ $sshId := "" }}
 {{ if stat (joinPath .chezmoi.homeDir ".ssh/id_ed25519.pub") }}
   {{ $sshId = include (joinPath .chezmoi.homeDir ".ssh/id_ed25519.pub") | trim }}

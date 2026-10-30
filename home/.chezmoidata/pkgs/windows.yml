@@ -141,6 +141,8 @@ pkgs:
       # Shells and Terminal (WinGet-only)
       - 'Eugeny.Tabby' # Not available in Chocolatey
       - 'Microsoft.PowerShell.Preview' # Not available in Chocolatey
+      - 'marlocarlo.psmux' # tmux for Windows
+      - 'Zellij.Zellij' # Not available in Chocolatey
       #- 'Starship.Starship'
       #- 'Nushell.Nushell'
       # Essentials (WinGet-only)

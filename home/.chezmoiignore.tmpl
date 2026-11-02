@@ -149,3 +149,8 @@
     .config/sway/
     {{- end }}
 {{- end }}
+
+##########################################
+# Machine-local state: never manage (an apply would wipe saved host keys)
+.ssh/known_hosts
+.ssh/known_hosts.old

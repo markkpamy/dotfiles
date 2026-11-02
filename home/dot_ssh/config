@@ -3,6 +3,26 @@ Host PROD-US
   User unknown224
   ForwardAgent yes
 
+Host NAS
+  HostName 192.168.1.29
+  User unknown224
+  ForwardAgent yes
+
+Host NAS-TS
+  HostName ugreen-nas-mkp
+  User unknown224
+  ForwardAgent yes
+
+Host NX-VM-MKP2
+  HostName nx-vm-mkp2
+  User testauto
+  ForwardAgent yes
+
+Host PVE
+  HostName 192.168.1.131
+  User root
+  ForwardAgent yes
+
 Host forgejo
   HostName 192.168.1.180
   Port 222

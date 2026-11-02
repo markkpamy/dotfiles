@@ -1,0 +1,32 @@
+# Throwaway Windows 11 VM for testing a fresh dotfiles install.
+# Runs on a Linux Docker host with KVM (here: a Proxmox VM with nested virtualisation).
+# Usage: see README.md in this folder. Settings come from .env (copy .env.example).
+services:
+  windows:
+    image: dockurr/windows
+    container_name: dotfiles-windows-test
+    environment:
+      VERSION: '${WIN_VERSION:-11}'
+      RAM_SIZE: '${RAM_SIZE:-8G}'
+      CPU_CORES: '${CPU_CORES:-4}'
+      DISK_SIZE: '${DISK_SIZE:-96G}'
+      USERNAME: '${WIN_USERNAME:-Docker}'
+      PASSWORD: '${WIN_PASSWORD:-admin}'
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - '${BIND_ADDR:-0.0.0.0}:8006:8006' # web viewer (no auth)
+      - '${BIND_ADDR:-0.0.0.0}:3389:3389/tcp' # RDP
+      - '${BIND_ADDR:-0.0.0.0}:3389:3389/udp'
+    volumes:
+      # VM disk. Keep it OUTSIDE the repo, or it shows up on Z:.
+      - '${STORAGE_DIR:?set STORAGE_DIR in .env}:/storage'
+      # Copied to C:\OEM; install.bat runs at the end of Windows setup.
+      - ./oem:/oem
+      # The dotfiles checkout, visible in Windows as Z:. Logs go to Z:\.test-logs.
+      - '${REPO_DIR:-../..}:/shared'
+    restart: 'no'
+    stop_grace_period: 2m

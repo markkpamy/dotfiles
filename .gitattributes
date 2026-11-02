@@ -42,3 +42,7 @@ home/dot_config/obs/** linguist-generated
 home/AppData/Local/Microsoft/PowerToys/** linguist-generated
 home/dot_config/browser-data/vimium/** linguist-generated
 home/TrafficMonitor/** linguist-generated
+
+# cmd.exe scripts for the Windows install test
+test/windows/oem/*.bat text eol=crlf
+test/windows/oem/*.cmd text eol=crlf

@@ -2,3 +2,7 @@
 /.cache_ggshield
 /.idea/
 /.claude/
+
+# Windows install test (test/windows)
+/test/windows/.env
+/.test-logs/

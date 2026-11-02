@@ -1,4 +1,4 @@
-Host PROD-US
+Host PROD-US prod-vm-us
   HostName 192.168.1.148
   User unknown224
   ForwardAgent yes
@@ -18,12 +18,248 @@ Host NX-VM-MKP2
   User testauto
   ForwardAgent yes
 
-Host PVE
+Host PVE pve
   HostName 192.168.1.131
   User root
   ForwardAgent yes
 
+# Forgejo git SSH, on the UGREEN NAS since 2026-10-28
 Host forgejo
-  HostName 192.168.1.180
+  HostName 192.168.1.29
   Port 222
   User git
+
+# --- Proxmox guests (node pve), generated 2026-11-02 ---
+# unknown224 is used; test-lxc has no such account, so it stays root.
+# talos-plane-1 (VM 102) is not listed: Talos has no SSH.
+Host docker-apps-cifs
+  HostName 192.168.1.180
+  User unknown224
+
+Host radarr-anime
+  HostName 192.168.1.76
+  User unknown224
+
+Host homelable
+  HostName 192.168.1.79
+  User unknown224
+
+Host stirling-pdf
+  HostName 192.168.1.106
+  User unknown224
+
+Host sonarr-anime
+  HostName 192.168.1.177
+  User unknown224
+
+Host pihole
+  HostName 192.168.1.184
+  User unknown224
+
+Host suggestarr
+  HostName 192.168.1.24
+  User unknown224
+
+Host metube
+  HostName 192.168.1.21
+  User unknown224
+
+Host plex-us-24
+  HostName 192.168.1.13
+  User unknown224
+
+Host sonarr
+  HostName 192.168.1.120
+  User unknown224
+
+Host prowlarr
+  HostName 192.168.1.129
+  User unknown224
+
+Host radarr
+  HostName 192.168.1.97
+  User unknown224
+
+Host pve-scripts-local
+  HostName 192.168.1.103
+  User unknown224
+
+Host remmina-kasm
+  HostName 192.168.1.195
+  User unknown224
+
+Host garage
+  HostName 192.168.1.12
+  User unknown224
+
+Host readeck
+  HostName 192.168.1.144
+  User unknown224
+
+Host sftpgo
+  HostName 192.168.1.128
+  User unknown224
+
+Host joplin-server
+  HostName 192.168.1.20
+  User unknown224
+
+Host tube-archivist
+  HostName 192.168.1.188
+  User unknown224
+
+Host termix
+  HostName 192.168.1.102
+  User unknown224
+
+Host cloudflare-tunnel
+  HostName 192.168.1.105
+  User unknown224
+
+Host jackett
+  HostName 192.168.1.22
+  User unknown224
+
+Host archivebox
+  HostName 192.168.1.100
+  User unknown224
+
+Host whois
+  HostName 192.168.1.98
+  User unknown224
+
+Host jellyfin
+  HostName 192.168.1.62
+  User unknown224
+
+Host n8n
+  HostName 192.168.1.46
+  User unknown224
+
+Host nexterm
+  HostName 192.168.1.107
+  User unknown224
+
+Host freshrss
+  HostName 192.168.1.19
+  User unknown224
+
+Host flaresolverr-byparr
+  HostName 192.168.1.47
+  User unknown224
+
+Host dispatcharr
+  HostName 192.168.1.136
+  User unknown224
+
+Host test-lxc
+  HostName 192.168.1.58
+  User root
+
+Host swarm-node-1
+  HostName 192.168.1.200
+  User unknown224
+
+Host certwarden
+  HostName 192.168.1.111
+  User unknown224
+
+Host step-ca
+  HostName 192.168.1.78
+  User unknown224
+
+Host upsnap
+  HostName 192.168.1.196
+  User unknown224
+
+Host semaphore
+  HostName 192.168.1.137
+  User unknown224
+
+Host unbound
+  HostName 192.168.1.95
+  User unknown224
+
+Host pulse
+  HostName 192.168.1.50
+  User unknown224
+
+Host networking-tools
+  HostName 192.168.1.151
+  User unknown224
+
+Host linkwarden
+  HostName 192.168.1.183
+  User unknown224
+
+Host tautulli
+  HostName 192.168.1.52
+  User unknown224
+
+Host uptimekuma
+  HostName 192.168.1.187
+  User unknown224
+
+Host speedtest-tracker
+  HostName 192.168.1.185
+  User unknown224
+
+Host dozzle
+  HostName 192.168.1.109
+  User unknown224
+
+Host traefik
+  HostName 192.168.1.14
+  User unknown224
+
+Host playnite
+  HostName 192.168.1.146
+  User unknown224
+
+Host garage-web-ui
+  HostName 192.168.1.101
+  User unknown224
+
+Host ignis-obsidian
+  HostName 192.168.1.23
+  User unknown224
+
+Host cronmaster
+  HostName 192.168.1.11
+  User unknown224
+
+Host dagu
+  HostName 192.168.1.44
+  User unknown224
+
+Host arcane
+  HostName 192.168.1.175
+  User unknown224
+
+Host nx-tempo-prod
+  HostName 192.168.1.104
+  User unknown224
+
+Host gatus
+  HostName 192.168.1.64
+  User unknown224
+
+Host seerr
+  HostName 192.168.1.139
+  User unknown224
+
+Host profilarr
+  HostName 192.168.1.113
+  User unknown224
+
+Host certwarden-nx
+  HostName 192.168.1.125
+  User unknown224
+
+Host dashy
+  HostName 192.168.1.25
+  User unknown224
+
+Host tracearr
+  HostName 192.168.1.165
+  User unknown224

@@ -8,7 +8,7 @@ services:
     container_name: dotfiles-windows-test
     environment:
       VERSION: '${WIN_VERSION:-11}'
-      RAM_SIZE: '${RAM_SIZE:-8G}'
+      RAM_SIZE: '${RAM_SIZE:-6G}'
       CPU_CORES: '${CPU_CORES:-4}'
       DISK_SIZE: '${DISK_SIZE:-96G}'
       USERNAME: '${WIN_USERNAME:-Docker}'

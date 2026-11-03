@@ -2,8 +2,8 @@
 [wsl2]
 
 # Upper limit for the WSL VM (Docker Desktop runs inside it). Sized so the
-# dockur/windows test VM (test/windows, 8 GB) fits with room to spare.
-memory=16GB
+# dockur/windows test VM (test/windows, 6 GB) fits with room to spare.
+memory=12GB
 
 # Swap storage for the WSL VM
 swap=8GB

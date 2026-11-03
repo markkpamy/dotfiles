@@ -197,7 +197,7 @@ Host tautulli
   User unknown224
 
 Host uptimekuma
-  HostName 192.168.1.187
+  HostName 192.168.1.241
   User unknown224
 
 Host speedtest-tracker
@@ -241,7 +241,7 @@ Host nx-tempo-prod
   User unknown224
 
 Host gatus
-  HostName 192.168.1.64
+  HostName 192.168.1.240
   User unknown224
 
 Host seerr

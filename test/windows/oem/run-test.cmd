@@ -11,7 +11,16 @@ if exist "C:\dotfiles-src.zip" (
 )
 
 rem Prefer the live copy of run-test.ps1 so edits don't need a new base image.
-set "SCRIPT=C:\OEM\run-test.ps1"
+set "SCRIPT="
+if exist "C:\OEM\run-test.ps1" set "SCRIPT=C:\OEM\run-test.ps1"
 if exist "C:\dotfiles-src\test\windows\oem\run-test.ps1" set "SCRIPT=C:\dotfiles-src\test\windows\oem\run-test.ps1"
 if exist "Z:\test\windows\oem\run-test.ps1" set "SCRIPT=Z:\test\windows\oem\run-test.ps1"
+if not defined SCRIPT (
+    echo No copy of the dotfiles repo found in this VM.
+    echo   Hyper-V: on the host, run  .\vm.ps1 push  ^(or  .\vm.ps1 restore^), then start this again.
+    echo   dockur:  the repo should be on Z:. Check the /shared mount in compose.yml.
+    pause
+    exit /b 1
+)
+echo Running %SCRIPT%
 powershell.exe -NoProfile -ExecutionPolicy Bypass -NoExit -File "%SCRIPT%" %*

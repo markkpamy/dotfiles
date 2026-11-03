@@ -1,5 +1,4 @@
 #Requires -Version 5.1
-#Requires -RunAsAdministrator
 <#
 .SYNOPSIS
     Hyper-V version of the Windows fresh-install test: a Windows 11 VM with a clean checkpoint.
@@ -36,8 +35,8 @@ param(
     [int]$ProcessorCount = 4,
     [int64]$DiskBytes = 96GB,
     [string]$SwitchName = 'Default Switch',
-    # Must be a language contained in the ISO.
-    [string]$UILanguage = 'en-US',
+    # Windows display language; must be one the ISO contains. Default: read from the ISO.
+    [string]$UILanguage,
     # Defaults to this machine's keyboard layout and regional format.
     [string]$InputLocale = ((Get-WinUserLanguageList)[0].InputMethodTips | Select-Object -First 1),
     [string]$Locale = (Get-Culture).Name,
@@ -45,18 +44,38 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+
+# Hyper-V needs admin rights or membership of "Hyper-V Administrators" (S-1-5-32-578, name is localized).
+$me = [Security.Principal.WindowsIdentity]::GetCurrent()
+$isAdmin = ([Security.Principal.WindowsPrincipal]$me).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $isAdmin -and -not ($me.Groups | Where-Object Value -eq 'S-1-5-32-578')) {
+    throw 'Run from an elevated PowerShell, or join Hyper-V Administrators: Add-LocalGroupMember -SID S-1-5-32-578 -Member $env:USERNAME (then sign out and in).'
+}
+
+$repoRoot =(Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $vmDir = Join-Path $VMPath $Name
 $checkpoint = 'clean'
 $guestZip = 'C:\dotfiles-src.zip'
 
 function Get-TestVM { Get-VM -Name $Name -ErrorAction SilentlyContinue }
 
+# Integration service names are localized (e.g. French Windows), so find them by their fixed IDs.
+$serviceIds = @{
+    GuestServices = '6C09BB55-D683-4DA0-8931-C9BF705F6480'
+    Heartbeat     = '84EAAE65-2F2E-45F5-9BB5-0E857DC8EB47'
+}
+function Get-IntegrationService([string]$Service) {
+    $id = $serviceIds[$Service]
+    $svc = Get-VMIntegrationService -VMName $Name | Where-Object { $_.Id -like "*$id" }
+    if (-not $svc) { throw "Integration service $Service ($id) not found on VM $Name." }
+    $svc
+}
+
 function Wait-Heartbeat([int]$TimeoutSec = 600) {
     $deadline = (Get-Date).AddSeconds($TimeoutSec)
     while ((Get-Date) -lt $deadline) {
-        $hb = Get-VMIntegrationService -VMName $Name -Name Heartbeat
-        if ($hb.PrimaryStatusDescription -eq 'OK') { return }
+        # PrimaryStatusDescription is localized too; PrimaryOperationalStatus is an enum.
+        if ((Get-IntegrationService Heartbeat).PrimaryOperationalStatus -eq 'Ok') { return }
         Start-Sleep -Seconds 3
     }
     throw "VM $Name did not report a heartbeat within $TimeoutSec s."
@@ -106,6 +125,28 @@ public class ISOFile {
     [ISOFile]::Create($Path, $img.ImageStream, $img.BlockSize, $img.TotalBlocks)
 }
 
+# Read the default language from the ISO's install.wim/esd. Its XML metadata (UTF-16) sits at the end of the file.
+function Get-IsoLanguage([string]$Path) {
+    $img = Mount-DiskImage -ImagePath $Path -PassThru
+    try {
+        $drive = ($img | Get-Volume).DriveLetter
+        $wim = Get-ChildItem "$($drive):\sources\install.*" | Where-Object Extension -in '.wim', '.esd' | Select-Object -First 1
+        if (-not $wim) { return $null }
+        [int]$n = [Math]::Min([int64]4MB, $wim.Length)
+        $fs = [IO.File]::OpenRead($wim.FullName)
+        try {
+            [void]$fs.Seek(-[int64]$n, 'End')
+            $buf = New-Object byte[] $n
+            [void]$fs.Read($buf, 0, $n)
+        } finally { $fs.Close() }
+        foreach ($offset in 0, 1) {   # the XML may start on an odd byte
+            $text = [Text.Encoding]::Unicode.GetString($buf, $offset, $n - $offset)
+            if ($text -match '<DEFAULT>([^<]+)</DEFAULT>') { return $Matches[1] }
+        }
+        return $null
+    } finally { Dismount-DiskImage -ImagePath $Path | Out-Null }
+}
+
 function Push-Repo {
     $zip = Join-Path $env:TEMP "$Name-src.zip"
     if (Test-Path $zip) { Remove-Item $zip -Force }
@@ -117,6 +158,10 @@ function Push-Repo {
     Write-Host "Copying it into the VM as $guestZip"
     Copy-VMFile -Name $Name -SourcePath $zip -DestinationPath $guestZip -FileSource Host -CreateFullPath -Force
     Remove-Item $zip -Force
+    # Keep the desktop launcher current too (the one from install time may be outdated).
+    Copy-VMFile -Name $Name -SourcePath (Resolve-Path (Join-Path $PSScriptRoot '..\oem\run-test.cmd')).Path `
+        -DestinationPath 'C:\Users\Public\Desktop\Run dotfiles test.cmd' -FileSource Host -Force
+    Write-Host 'Repo and launcher copied into the VM.'
 }
 
 switch ($Action) {
@@ -124,6 +169,11 @@ switch ($Action) {
         if (Get-TestVM) { throw "VM $Name already exists. Use '.\vm.ps1 remove' first." }
         if (-not $IsoPath -or -not (Test-Path $IsoPath)) { throw 'Pass -IsoPath <Windows 11 ISO>.' }
         if (-not (Get-VMSwitch -Name $SwitchName -ErrorAction SilentlyContinue)) { throw "No Hyper-V switch named '$SwitchName'." }
+        if (-not $UILanguage) {
+            $UILanguage = Get-IsoLanguage $IsoPath
+            if (-not $UILanguage) { throw 'Could not read the language from the ISO: pass -UILanguage (e.g. en-US, fr-FR).' }
+        }
+        Write-Host "Windows language: $UILanguage | keyboard: $InputLocale | regional format: $Locale"
 
         $secure = Read-Host "Password for the VM's local account '$UserName'" -AsSecureString
         $plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure))
@@ -156,7 +206,7 @@ switch ($Action) {
             -CheckpointType Standard -AutomaticStopAction ShutDown
         Set-VMKeyProtector -VMName $Name -NewLocalKeyProtector   # Windows 11 needs a TPM
         Enable-VMTPM -VMName $Name
-        Enable-VMIntegrationService -VMName $Name -Name 'Guest Service Interface'   # for Copy-VMFile
+        Get-IntegrationService GuestServices | Enable-VMIntegrationService   # for Copy-VMFile
         $dvd = Add-VMDvdDrive -VMName $Name -Path $IsoPath -Passthru
         Add-VMDvdDrive -VMName $Name -Path $unattendIso
         Set-VMFirmware -VMName $Name -FirstBootDevice $dvd
@@ -196,7 +246,10 @@ switch ($Action) {
     }
 
     'logs' {
-        $cred = Get-Credential -UserName $UserName -Message "Password of the VM account '$UserName'"
+        # Optional DPAPI-encrypted credential (only this Windows user can read it); otherwise ask.
+        $credFile = Join-Path $HOME '.dotfiles-test-vm.cred.xml'
+        $cred = if (Test-Path $credFile) { Import-Clixml $credFile }
+                else { Get-Credential -UserName $UserName -Message "Password of the VM account '$UserName'" }
         $dest = Join-Path $repoRoot '.test-logs'
         New-Item -ItemType Directory -Force -Path $dest | Out-Null
         $session = New-PSSession -VMName $Name -Credential $cred   # PowerShell Direct: no network needed

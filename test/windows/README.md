@@ -9,11 +9,27 @@ Three ways to host the VM; all use the same test script, `oem/run-test.ps1`:
 
 ## Hyper-V (Windows host, without Docker)
 
-Windows runs natively under Hyper-V, so no nested virtualisation is needed. Scripts are in `hyperv/`
-and must run from an **elevated** PowerShell (or join the *Hyper-V Administrators* group).
+Windows runs natively under Hyper-V, so no nested virtualisation is needed. Scripts are in `hyperv/`.
+They need Hyper-V rights: run them from an elevated PowerShell, or join *Hyper-V Administrators*
+for the duration of a testing session (then sign out and in):
 
-1. Download a Windows 11 ISO from Microsoft. Its language must match `-UILanguage` (default `en-US`);
-   the keyboard layout and regional format default to this machine's.
+```powershell
+Add-LocalGroupMember -SID S-1-5-32-578 -Member $env:USERNAME   # from an elevated PowerShell; name is localized
+```
+
+> [!WARNING]
+> **Hyper-V Administrators is close to full admin, not just "control of VMs".** Members can, for
+> example, attach host disks to a VM and read or change them there; security guidance treats the
+> group as roughly equivalent to Administrators. For an account that is already an admin, the real
+> change is that **anything running as you** (scripts, AI agents) **can do this without a UAC
+> prompt**. Acceptable while testing, but **leave the group when you're done**, then sign out and in:
+>
+> ```powershell
+> Remove-LocalGroupMember -SID S-1-5-32-578 -Member $env:USERNAME   # from an elevated PowerShell
+> ```
+
+1. Download a Windows 11 ISO from Microsoft (any language: `create` reads it from the ISO;
+   override with `-UILanguage`). The keyboard layout and regional format default to this machine's.
 2. Create the VM. It asks for a password for the VM's local account (`tester`), then installs
    Windows 11 Pro unattended (~20 min) into `E:\Hyper-V\dotfiles-windows-test` (6 GB RAM, 4 CPUs, 96 GB disk):
 
@@ -28,7 +44,10 @@ and must run from an **elevated** PowerShell (or join the *Hyper-V Administrator
       (uncommitted changes included) and opens the console.
    2. In the VM, double-click **Run dotfiles test**, answer the chezmoi prompts, paste the BWS token.
       To paste in the console window: *Clipboard → Type clipboard text*.
-   3. `.\vm.ps1 logs` copies the VM's `C:\test-logs` into this repo's `.test-logs/` (asks for the VM password).
+   3. `.\vm.ps1 logs` copies the VM's `C:\test-logs` into this repo's `.test-logs/`. It asks for the
+      VM password, unless you saved it once, encrypted for your Windows account only (DPAPI):
+      `Get-Credential tester | Export-Clixml "$HOME\.dotfiles-test-vm.cred.xml"`.
+5. When you're done testing: remove yourself from *Hyper-V Administrators* (see the warning above).
 
 Other actions: `push` (copy the checkout into a running VM again), `status`, `remove`.
 The VM password is written in plain text to the VM's answer file (`unattend.iso` in the VM folder,

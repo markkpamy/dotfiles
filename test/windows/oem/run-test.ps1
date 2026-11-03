@@ -63,10 +63,36 @@ if (Test-Path $sourceDir) {
 # Make sure the token comes from the prompt, as on a real first install.
 Remove-Item Env:BWS_ACCESS_TOKEN -ErrorAction SilentlyContinue
 
+# Right after boot (or a host network change) the VM's DNS can fail for a while,
+# notably behind Hyper-V's Default Switch. Wait for it instead of failing the run.
+Write-Step 'Waiting for DNS'
+$deadline = (Get-Date).AddMinutes(3)
+foreach ($name in 'get.chezmoi.io', 'github.com') {
+    while ($true) {
+        try { Resolve-DnsName $name -Type A -DnsOnly -ErrorAction Stop | Out-Null; break }
+        catch {
+            if ((Get-Date) -gt $deadline) { throw "DNS still can't resolve $name after 3 minutes. Check the VM's network." }
+            Write-Host "  $name not resolvable yet, retrying..."
+            Start-Sleep -Seconds 5
+        }
+    }
+}
+
 Write-Step 'Installing chezmoi'
 if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) {
     New-Item -ItemType Directory -Force -Path $binDir | Out-Null
-    Invoke-Expression "&{$(Invoke-RestMethod 'https://get.chezmoi.io/ps1')} -b '$binDir'"
+    # The installer fetches the binary from GitHub: retry the whole thing on transient network errors.
+    for ($attempt = 1; ; $attempt++) {
+        try {
+            Invoke-Expression "&{$(Invoke-RestMethod 'https://get.chezmoi.io/ps1')} -b '$binDir'"
+            if (Test-Path (Join-Path $binDir 'chezmoi.exe')) { break }
+            throw 'chezmoi.exe was not installed.'
+        } catch {
+            if ($attempt -ge 4) { throw }
+            Write-Host "  Install attempt $attempt failed: $($_.Exception.Message). Retrying in $(5 * $attempt) s..."
+            Start-Sleep -Seconds (5 * $attempt)
+        }
+    }
     $env:Path = "$binDir;$env:Path"
 }
 Invoke-Logged { chezmoi --version } | Out-Null

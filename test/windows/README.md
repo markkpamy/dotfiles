@@ -1,7 +1,40 @@
 # Windows fresh-install test
 
-Runs a throwaway Windows 11 VM with [dockur/windows](https://github.com/dockur/windows)
-in Docker, then does a first-time chezmoi install of this repo inside it.
+Runs a throwaway Windows 11 VM, then does a first-time chezmoi install of this repo inside it.
+Three ways to host the VM; all use the same test script, `oem/run-test.ps1`:
+
+- **Hyper-V on this Windows machine**: see [Hyper-V](#hyper-v-windows-host-without-docker) below.
+  Use this when Docker Desktop can't get `/dev/kvm` (WSL reports `Hyper-V: Nested features: 0x0`).
+- **Docker Desktop** or a **Linux Docker host**, with [dockur/windows](https://github.com/dockur/windows).
+
+## Hyper-V (Windows host, without Docker)
+
+Windows runs natively under Hyper-V, so no nested virtualisation is needed. Scripts are in `hyperv/`
+and must run from an **elevated** PowerShell (or join the *Hyper-V Administrators* group).
+
+1. Download a Windows 11 ISO from Microsoft. Its language must match `-UILanguage` (default `en-US`);
+   the keyboard layout and regional format default to this machine's.
+2. Create the VM. It asks for a password for the VM's local account (`tester`), then installs
+   Windows 11 Pro unattended (~20 min) into `E:\Hyper-V\dotfiles-windows-test` (6 GB RAM, 4 CPUs, 96 GB disk):
+
+   ```powershell
+   cd test\windows\hyperv
+   .\vm.ps1 create -IsoPath <path-to-Win11.iso>
+   ```
+
+3. When the desktop shows **Run dotfiles test**, save the clean state: `.\vm.ps1 save`.
+4. Each test:
+   1. `.\vm.ps1 restore` reverts to the clean checkpoint, boots, copies this checkout in
+      (uncommitted changes included) and opens the console.
+   2. In the VM, double-click **Run dotfiles test**, answer the chezmoi prompts, paste the BWS token.
+      To paste in the console window: *Clipboard → Type clipboard text*.
+   3. `.\vm.ps1 logs` copies the VM's `C:\test-logs` into this repo's `.test-logs/` (asks for the VM password).
+
+Other actions: `push` (copy the checkout into a running VM again), `status`, `remove`.
+The VM password is written in plain text to the VM's answer file (`unattend.iso` in the VM folder,
+and inside Windows). Use a throwaway password.
+
+## dockur/windows (Docker)
 
 Two host versions share `compose.yml` and `oem/`:
 
@@ -18,7 +51,7 @@ Two host versions share `compose.yml` and `oem/`:
 
 ## 1. Prepare the host (once)
 
-dockur needs KVM (`/dev/kvm`) and about 10 GB of free RAM for an 8 GB guest.
+dockur needs KVM (`/dev/kvm`) and about 8 GB of free RAM for the 6 GB guest (RAM_SIZE).
 
 ### Windows host: Docker Desktop
 
@@ -27,7 +60,7 @@ WSL enough memory and nested virtualisation:
 
 ```ini
 [wsl2]
-memory=16GB
+memory=12GB
 processors=8
 nestedVirtualization=true
 ```
@@ -35,7 +68,7 @@ nestedVirtualization=true
 After changing it: quit Docker Desktop, run `wsl --shutdown`, start Docker Desktop again. Check:
 
 ```powershell
-docker info --format '{{.MemTotal}} {{.NCPU}}'            # ~16 GB, 8
+docker info --format '{{.MemTotal}} {{.NCPU}}'            # ~12 GB, 8
 docker run --rm --device /dev/kvm alpine ls -l /dev/kvm   # must list the device
 ```
 

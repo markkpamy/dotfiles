@@ -1,18 +1,26 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Fresh-install test of the dotfiles inside the dockur/windows VM.
+    Fresh-install test of the dotfiles inside the test VM (dockur/windows or Hyper-V).
 
 .DESCRIPTION
     1. Installs chezmoi with its official installer (no git or winget needed).
-    2. Puts the dotfiles in chezmoi's default source dir: a copy of Z:\ (the
-       repo checkout on the Docker host), or a clone of -Repo.
+    2. Puts the dotfiles in chezmoi's default source dir: a copy of the repo
+       (-Shared), or a clone of -Repo.
     3. Runs `chezmoi init` interactively. Answer the prompts and paste the BWS
        token yourself. This step is NOT logged, so the token stays out of logs.
-    4. Runs `chezmoi apply --verbose`, logged to Z:\.test-logs\.
+    4. Runs `chezmoi apply --verbose`, logged to -LogDir.
+
+.PARAMETER Shared
+    The repo copy to install from. Default: Z:\ (dockur shares the host checkout there),
+    else C:\dotfiles-src (Hyper-V: pushed in by vm.ps1 and unpacked by the launcher).
+
+.PARAMETER LogDir
+    Default: Z:\.test-logs (lands in the host checkout), else C:\test-logs
+    (Hyper-V: fetch with `vm.ps1 logs`).
 
 .PARAMETER Repo
-    Clone this URL instead of copying Z:\ (e.g. https://github.com/markkpamy/dotfiles.git).
+    Clone this URL instead of copying -Shared (e.g. https://github.com/markkpamy/dotfiles.git).
 
 .EXAMPLE
     # From the desktop launcher, or:
@@ -21,12 +29,15 @@
 [CmdletBinding()]
 param(
     [string]$Repo,
-    [string]$Shared = 'Z:\'
+    [string]$Shared,
+    [string]$LogDir
 )
 
 $ErrorActionPreference = 'Stop'
 $started = Get-Date
-$logDir = Join-Path $Shared '.test-logs'
+$onDockur = Test-Path 'Z:\test\windows'
+if (-not $Shared) { $Shared = if ($onDockur) { 'Z:\' } else { 'C:\dotfiles-src' } }
+if (-not $LogDir) { $LogDir = if ($onDockur) { 'Z:\.test-logs' } else { 'C:\test-logs' } }
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 $log = Join-Path $logDir ("{0:yyyyMMdd-HHmmss}-{1}.log" -f $started, $env:COMPUTERNAME)
 
@@ -46,7 +57,7 @@ $sourceDir = Join-Path $HOME '.local\share\chezmoi'
 $binDir = Join-Path $HOME '.local\bin'
 
 if (Test-Path $sourceDir) {
-    throw "$sourceDir already exists, so this VM isn't fresh. Run './reset.sh restore' on the Docker host first."
+    throw "$sourceDir already exists, so this VM isn't fresh. Restore the clean state first (reset.ps1 / reset.sh / hyperv\vm.ps1 restore)."
 }
 
 # Make sure the token comes from the prompt, as on a real first install.
@@ -64,6 +75,9 @@ if ($Repo) {
     Write-Step "chezmoi init $Repo  (answer the prompts; this step is not logged)"
     chezmoi init $Repo
 } else {
+    if (-not (Test-Path (Join-Path $Shared 'home'))) {
+        throw "No repo at $Shared. On Hyper-V, run '.\vm.ps1 push' on the host, then start the launcher again."
+    }
     Write-Step "Copying $Shared to $sourceDir"
     robocopy $Shared $sourceDir /E /XD node_modules .cache_ggshield .idea .claude .test-logs /NFL /NDL /NJH /NJS /NP | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "robocopy failed with exit code $LASTEXITCODE" }

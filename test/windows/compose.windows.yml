@@ -1,0 +1,13 @@
+# Windows host (Docker Desktop on WSL2): VM disk in a Docker volume.
+# A Windows folder would go through the slow WSL file share.
+services:
+  windows:
+    volumes:
+      - storage:/storage
+
+volumes:
+  storage:
+    name: dotfiles-windows-storage
+# The clean-install copy lives in a second volume, dotfiles-windows-golden, created by
+# reset.ps1. It is deliberately not declared here, so `docker compose down -v`
+# (which wipes the VM disk) leaves it alone.

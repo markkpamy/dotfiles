@@ -1,0 +1,6 @@
+# Linux Docker host with KVM: VM disk in a host folder (STORAGE_DIR in .env).
+services:
+  windows:
+    volumes:
+      # Keep it OUTSIDE the repo, or it shows up on Z:.
+      - '${STORAGE_DIR:?set STORAGE_DIR in .env}:/storage'

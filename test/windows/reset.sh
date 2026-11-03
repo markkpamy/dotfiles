@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Save or restore the clean-Windows disk of the dotfiles test VM.
+# Linux host: save or restore the clean-Windows disk of the dotfiles test VM.
+# (On a Windows host use reset.ps1.)
 #   ./reset.sh save      stop the VM and copy its disk to GOLDEN_DIR
 #   ./reset.sh restore   put the golden disk back and start the VM
 #   ./reset.sh status    show both folders
@@ -7,7 +8,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-[[ -f .env ]] || { echo "Missing .env: copy .env.example first." >&2; exit 1; }
+[[ -f .env ]] || { echo "Missing .env: copy .env.linux.example first." >&2; exit 1; }
 set -a; source .env; set +a
 : "${STORAGE_DIR:?set STORAGE_DIR in .env}" "${GOLDEN_DIR:?set GOLDEN_DIR in .env}"
 
@@ -27,7 +28,7 @@ case "${1:-}" in
     docker compose down
     sync_disk "$GOLDEN_DIR" "$STORAGE_DIR"
     docker compose up -d
-    echo "Restored. Connect via RDP or http://<this-host>:8006"
+    echo "Restored. Connect via RDP (port ${RDP_PORT:-3389}) or http://<this-host>:${WEB_PORT:-8006}"
     ;;
   status)
     du -sh --apparent-size "$STORAGE_DIR" "$GOLDEN_DIR" 2>/dev/null || true

@@ -63,6 +63,15 @@ bw-get-session() {
     fi
 }
 
+# `bw get <name>` is a fuzzy search: "BWS Access Token" also matches
+# "bws-access-token" and "Claude BWS Access Token" and then fails as ambiguous.
+# Resolve to the id of the single exact-name match when there is one.
+bw-resolve-id() {
+    local name="$1" id
+    id=$(bw list items --search "$name" --session "$BW_SESSION" 2>/dev/null         | jq -r --arg n "$name" '[.[] | select(.name == $n)] | if length == 1 then .[0].id else empty end' 2>/dev/null)
+    echo "${id:-$name}"
+}
+
 bw-unlock() {
     bw-ensure-unlocked
 }
@@ -79,14 +88,14 @@ bw-get-password() {
     local item_name="$1"
     bw-ensure-unlocked || return 1
     export BW_SESSION=$(bw-get-session)
-    bw get password "$item_name" --session "$BW_SESSION" 2>/dev/null
+    bw get password "$(bw-resolve-id "$item_name")" --session "$BW_SESSION" 2>/dev/null
 }
 
 bw-get-username() {
     local item_name="$1"
     bw-ensure-unlocked || return 1
     export BW_SESSION=$(bw-get-session)
-    bw get username "$item_name" --session "$BW_SESSION" 2>/dev/null
+    bw get username "$(bw-resolve-id "$item_name")" --session "$BW_SESSION" 2>/dev/null
 }
 
 bw-get-field() {
@@ -94,7 +103,7 @@ bw-get-field() {
     local field_name="$2"
     bw-ensure-unlocked || return 1
     export BW_SESSION=$(bw-get-session)
-    local item_json=$(bw get item "$item_name" --session "$BW_SESSION" 2>/dev/null)
+    local item_json=$(bw get item "$(bw-resolve-id "$item_name")" --session "$BW_SESSION" 2>/dev/null)
     echo "$item_json" | jq -r ".fields[]? | select(.name==\"$field_name\") | .value" 2>/dev/null
 }
 # BWS integration

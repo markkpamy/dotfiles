@@ -83,9 +83,24 @@ function Invoke-BitwardenEnsureUnlocked {
 # Session management
 function Get-BitwardenSession {
     if (Test-Path $env:BW_UTILS_SESSION_FILE) {
-        return Get-Content $env:BW_UTILS_SESSION_FILE -Raw
+        return (Get-Content $env:BW_UTILS_SESSION_FILE -Raw).Trim()
     }
     return $null
+}
+
+# `bw get <name>` is a fuzzy search: "BWS Access Token" also matches
+# "bws-access-token" and "Claude BWS Access Token" and then fails as ambiguous.
+# Resolve to the id of the single exact-name match when there is one.
+function Resolve-BitwardenItemId {
+    param([string]$ItemName, [string]$Session)
+
+    try {
+        $exact = @(bw list items --search $ItemName --session $Session 2>$null |
+            ConvertFrom-Json | Where-Object { $_.name -eq $ItemName })
+        if ($exact.Count -eq 1) { return $exact[0].id }
+    }
+    catch { }
+    return $ItemName
 }
 
 function Invoke-BitwardenUnlock {
@@ -122,7 +137,8 @@ function Get-BitwardenPassword {
     $env:BW_SESSION = $session
 
     try {
-        return bw get password $ItemName --session $session 2>$null
+        $id = Resolve-BitwardenItemId $ItemName $session
+        return bw get password $id --session $session 2>$null
     }
     catch {
         return $null
@@ -143,7 +159,8 @@ function Get-BitwardenField {
     $env:BW_SESSION = $session
 
     try {
-        $itemJson = bw get item $ItemName --session $session 2>$null
+        $id = Resolve-BitwardenItemId $ItemName $session
+        $itemJson = bw get item $id --session $session 2>$null
         if ($itemJson) {
             $item = $itemJson | ConvertFrom-Json
             $field = $item.fields | Where-Object { $_.name -eq $FieldName }

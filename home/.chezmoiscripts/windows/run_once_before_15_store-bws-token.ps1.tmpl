@@ -1,0 +1,38 @@
+{{- if .useBws -}}
+# Put the Bitwarden Secrets Manager access token in Windows Credential Manager,
+# where the bwst / bws-run / bws-inject helpers read it from.
+# Source, in order: already stored -> $env:BWS_ACCESS_TOKEN -> hidden prompt.
+# ASCII only: Windows PowerShell 5.1 misreads BOM-less UTF-8.
+# Never fails the install: without a token it says how to add one later.
+
+$chezmoi = if ($env:CHEZMOI_EXECUTABLE) { $env:CHEZMOI_EXECUTABLE } else { 'chezmoi' }
+$service = '{{ .bitwarden.keyring_service | default "bws" }}'
+$user = '{{ .bitwarden.keyring_user | default "access-token" }}'
+
+& $chezmoi secret keyring get --service $service --user $user *> $null
+if ($LASTEXITCODE -eq 0) {
+    Write-Host '[ok] BWS token already in Windows Credential Manager'
+    exit 0
+}
+
+$token = $env:BWS_ACCESS_TOKEN
+if (-not $token) {
+    if ([Console]::IsInputRedirected) {
+        Write-Host '[warn] No BWS token stored and no terminal to ask for one. Run bws-token-set later.'
+        exit 0
+    }
+    $secure = Read-Host 'BWS access token (leave empty to skip)' -AsSecureString
+    $token = [System.Net.NetworkCredential]::new('', $secure).Password
+}
+if (-not $token) {
+    Write-Host '[skip] Skipped. Run bws-token-set later to store the BWS token.'
+    exit 0
+}
+
+$token | & $chezmoi --no-tty secret keyring set --service $service --user $user *> $null
+if ($LASTEXITCODE -eq 0) {
+    Write-Host '[ok] BWS token stored in Windows Credential Manager'
+} else {
+    Write-Host '[warn] Could not write the BWS token to Windows Credential Manager. Run bws-token-set later.'
+}
+{{- end }}

@@ -9,8 +9,7 @@ alias bwi='bw-info'
 alias bwp='bw-get-password'
 alias bwh='bw-help'
 
-# BWS token export alias
-alias bwst='export BWS_ACCESS_TOKEN="$(bws-get-token)"'
+# bwst is a function in functions-{bash,fish}.tmpl (keystore, vault fallback)
 
 {{- if .bitwarden.aliases.docker_secure }}
 # Enhanced Docker Compose with BWS secrets

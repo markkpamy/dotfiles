@@ -3,8 +3,8 @@
 ##########################################
 # Conditional exclusions
 
-{{- if not .accessToken }}
-# Ignore Kubernetes/Talos config when Bitwarden access token is not available
+{{- if not .useBws }}
+# Ignore Kubernetes/Talos config when Bitwarden Secrets Manager is not in use
 .kube/talosconfig
 {{- end }}
 

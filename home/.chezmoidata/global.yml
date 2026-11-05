@@ -6,6 +6,11 @@ isDockerInstallMode: false
 bitwarden:
   enabled: true
   auto_install: true
+  # The BWS access token is read from the OS keystore (chezmoi secret keyring):
+  # Windows Credential Manager, Secret Service on Linux, Keychain on macOS.
+  keyring_service: 'bws'
+  keyring_user: 'access-token'
+  # Fallback when the keystore has no token: the vault item holding it.
   token_item: 'BWS Access Token'
   storage_method: 'login'
   default_project: '' # Set your default BWS project ID

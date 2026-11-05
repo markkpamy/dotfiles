@@ -12,7 +12,7 @@ Your dotfiles include a powerful, secure BWS (Bitwarden Secrets Manager) integra
 
 ### Core Components
 
-1. **Token Management**: Secure retrieval from Bitwarden vault
+1. **Token Management**: Token kept in the OS keystore, with the Bitwarden vault as a fallback
 2. **BWS Execution**: Direct CLI interface with automatic authentication
 3. **Environment Injection**: Seamless secret injection into commands
 4. **Docker Integration**: Secure container deployments
@@ -24,8 +24,10 @@ Your dotfiles include a powerful, secure BWS (Bitwarden Secrets Manager) integra
 # Located in: home/.chezmoidata/global.yml
 bitwarden:
   enabled: true
-  token_item: "BWS Access Token"           # Vault item containing BWS token
-  storage_method: "login"                  # How token is stored (login/field)
+  keyring_service: "bws"                   # OS keystore entry holding the BWS token
+  keyring_user: "access-token"
+  token_item: "BWS Access Token"           # Vault fallback: item containing the token
+  storage_method: "login"                  # How the vault item stores it (login/field)
   default_project: "your-project-id"      # Default BWS project ID (optional)
 ```
 
@@ -39,7 +41,7 @@ bitwarden:
 
 **How it works**:
 1. Verifies BWS CLI is installed
-2. Retrieves access token from Bitwarden vault
+2. Retrieves the access token (see Token Management System)
 3. Executes BWS command with token authentication
 4. Returns BWS output directly
 
@@ -83,7 +85,7 @@ bws-run <command> [args...]
 **Syntax**: `bws-inject <command> [arguments...]`
 
 **How it works**:
-1. Retrieves BWS token from vault
+1. Retrieves the BWS token (see Token Management System)
 2. Uses BWS run command to inject secrets
 3. Automatically uses default project if configured
 4. Executes your command in enriched environment
@@ -133,16 +135,35 @@ dcls    # docker compose logs with BWS secrets
 
 ## 🔐 Token Management System
 
-### `bws-get-token` - Secure Token Retrieval
+The BWS access token lives in the **OS keystore**, through `chezmoi secret keyring`:
 
-**How it works**:
-1. Automatically unlocks Bitwarden vault if needed
-2. Retrieves token from configured vault item
-3. Supports two storage methods:
-   - `login`: Token stored as password in login item
-   - `field`: Token stored in custom field named "token"
+| OS | Keystore |
+|----|----------|
+| Windows | Credential Manager |
+| Linux desktop | Secret Service (GNOME Keyring, KWallet) |
+| macOS | Keychain |
 
-**Configuration examples**:
+The entry is service `bws`, user `access-token` (`keyring_service` / `keyring_user`).
+It is never written to `chezmoi.toml` or any other file.
+
+**Lookup order** (`bws-token-get`, used by `bwst`, `bws-run`, `bws-inject`):
+1. `$BWS_ACCESS_TOKEN`, when set (CI, Docker, headless Linux without a Secret Service)
+2. The OS keystore
+3. Fallback: the vault item below, which unlocks the vault. `bwst` then offers to
+   copy the token into the keystore so the vault isn't needed next time.
+
+**Commands**:
+```bash
+bws-token-set     # Store or replace the token (hidden prompt, or from stdin)
+bws-token-get     # Print the token
+bws-token-clear   # Remove it from the keystore
+bwst              # Export it to BWS_ACCESS_TOKEN in the current shell
+```
+
+On a fresh install, `chezmoi apply` asks for the token once with a hidden prompt
+(or takes `$BWS_ACCESS_TOKEN`) and stores it in the keystore. Leave it empty to skip.
+
+**Vault fallback configuration**:
 ```yaml
 # Store token as password in login item (default)
 bitwarden:
@@ -270,9 +291,9 @@ bw-export-env \
 ## 🔒 Security Features
 
 ### 1. **Secure Token Storage**
-- BWS access token encrypted in Bitwarden vault
-- No plain-text tokens in environment or files
-- Automatic token retrieval with vault authentication
+- BWS access token kept in the OS keystore, encrypted by the OS
+- No plain-text tokens in `chezmoi.toml` or other files
+- Hidden prompt when the token is entered; it never reaches shell history
 
 ### 2. **Session Management**
 - Automatic vault unlocking when needed
@@ -293,10 +314,10 @@ bw-export-env \
 
 ### 1. **Token Management**
 ```bash
-# Store BWS token in dedicated vault item
-# Item name: "BWS Access Token"
-# Password field: your-actual-bws-token
-# Never store tokens in scripts or environment
+# Keep the BWS token in the OS keystore
+bws-token-set
+# Optionally also keep it in a vault item ("BWS Access Token") as the
+# fallback for new machines. Never store tokens in scripts or files.
 ```
 
 ### 2. **Project Organization**
@@ -337,11 +358,14 @@ chezmoi apply  # This installs BWS via externals
 
 **2. "Failed to get BWS token"**
 ```bash
-# Check vault item exists
+# Store the token in the OS keystore
+bws-token-set
+
+# Or check the vault fallback item exists
 bw-unlock
 bw get item "BWS Access Token"
 
-# Verify token storage method in global.yml
+# Headless Linux (no Secret Service): export BWS_ACCESS_TOKEN instead
 ```
 
 **3. "Please login and unlock Bitwarden first"**
@@ -371,8 +395,8 @@ bw-info
 # Test BWS connection
 bws-run project list
 
-# Verify token retrieval
-bws-get-token > /dev/null && echo "Token OK" || echo "Token Failed"
+# Verify token retrieval (env var, then keystore)
+bws-token-get > /dev/null && echo "Token OK" || echo "Token Failed"
 
 # Check configuration
 echo "Token Item: $BWS_TOKEN_ITEM"
@@ -385,9 +409,9 @@ echo "Default Project: $BWS_PROJECT_ID"
 ### Updating BWS Token
 ```bash
 # 1. Generate new token in Bitwarden web app
-# 2. Update vault item
-bw-unlock
-bw edit item "BWS Access Token"  # Update password field
+# 2. Replace it in the OS keystore
+bws-token-set
+# (and in the "BWS Access Token" vault item, if you keep the fallback)
 
 # 3. Test new token
 bws-run project list

@@ -7,9 +7,10 @@
     1. Installs chezmoi with its official installer (no git or winget needed).
     2. Puts the dotfiles in chezmoi's default source dir: a copy of the repo
        (-Shared), or a clone of -Repo.
-    3. Runs `chezmoi init` interactively. Answer the prompts and paste the BWS
-       token yourself. This step is NOT logged, so the token stays out of logs.
-    4. Runs `chezmoi apply --verbose`, logged to -LogDir.
+    3. Runs `chezmoi init` interactively. Answer the prompts. This step is NOT logged.
+    4. Runs `chezmoi apply --verbose`, logged to -LogDir. Early on it asks for the
+       BWS token with a hidden prompt and stores it in Credential Manager, so the
+       token is neither echoed nor logged.
 
 .PARAMETER Shared
     The repo copy to install from. Default: Z:\ (dockur shares the host checkout there),
@@ -60,7 +61,7 @@ if (Test-Path $sourceDir) {
     throw "$sourceDir already exists, so this VM isn't fresh. Restore the clean state first (reset.ps1 / reset.sh / hyperv\vm.ps1 restore)."
 }
 
-# Make sure the token comes from the prompt, as on a real first install.
+# Make sure the token comes from the hidden prompt, as on a real first install.
 Remove-Item Env:BWS_ACCESS_TOKEN -ErrorAction SilentlyContinue
 
 # Right after boot (or a host network change) the VM's DNS can fail for a while,

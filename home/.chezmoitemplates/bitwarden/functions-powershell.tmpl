@@ -11,6 +11,8 @@ $env:BW_UTILS_CONFIG_DIR = "$env:USERPROFILE\.config\bitwarden-utils"
 $env:BW_UTILS_SESSION_FILE = "$env:BW_UTILS_CONFIG_DIR\session"
 $env:BWS_TOKEN_ITEM = "{{ .bitwarden.token_item | default "BWS Access Token" }}"
 $env:BWS_STORAGE_METHOD = "{{ .bitwarden.storage_method | default "login" }}"
+$env:BWS_KEYRING_SERVICE = "{{ .bitwarden.keyring_service | default "bws" }}"
+$env:BWS_KEYRING_USER = "{{ .bitwarden.keyring_user | default "access-token" }}"
 $env:BWS_PROJECT_ID = "{{ .bitwarden.default_project | default "" }}"
 
 # Colors for PowerShell
@@ -186,16 +188,12 @@ function Get-BitwardenInfo {
 
     # Check BWS availability without triggering unlock
     if (Get-Command bws -ErrorAction SilentlyContinue) {
-        if (Test-BitwardenUnlocked) {
-            # Only test BWS token if vault is already unlocked
-            $token = Get-BWSToken
-            if ($token) {
-                Write-Host "BWS Access: ✅ Available"
-            } else {
-                Write-Host "BWS Access: ⚠️  Token not found in vault"
-            }
+        if ($env:BWS_ACCESS_TOKEN) {
+            Write-Host "BWS Access: ✅ Token from BWS_ACCESS_TOKEN"
+        } elseif (Get-BWSKeystoreToken) {
+            Write-Host "BWS Access: ✅ Token in Windows Credential Manager"
         } else {
-            Write-Host "BWS Access: 🔒 Vault locked (unlock to test BWS token)"
+            Write-Host "BWS Access: ⚠️  No token in Windows Credential Manager (run bws-token-set)"
         }
     } else {
         Write-Host "BWS Access: ❌ BWS CLI not installed"
@@ -216,9 +214,12 @@ SECRETS RETRIEVAL:
   Get-BitwardenField <item> <field>   Get custom field from item
 
 BWS (SECRETS MANAGER):
-  bws-run <command>             Run BWS command with token from vault
+  bws-run <command>             Run BWS command with token from Credential Manager
   bws-inject <command>          Run command with BWS secrets injected
   bwst                          Export BWS token to BWS_ACCESS_TOKEN env var
+  bws-token-set                 Store the BWS token in Credential Manager (hidden prompt)
+  bws-token-get                 Print the BWS token (env var, then Credential Manager)
+  bws-token-clear               Remove the BWS token from Credential Manager
 
 EXAMPLES:
   bws-run secret list
@@ -230,8 +231,69 @@ EXAMPLES:
 "@
 }
 
-# BWS integration - The core bws-run function
+# BWS integration
+# The access token lives in Windows Credential Manager through
+# `chezmoi secret keyring`. $env:BWS_ACCESS_TOKEN, when set, wins.
+
+# Token from $env:BWS_ACCESS_TOKEN or Credential Manager; $null when neither has one.
+function Get-BWSKeystoreToken {
+    if ($env:BWS_ACCESS_TOKEN) { return $env:BWS_ACCESS_TOKEN }
+    if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { return $null }
+
+    $token = chezmoi secret keyring get --service $env:BWS_KEYRING_SERVICE --user $env:BWS_KEYRING_USER 2>$null
+    if ($LASTEXITCODE -eq 0 -and $token) { return ($token | Out-String).Trim() }
+    return $null
+}
+
+# Store the token in Credential Manager. Prompts without echo, or takes it from
+# the pipeline ($token | bws-token-set), so it never lands in shell history.
+function Set-BWSKeystoreToken {
+    param([Parameter(ValueFromPipeline = $true)][string]$Token)
+
+    if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) {
+        Write-Host "$($BWColors.Red)❌ chezmoi not found$($BWColors.Reset)"
+        return
+    }
+    if (-not $Token) {
+        $secure = Read-Host "🔑 BWS access token" -AsSecureString
+        $Token = [System.Net.NetworkCredential]::new('', $secure).Password
+    }
+    if (-not $Token) {
+        Write-Host "$($BWColors.Red)❌ No token given$($BWColors.Reset)"
+        return
+    }
+
+    $Token | chezmoi --no-tty secret keyring set --service $env:BWS_KEYRING_SERVICE --user $env:BWS_KEYRING_USER *> $null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "$($BWColors.Green)✅ BWS token stored in Windows Credential Manager$($BWColors.Reset)"
+    } else {
+        Write-Host "$($BWColors.Red)❌ Could not write to Windows Credential Manager$($BWColors.Reset)"
+    }
+}
+
+function Remove-BWSKeystoreToken {
+    chezmoi secret keyring delete --service $env:BWS_KEYRING_SERVICE --user $env:BWS_KEYRING_USER 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "$($BWColors.Green)🗑️  BWS token removed from Windows Credential Manager$($BWColors.Reset)"
+    } else {
+        Write-Host "$($BWColors.Yellow)⚠️  No BWS token in Windows Credential Manager$($BWColors.Reset)"
+    }
+}
+
+# Token for bws-run / bws-inject: Credential Manager first, vault as a fallback.
 function Get-BWSToken {
+    $token = Get-BWSKeystoreToken
+    if ($token) { return $token }
+
+    $token = Get-BWSVaultToken
+    if ($token) {
+        Write-Host "$($BWColors.Yellow)⚠️  BWS token read from the vault. Run bwst to keep it in Credential Manager.$($BWColors.Reset)"
+    }
+    return $token
+}
+
+# Fallback: read the token from the vault item (unlocks the vault).
+function Get-BWSVaultToken {
     param(
         [string]$TokenItem = $env:BWS_TOKEN_ITEM,
         [string]$StorageMethod = $env:BWS_STORAGE_METHOD
@@ -303,16 +365,28 @@ Set-Alias -Name bw-help -Value Show-BitwardenHelp
 Set-Alias -Name bws-run -Value Invoke-BWSRun
 Set-Alias -Name bws-inject -Value Invoke-BWSInject
 
-# BWS token export function and alias (short form)
+# Export the token to BWS_ACCESS_TOKEN. Taken from the vault when Credential
+# Manager has none, with an offer to store it there for next time.
 function Export-BWSTokenShort {
-    $token = Get-BWSToken
-    if ($token) {
-        $env:BWS_ACCESS_TOKEN = $token
-        Write-Host "$($BWColors.Green)✅ BWS_ACCESS_TOKEN exported to environment$($BWColors.Reset)"
-    } else {
-        Write-Host "$($BWColors.Red)❌ Failed to get BWS token$($BWColors.Reset)"
+    $token = Get-BWSKeystoreToken
+    if (-not $token) {
+        $token = Get-BWSVaultToken
+        if (-not $token) {
+            Write-Host "$($BWColors.Red)❌ Failed to get BWS token (Credential Manager empty, vault lookup failed)$($BWColors.Reset)"
+            return
+        }
+        if (-not [Console]::IsInputRedirected) {
+            $answer = Read-Host "💾 Store the token in Windows Credential Manager so the vault isn't needed next time? [Y/n]"
+            if ($answer -notmatch '^[Nn]') { $token | Set-BWSKeystoreToken }
+        }
     }
+    $env:BWS_ACCESS_TOKEN = $token
+    Write-Host "$($BWColors.Green)✅ BWS_ACCESS_TOKEN exported to environment$($BWColors.Reset)"
 }
+
+Set-Alias -Name bws-token-get -Value Get-BWSKeystoreToken
+Set-Alias -Name bws-token-set -Value Set-BWSKeystoreToken
+Set-Alias -Name bws-token-clear -Value Remove-BWSKeystoreToken
 
 Set-Alias -Name bwst -Value Export-BWSTokenShort
 

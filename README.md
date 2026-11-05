@@ -159,7 +159,7 @@ During the initial setup, you'll be prompted for:
 - **Python packages**: Development tools and CLI applications via pip/pipx and UV/UVX
 
 ### 🔐 **Both Platforms**
-- **Bitwarden access token**: For secret management (optional but recommended)
+- **Bitwarden access token**: For secret management (optional but recommended). Asked for once with a hidden prompt and kept in the OS keystore (Windows Credential Manager, Secret Service, macOS Keychain), never in `chezmoi.toml`
 - **GPG/SSH setup**: For Git signing and authentication
 
 ## Directory Structure
@@ -430,6 +430,9 @@ refreshenv        # Windows (if using Chocolatey)
 ```bash
 # Re-authenticate with Bitwarden
 bw login
+# Store (or replace) the BWS access token in the OS keystore
+bws-token-set
+# Headless Linux without a Secret Service: use the environment variable instead
 export BWS_ACCESS_TOKEN="your-token"
 ```
 

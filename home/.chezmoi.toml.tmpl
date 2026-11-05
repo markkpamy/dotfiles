@@ -30,11 +30,10 @@
 {{ $desktopEnv := "none" }}
 
 {{ $isDockerInstallMode = promptBool "Are you installing inside Docker ? " $isDockerInstallMode}}
-{{/* Access token handling */}}
-{{ $accessToken := env "BWS_ACCESS_TOKEN" }}
-{{ if not $accessToken }}
-  {{ $accessToken = promptString "Bitwarden access token not found in environment. Please enter it" }}
-{{ end }}
+{{/* Bitwarden Secrets Manager. Only the choice is stored here: the access token
+     itself lives in the OS keystore (Windows Credential Manager, Secret Service,
+     macOS Keychain), put there by the store-bws-token script or bws-token-set. */}}
+{{ $useBws := promptBoolOnce . "useBws" "Use Bitwarden Secrets Manager (token kept in the OS keystore)" true }}
 
 {{/* Pre auto */}}
 
@@ -202,7 +201,7 @@ installUvPackages = {{ $installUvPackages }}
 installUvxPackages = {{ $installUvxPackages }}
 isDockerInstallMode = {{ $isDockerInstallMode }}
 installCargoPackages = {{ $installCargoPackages }}
-accessToken = {{ $accessToken | quote }}
+useBws = {{ $useBws }}
 isDesktop = {{ $isDesktop }}
 desktopEnv = {{ $desktopEnv | quote }}
 

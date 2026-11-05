@@ -1,0 +1,38 @@
+{{- if and .useBws (not .isDockerInstallMode) -}}
+#!/bin/bash
+# Put the Bitwarden Secrets Manager access token in the OS keystore (Secret
+# Service on Linux, Keychain on macOS), where bwst / bws-run / bws-inject read it.
+# Source, in order: already stored -> $BWS_ACCESS_TOKEN -> hidden prompt.
+# Never fails the install: headless machines without a Secret Service keep
+# using the BWS_ACCESS_TOKEN environment variable instead.
+
+chezmoi="${CHEZMOI_EXECUTABLE:-chezmoi}"
+service='{{ .bitwarden.keyring_service | default "bws" }}'
+user='{{ .bitwarden.keyring_user | default "access-token" }}'
+
+if "$chezmoi" secret keyring get --service "$service" --user "$user" > /dev/null 2>&1; then
+    echo "✅ BWS token already in the OS keystore"
+    exit 0
+fi
+
+token="${BWS_ACCESS_TOKEN:-}"
+if [[ -z "$token" ]]; then
+    if [[ ! -t 0 ]]; then
+        echo "⚠️  No BWS token stored and no terminal to ask for one. Run bws-token-set later."
+        exit 0
+    fi
+    read -rsp "🔑 BWS access token (leave empty to skip): " token
+    echo
+fi
+if [[ -z "$token" ]]; then
+    echo "⏭️  Skipped. Run bws-token-set later to store the BWS token."
+    exit 0
+fi
+
+if printf '%s\n' "$token" | "$chezmoi" --no-tty secret keyring set --service "$service" --user "$user" > /dev/null 2>&1; then
+    echo "✅ BWS token stored in the OS keystore"
+else
+    echo "⚠️  No usable OS keystore here (Secret Service not running?)."
+    echo "   Export BWS_ACCESS_TOKEN in your shell instead, or run bws-token-set once a keyring is available."
+fi
+{{- end }}

@@ -10,6 +10,8 @@ set -g BW_UTILS_CONFIG_DIR "$HOME/.config/bitwarden-utils"
 set -g BW_UTILS_SESSION_FILE "$BW_UTILS_CONFIG_DIR/session"
 set -g BWS_TOKEN_ITEM "{{ .bitwarden.token_item | default "BWS Access Token" }}"
 set -g BWS_STORAGE_METHOD "{{ .bitwarden.storage_method | default "login" }}"
+set -g BWS_KEYRING_SERVICE "{{ .bitwarden.keyring_service | default "bws" }}"
+set -g BWS_KEYRING_USER "{{ .bitwarden.keyring_user | default "access-token" }}"
 set -g BWS_PROJECT_ID "{{ .bitwarden.default_project | default "" }}"
 
 # Colors
@@ -118,26 +120,101 @@ function bw-get-field
     echo "$item_json" | jq -r ".fields[]? | select(.name==\"$field_name\") | .value" 2>/dev/null
 end
 # BWS integration
-function bws-get-token
-    set token_item $argv[1]
-    set storage_method $argv[2]
+# The access token lives in the OS keystore (Windows Credential Manager, Secret
+# Service, macOS Keychain) through `chezmoi secret keyring`. $BWS_ACCESS_TOKEN,
+# when set, wins (CI, Docker, headless machines without a Secret Service).
 
-    if test -z "$token_item"
-        set token_item $BWS_TOKEN_ITEM
+# Print the token from $BWS_ACCESS_TOKEN or the keystore. Prints nothing else.
+function bws-token-get
+    if test -n "$BWS_ACCESS_TOKEN"
+        printf '%s' $BWS_ACCESS_TOKEN
+        return 0
     end
-    if test -z "$storage_method"
-        set storage_method $BWS_STORAGE_METHOD
+    command -q chezmoi; or return 1
+    chezmoi secret keyring get --service $BWS_KEYRING_SERVICE --user $BWS_KEYRING_USER 2>/dev/null
+end
+
+# Store the token in the keystore. Prompts without echo, or reads it from stdin
+# (printf '%s' $token | bws-token-set), so it never lands in shell history.
+function bws-token-set
+    if not command -q chezmoi
+        echo -e "$_BW_RED❌ chezmoi not found$_BW_NC" >&2
+        return 1
+    end
+    set -l token
+    if isatty stdin
+        read -s -P "🔑 BWS access token: " token
+    else
+        read token
+    end
+    if test -z "$token"
+        echo -e "$_BW_RED❌ No token given$_BW_NC" >&2
+        return 1
     end
 
-    switch "$storage_method"
+    if printf '%s
+' $token | chezmoi --no-tty secret keyring set             --service $BWS_KEYRING_SERVICE --user $BWS_KEYRING_USER >/dev/null 2>&1
+        echo -e "$_BW_GREEN✅ BWS token stored in the OS keystore$_BW_NC" >&2
+    else
+        echo -e "$_BW_RED❌ Could not write to the OS keystore (no Secret Service running?). Export BWS_ACCESS_TOKEN instead.$_BW_NC" >&2
+        return 1
+    end
+end
+
+function bws-token-clear
+    if chezmoi secret keyring delete --service $BWS_KEYRING_SERVICE --user $BWS_KEYRING_USER 2>/dev/null
+        echo -e "$_BW_GREEN🗑️  BWS token removed from the OS keystore$_BW_NC"
+    else
+        echo -e "$_BW_YELLOW⚠️  No BWS token in the OS keystore$_BW_NC"
+    end
+end
+
+# Fallback: read the token from the vault item (unlocks the vault).
+function bws-vault-token
+    switch "$BWS_STORAGE_METHOD"
         case "login"
-            bw-get-password "$token_item"
+            bw-get-password "$BWS_TOKEN_ITEM"
         case "field"
-            bw-get-field "$token_item" "token"
+            bw-get-field "$BWS_TOKEN_ITEM" "token"
         case '*'
             echo -e "$_BW_RED❌ Invalid storage method$_BW_NC" >&2
             return 1
     end
+end
+
+# Token for bws-run / bws-inject: keystore first, vault as a fallback.
+function bws-get-token
+    set -l token (bws-token-get)
+    if test -n "$token"
+        printf '%s' $token
+        return 0
+    end
+    set token (bws-vault-token)
+    test -n "$token"; or return 1
+    echo -e "$_BW_YELLOW⚠️  BWS token read from the vault. Run bwst to keep it in the OS keystore.$_BW_NC" >&2
+    printf '%s' $token
+end
+
+# Export the token to BWS_ACCESS_TOKEN. Taken from the vault when the keystore
+# has none, with an offer to store it there for next time.
+function bwst
+    set -l token (bws-token-get)
+    if test -z "$token"
+        set token (bws-vault-token)
+        if test -z "$token"
+            echo -e "$_BW_RED❌ Failed to get BWS token (keystore empty, vault lookup failed)$_BW_NC" >&2
+            return 1
+        end
+        if isatty stdin
+            read -P "💾 Store the token in the OS keystore so the vault isn't needed next time? [Y/n] " answer
+            if not string match -qri '^n' -- "$answer"
+                printf '%s
+' $token | bws-token-set
+            end
+        end
+    end
+    set -gx BWS_ACCESS_TOKEN $token
+    echo -e "$_BW_GREEN✅ BWS_ACCESS_TOKEN exported to environment$_BW_NC"
 end
 
 function bws-run
@@ -255,15 +332,12 @@ function bw-info
 
     # Check BWS availability without triggering unlock
     if command -v bws >/dev/null 2>&1
-        if bw-is-unlocked
-            # Only test BWS token if vault is already unlocked
-            if bws-get-token >/dev/null 2>&1
-                echo "BWS Access: ✅ Available"
-            else
-                echo "BWS Access: ⚠️  Token not found in vault"
-            end
+        if test -n "$BWS_ACCESS_TOKEN"
+            echo "BWS Access: ✅ Token from BWS_ACCESS_TOKEN"
+        else if bws-token-get >/dev/null 2>&1
+            echo "BWS Access: ✅ Token in the OS keystore"
         else
-            echo "BWS Access: 🔒 Vault locked (unlock to test BWS token)"
+            echo "BWS Access: ⚠️  No token in the OS keystore (run bws-token-set)"
         end
     else
         echo "BWS Access: ❌ BWS CLI not installed"
@@ -285,11 +359,14 @@ SECRETS RETRIEVAL:
   bw-get-field <item> <field>   Get custom field from item
 
 BWS (SECRETS MANAGER):
-  bws-run <command>             Run BWS command with token from vault
+  bws-run <command>             Run BWS command with token from the OS keystore
   bws-inject <command>          Run command with BWS secrets injected
   bws-compose-up                Start compose with BWS secrets
   bws-compose-down              Stop compose
   bwst                          Export BWS token to BWS_ACCESS_TOKEN env var
+  bws-token-set                 Store the BWS token in the OS keystore (hidden prompt)
+  bws-token-get                 Print the BWS token (env var, then keystore)
+  bws-token-clear               Remove the BWS token from the OS keystore
 
 ENVIRONMENT VARIABLES:
   bw-export-env <items...>      Export passwords as env vars

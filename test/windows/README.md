@@ -42,7 +42,7 @@ Add-LocalGroupMember -SID S-1-5-32-578 -Member $env:USERNAME   # from an elevate
 4. Each test:
    1. `.\vm.ps1 restore` reverts to the clean checkpoint, boots, copies this checkout in
       (uncommitted changes included) and opens the console.
-   2. In the VM, double-click **Run dotfiles test**, answer the chezmoi prompts, paste the BWS token.
+   2. In the VM, double-click **Run dotfiles test**, answer the chezmoi prompts, paste the BWS token at the hidden prompt.
       To paste in the console window: *Clipboard → Type clipboard text*.
    3. `.\vm.ps1 logs` copies the VM's `C:\test-logs` into this repo's `.test-logs/`. It asks for the
       VM password, unless you saved it once, encrypted for your Windows account only (DPAPI):
@@ -137,7 +137,7 @@ Watch the install in the web viewer (see table). When the desktop shows
 1. `.\reset.ps1 restore` or `./reset.sh restore`.
 2. RDP in as `WIN_USERNAME` / `WIN_PASSWORD` (Windows host: `mstsc /v:localhost:3390`).
 3. Double-click **Run dotfiles test.cmd**.
-4. Answer chezmoi's prompts, and paste the BWS access token when asked. That step isn't logged.
+4. Answer chezmoi's prompts, and paste the BWS access token at the hidden prompt during `apply`. It isn't echoed or logged.
 5. Read the result in the repo's `.test-logs/` folder.
 
 The test copies the checkout mounted as `Z:`, uncommitted changes included. On a Linux host that is
@@ -155,8 +155,8 @@ Edits to `oem/install.bat` only apply to a new base install. Delete the VM disk 
 
 ## Secrets
 
-- After `chezmoi init` the token sits in the VM's `~/.config/chezmoi/chezmoi.toml`.
-  A restore overwrites that disk. Never `save` after a test run.
+- After the run the token sits in the VM's Windows Credential Manager (service `bws`, user `access-token`),
+  not in `chezmoi.toml`. A restore overwrites that disk. Never `save` after a test run.
 - Prefer a dedicated BWS machine account for this VM: read-only, scoped, with an expiry.
 - `.test-logs/` holds verbose `chezmoi apply` output and is gitignored. Treat it as sensitive.
 - The web viewer has no login. Keep `BIND_ADDR=127.0.0.1` unless you need LAN access.

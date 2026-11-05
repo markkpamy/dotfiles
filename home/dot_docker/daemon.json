@@ -1,8 +1,12 @@
 {
-  "insecure-registries": ["192.168.1.78:30008","192.168.1.130:3000","192.168.1.12:3000"],
+  "insecure-registries": [
+    "192.168.1.78:30008",
+    "192.168.1.130:3000",
+    "192.168.1.12:3000"
+  ],
   "log-driver": "json-file",
   "log-opts": {
-    "max-size": "10m",
-    "max-file": "3"
+    "max-file": "3",
+    "max-size": "10m"
   }
 }

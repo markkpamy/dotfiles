@@ -1,5 +1,5 @@
 [user]
-    email = {{ .email }}
+	email = {{ .email }}
     name = Mark Kpamy
     signingkey = "{{ .sshId }}"
 
@@ -108,3 +108,16 @@ conflictstyle = diff3
 
 [safe]
     directory = *
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[credential "https://bitbucket.my-nx.com"]
+	provider = bitbucket
+[credential "https://neoxam.ghe.com"]
+	provider = github
+[credential "https://forgejo.toolsera.lan"]
+	provider = generic

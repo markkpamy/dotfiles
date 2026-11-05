@@ -10,3 +10,20 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
 if (Get-Command atuin -ErrorAction SilentlyContinue) {
     atuin init powershell | Out-String | Invoke-Expression
 }
+
+##########################################
+# Claude Code - second account
+##########################################
+function claude-work {
+    $env:CLAUDE_CONFIG_DIR = "$HOME\.claude-work"
+    try { claude @args }
+    finally { Remove-Item Env:CLAUDE_CONFIG_DIR -ErrorAction SilentlyContinue }
+}
+
+##########################################
+# Ghostty shell integration (only inside Ghostty)
+##########################################
+$ghosttyIntegration = "$env:LOCALAPPDATA\Programs\Ghostty\ghostty\share\ghostty\shell-integration\powershell\ghostty-shell-integration.ps1"
+if (($env:TERM_PROGRAM -eq 'ghostty' -or $env:GHOSTTY_RESOURCES_DIR) -and (Test-Path $ghosttyIntegration)) {
+    . $ghosttyIntegration
+}

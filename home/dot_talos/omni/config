@@ -4,4 +4,9 @@ contexts:
         auth:
             siderov1:
                 identity: markkpamy@gmail.com
-context: default
+    toolsera:
+        url: https://toolsera.eu-central-2.omni.siderolabs.io
+        auth:
+            siderov1:
+                identity: markkpamy@gmail.com
+context: toolsera

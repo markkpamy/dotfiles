@@ -97,3 +97,9 @@ export PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND}"
 if [[ $- =~ .*i.* ]]; then bind '"\C-r": "\C-a hstr -- \C-j"'; fi
 # if this is interactive shell, then bind 'kill last command' to Ctrl-x k
 if [[ $- =~ .*i.* ]]; then bind '"\C-xk": "\C-a hstr -k \C-j"'; fi
+{{- if eq .chezmoi.os "windows" }}
+for _d in "$HOME/AppData/Local/Programs/Python/Python313" "$HOME/AppData/Local/Programs/Python/Python313/Scripts" "$HOME/AppData/Local/plannotator"; do
+    [[ -d "$_d" && ":$PATH:" != *":$_d:"* ]] && export PATH="$PATH:$_d"
+done
+unset _d
+{{- end }}

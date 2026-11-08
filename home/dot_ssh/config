@@ -29,7 +29,7 @@ Host forgejo
   Port 222
   User git
 
-# --- Proxmox guests (node pve), generated 2026-11-02 ---
+# --- Proxmox guests (node pve), generated 2026-11-07 ---
 # unknown224 is used; test-lxc has no such account, so it stays root.
 # talos-plane-1 (VM 102) is not listed: Talos has no SSH.
 Host docker-apps-cifs
@@ -38,10 +38,6 @@ Host docker-apps-cifs
 
 Host radarr-anime
   HostName 192.168.1.76
-  User unknown224
-
-Host homelable
-  HostName 192.168.1.79
   User unknown224
 
 Host stirling-pdf
@@ -80,16 +76,8 @@ Host radarr
   HostName 192.168.1.97
   User unknown224
 
-Host pve-scripts-local
-  HostName 192.168.1.103
-  User unknown224
-
 Host remmina-kasm
   HostName 192.168.1.195
-  User unknown224
-
-Host garage
-  HostName 192.168.1.12
   User unknown224
 
 Host readeck
@@ -109,7 +97,7 @@ Host tube-archivist
   User unknown224
 
 Host termix
-  HostName 192.168.1.102
+  HostName 192.168.1.242
   User unknown224
 
 Host cloudflare-tunnel
@@ -134,10 +122,6 @@ Host jellyfin
 
 Host n8n
   HostName 192.168.1.46
-  User unknown224
-
-Host nexterm
-  HostName 192.168.1.107
   User unknown224
 
 Host freshrss
@@ -216,10 +200,6 @@ Host playnite
   HostName 192.168.1.146
   User unknown224
 
-Host garage-web-ui
-  HostName 192.168.1.101
-  User unknown224
-
 Host ignis-obsidian
   HostName 192.168.1.23
   User unknown224
@@ -253,7 +233,7 @@ Host profilarr
   User unknown224
 
 Host certwarden-nx
-  HostName 192.168.1.125
+  HostName 192.168.1.243
   User unknown224
 
 Host dashy

@@ -1,16 +1,50 @@
 pkgs:
   windows:
+    # Scoop is the default for portable CLI tools: every app is exposed through
+    # the single ~\scoop\shims PATH entry. User-scope WinGet portable installs add
+    # one ~100-char PATH entry per package instead, and once Machine + User PATH
+    # passes ~4095 chars Explorer silently drops the whole User PATH when it
+    # refreshes the environment (every tool "disappears" in new terminals).
     scoop:
       buckets:
-      #        - 'main'
-      #        - 'extras'
+        - 'main'
+        - 'extras'
       #        - 'nonportable'
       #        - 'sysinternals'
       #        - 'nerd-fonts'
       #        - 'versions'
       # - 'neorocks-scoop' # https://github.com/nvim-neorocks/rocks-scoop.git
       pkgs:
-        # Programming Languages
+        # Languages and runtimes
+        - 'mise'
+        - 'fnm'
+        - 'bun' # adds ~\scoop\persist\bun\bin to PATH for `bun add -g`
+        # Shells and terminal
+        - 'psmux' # tmux for Windows
+        - 'atuin' # Better shell history
+        # Essentials
+        - 'bitwarden-cli'
+        - 'openssl' # adds its bin dir to PATH
+        - 'extras/age'
+        - 'aws-vault'
+        # CLI tools
+        - 'bat'
+        - 'delta'
+        - 'eza'
+        - 'fd'
+        - 'fzf'
+        - 'jq'
+        - 'ripgrep'
+        - 'zoxide'
+        - 'xh'
+        - 'glow'
+        - 'hexyl'
+        - 'just'
+        - 'btop' # btop4win
+        - 'git-cliff'
+        # DevOps tools
+        - 'gitleaks'
+        - 'k9s'
         # Completion (keep in Scoop as not available in Winget)
       #        - 'extras/dockercompletion'
       #        - 'extras/scoop-completion'
@@ -30,7 +64,7 @@ pkgs:
       - 'python312'
       #- 'uv' # Not available in Chocolatey
       #- 'mise' # Not available in Chocolatey
-      - 'fnm'
+      #- 'fnm' # Scoop
       - 'notepadplusplus'
       - 'mingw'
       - 'luarocks'
@@ -51,7 +85,7 @@ pkgs:
       - '7zip'
       #- 'aria2'
       #- 'neovim'
-      - 'bitwarden-cli'
+      #- 'bitwarden-cli' # Scoop
       - 'bitwarden'
       #- '1password'
       #- '1password-cli'
@@ -70,27 +104,27 @@ pkgs:
       #- 'lazygit'
       #- 'whkd' # Not available in Chocolatey
       #- 'yasb' # Not available in Chocolatey
-      - 'bat'
-      - 'delta'
-      - 'eza'
+      #- 'bat' # Scoop
+      #- 'delta' # Scoop
+      #- 'eza' # Scoop
       #- 'fastfetch'
-      - 'fd'
+      #- 'fd' # Scoop
       #- 'ffmpeg'
-      - 'fzf'
+      #- 'fzf' # Scoop
       - 'gh'
-      #- 'glow'
+      #- 'glow' # Scoop
       - 'gzip'
-      - 'jq'
+      #- 'jq' # Scoop
       - 'lazydocker'
-      #- 'ripgrep'
+      #- 'ripgrep' # Scoop
       #- 'sd'
       #- 'gsudo'
       - 'tldr'
       #- 'wakatime' # Desktop version not in Chocolatey
-      #- 'xh'
+      #- 'xh' # Scoop
       - 'yazi'
       - 'yq'
-      - 'zoxide'
+      #- 'zoxide' # Scoop
       #- 'topgrade' # Not available in Chocolatey
       - 'sysinternals'
       #- 'httrack'
@@ -103,7 +137,7 @@ pkgs:
       #- 'agg' # Not available in Chocolatey
       #- 'ascii-image-converter'
       #- 'neohtop' # Not available in Chocolatey
-      #- 'btop4win' # Not available in Chocolatey
+      #- 'btop4win' # Scoop (btop)
       - 'listary'
       #- 'powersession' # Not available in Chocolatey
       - 'direnv'
@@ -118,22 +152,25 @@ pkgs:
       - 'kubernetes-helm'
       #- 'kubetui' # Not available in Chocolatey
       #- 'ingress2gateway' # Not available in Chocolatey
-      - 'k9s'
+      #- 'k9s' # Scoop
       #- 'docker-desktop'
       - 'terraform'
       - 'fluxctl'
       #- 'xpipe' # Not available in Chocolatey
-      - 'gitleaks'
+      #- 'gitleaks' # Scoop
       - 'lsd'
       - 'devtoys'
       # Others
       - 'powertoys'
       - 'winscp'
-      - 'openssl'
+      #- 'openssl' # Scoop
       #- 'localsend' # Not available in Chocolatey
       #- 'onecommander' # Not available in Chocolatey
       - 'windirstat'
       #- 'gpgfrontend' # Not available in Chocolatey
+    # WinGet is for GUI apps and tools scoop doesn't carry. Installs run with
+    # --scope machine so portable CLIs share C:\Program Files\WinGet\Links
+    # instead of adding a per-package entry to the User PATH.
     winget:
       # Languages and Development (WinGet-only)
       - 'astral-sh.uv' # Not available in Chocolatey
@@ -141,7 +178,6 @@ pkgs:
       # Shells and Terminal (WinGet-only)
       - 'Eugeny.Tabby' # Not available in Chocolatey
       - 'Microsoft.PowerShell.Preview' # Not available in Chocolatey
-      - 'marlocarlo.psmux' # tmux for Windows
       - 'Zellij.Zellij' # Not available in Chocolatey
       #- 'Starship.Starship'
       #- 'Nushell.Nushell'
@@ -152,7 +188,6 @@ pkgs:
       #- 'AgileBits.1Password.CLI'
       - 'FilesCommunity.Files' # Not available in Chocolatey
       # CLI Tools (WinGet-only)
-      - 'Atuinsh.Atuin' # Better shell history
       #- 'alexpasmantier.television' # Not available in Chocolatey
       #- 'RamenSoftware.Windhawk' # Not available in Chocolatey
       #- 'AutoHotkey.AutoHotkey'
@@ -167,12 +202,9 @@ pkgs:
       - 'AmN.yasb' # Not available in Chocolatey
       #- 'fastfetch-cli.fastfetch'
       #- 'Gyan.FFmpeg'
-      #- 'charmbracelet.glow'
-      #- 'BurntSushi.ripgrep.MSVC'
       #- 'chmln.sd'
       #- 'gerardog.gsudo'
       #- 'Wakatime.DesktopWakatime' # Desktop version not in Chocolatey
-      #- 'ducaale.xh'
       #- 'topgrade-rs.topgrade' # Not available in Chocolatey
       #- 'XavierRoche.HTTrack'
       - 'Ombrelin.PandocGui' # Not available in Chocolatey
@@ -183,7 +215,6 @@ pkgs:
       - 'asciinema.agg' # Not available in Chocolatey
       #- 'TheZoraiz.ascii-image-converter'
       #- 'abdenasser.NeoHtop' # Not available in Chocolatey
-      #- 'aristocratos.btop4win' # Not available in Chocolatey
       - 'Watfaq.PowerSession' # Not available in Chocolatey
       - 'abhimanyu003.sttr' # Not available in Chocolatey
       # DevOps Tools (WinGet-only)

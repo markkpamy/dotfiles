@@ -45,8 +45,9 @@ The Windows dotfiles setup includes comprehensive automated package management u
 During `chezmoi apply`, you'll be prompted for package installation:
 
 ```
-Install Scoop packages? This may take some time [y/N]:
-Install Choco packages? This may take some time [y/N]:
+Install Scoop packages? This may take some time [Y/n]:
+Install WinGet packages? This may take some time [Y/n]:
+Install Choco packages? This may take some time [Y/n]:
 Install Python packages (pip and pipx)? This may take some time [y/N]:
 ```
 
@@ -56,18 +57,18 @@ Install Python packages (pip and pipx)? This may take some time [y/N]:
 
 ### Package Managers Used
 
-#### 🟦 **WinGet** (Always installed)
-Core development tools and system applications:
-- **Languages**: Git, Python, Node.js (via fnm)
-- **Development**: Neovim, Docker Desktop, AWS CLI, Azure CLI
-- **CLI Tools**: bat, eza, fd, fzf, ripgrep, delta, lazygit
-- **Productivity**: Windows Terminal, PowerToys, Obsidian
+#### 🟪 **Scoop** (Prompted, on by default)
+The default for portable CLI tools: if scoop's `main` or `extras` bucket has it, it goes here.
+- **Runtimes**: mise, fnm, bun
+- **CLI Tools**: bat, eza, fd, fzf, jq, ripgrep, delta, zoxide, xh, glow, hexyl, just, btop, git-cliff
+- **Shell**: atuin, psmux
+- **Other**: bitwarden-cli, age, aws-vault, openssl, gitleaks, k9s
+- Installs to the user directory (no admin required), and every app shares the single `~\scoop\shims` PATH entry
 
-#### 🟪 **Scoop** (Optional, prompted)
-Portable applications and CLI tools:
-- Focus on development tools and utilities
-- Installs to user directory (no admin required)
-- Easy package management and updates
+#### 🟦 **WinGet** (Prompted)
+GUI apps and tools scoop doesn't carry (uv, Tabby, Zellij, agg, sttr, PowerSession…).
+Installed with `--scope machine`, so portable packages share `C:\Program Files\WinGet\Links`.
+Avoid user-scope WinGet installs of CLI tools: each one adds its own ~100-char User PATH entry.
 
 #### 🍫 **Chocolatey** (Optional, prompted)  
 System-wide applications requiring admin privileges:
@@ -387,6 +388,19 @@ gpg --edit-key your-key-id
    refreshenv  # If using Chocolatey
    # Or restart PowerShell/Command Prompt
    ```
+
+   **Every tool from the User PATH is missing in new terminals** (`mise`, `bun`,
+   scoop shims… "not recognized", only system tools work): Machine + User PATH has
+   probably passed ~4095 chars, and Explorer dropped the User PATH when it reloaded
+   the environment. Check the length:
+   ```powershell
+   ([Environment]::GetEnvironmentVariable('Path','Machine') + ';' +
+    [Environment]::GetEnvironmentVariable('Path','User')).Length
+   ```
+   Fix it by moving per-package entries (user-scope WinGet portables especially) to
+   scoop. Signing out and back in also restores it until the next PATH change.
+   Also check what launched the terminal: a long-running launcher (Everything,
+   PowerToys Run…) passes on its own stale environment to anything it starts.
 
 3. **Package installation fails:**
    - Check internet connection

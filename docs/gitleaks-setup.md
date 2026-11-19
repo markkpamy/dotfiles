@@ -26,7 +26,7 @@ This configuration adds gitleaks as a pre-commit hook to prevent secrets from be
 
 Gitleaks will be automatically installed through your package managers:
 
-- **Windows**: Installed via winget (`Gitleaks.Gitleaks`)
+- **Windows**: Installed via Scoop (`gitleaks`)
 - **Linux**: Installed via the official installation script
 - **macOS**: Installed via Homebrew (`gitleaks`)
 

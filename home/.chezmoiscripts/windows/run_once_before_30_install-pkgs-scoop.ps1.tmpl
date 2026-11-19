@@ -34,6 +34,10 @@ scoop install '{{ $pkg }}'
   {{ end }}
 {{ end }}
 
+{{ template "powershell/path-check.ps1" . }}
+# Some manifests (openssl, bun) add their own PATH entry
+Optimize-UserPath
+
 {{ if .pkgs.windows.scoop.importRegistry }}
 Write-Host 'IMPORTING SCOOP REGISTRY...'
 {{ range $reg := .pkgs.windows.scoop.importRegistry }}

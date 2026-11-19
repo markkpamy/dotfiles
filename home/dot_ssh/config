@@ -29,7 +29,7 @@ Host forgejo
   Port 222
   User git
 
-# --- Proxmox guests (node pve), generated 2026-11-07 ---
+# --- Proxmox guests (node pve), generated 2026-11-15 ---
 # unknown224 is used; test-lxc has no such account, so it stays root.
 # talos-plane-1 (VM 102) is not listed: Talos has no SSH.
 Host docker-apps-cifs
@@ -40,8 +40,12 @@ Host radarr-anime
   HostName 192.168.1.76
   User unknown224
 
-Host stirling-pdf
-  HostName 192.168.1.106
+Host bentopdf
+  HostName 192.168.1.27
+  User unknown224
+
+Host pricebuddy
+  HostName 192.168.1.102
   User unknown224
 
 Host sonarr-anime
@@ -110,10 +114,6 @@ Host jackett
 
 Host archivebox
   HostName 192.168.1.100
-  User unknown224
-
-Host whois
-  HostName 192.168.1.98
   User unknown224
 
 Host jellyfin

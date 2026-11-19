@@ -17,3 +17,6 @@ $SetupEnv = @{
 $SetupEnv.GetEnumerator() | ForEach-Object {
   [System.Environment]::SetEnvironmentVariable($_.Key, $_.Value, [System.EnvironmentVariableTarget]::User)
 }
+
+{{ template "powershell/path-check.ps1" . }}
+Optimize-UserPath

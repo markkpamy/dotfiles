@@ -153,9 +153,9 @@ During the initial setup, you'll be prompted for:
 - **Package installation**: Python packages via pip/pipx and modern UV/UVX
 
 ### 🪟 **Windows**  
-- **Scoop packages**: Development tools, CLI utilities
+- **Scoop packages**: Portable CLI tools (default for anything scoop carries)
 - **Chocolatey packages**: Additional Windows applications
-- **WinGet packages**: Microsoft Store and system tools
+- **WinGet packages**: GUI apps and tools scoop doesn't carry (machine scope)
 - **Python packages**: Development tools and CLI applications via pip/pipx and UV/UVX
 
 ### 🔐 **Both Platforms**
@@ -269,9 +269,15 @@ This dotfiles setup includes comprehensive package management across platforms:
 ### Windows Packages
 
 **Automatically installed via:**
-- **WinGet**: Core development tools (Git, Python, Neovim, Docker, Kubernetes tools)
-- **Scoop**: CLI utilities and portable apps (optional, user-prompted)
+- **Scoop**: Portable CLI tools (bat, fd, rg, fzf, jq, atuin, bun, mise…), user-prompted, on by default
+- **WinGet**: GUI apps and tools scoop doesn't carry, installed machine-wide (user-prompted)
 - **Chocolatey**: Additional Windows applications (optional, user-prompted)
+
+> **Keep CLI tools on scoop.** Scoop exposes every app through one `~\scoop\shims`
+> PATH entry. User-scope WinGet portable installs add a ~100-char entry per
+> package, and once Machine + User PATH passes ~4095 chars Explorer silently
+> drops the whole User PATH on the next environment refresh. The env-vars and
+> scoop setup scripts dedupe the User PATH and warn when it gets close.
 - **PowerShell Gallery**: PowerShell modules (PSReadLine, Terminal-Icons, posh-git)
 
 **Key packages include:**
